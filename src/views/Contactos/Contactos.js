@@ -30,12 +30,12 @@ class Contactos extends Component {
                         class="card-user text-dark"
                         colLg="3" colMd="6" colSm="6" colXs="12"
                         contenidoHeader={
-                          <CardImg top width="100%" src={item.img} alt={`Imagen: ${item.nombre}`} title={item.nombre} />
+                          <CardImg top width="100%" src={item.img} alt={`Imagen: ${item.name}`} title={item.name} />
                         }
                         contenidoBody={
                           <>
                             <Link to={item.path}  >
-                              <h5 className="title">{item.nombre}</h5>
+                              <h5 className="title">{item.name}</h5>
                             </Link>
                             <p className="description">Leyenda del Item</p>
                             <p className="description text-center">

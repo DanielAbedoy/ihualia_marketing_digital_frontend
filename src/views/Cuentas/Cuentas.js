@@ -9,11 +9,12 @@ class Cuentas extends Component{
           <Col xs="12">
             <Card>
               <CardHeader>
-                <i className="fa fa-briefcase"></i>
-                <strong>Cuentas</strong>
+                <p className="h3 m-3"><i class="fa fa-briefcase" ></i> Mis Cuentas |</p>
               </CardHeader>
               <CardBody>
-                <h3>Listado de Cuentas</h3>
+                
+                  
+
               </CardBody>
             </Card>
           </Col>

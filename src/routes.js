@@ -2,6 +2,7 @@ import React from 'react';
 
 //Contactos
 import routes_contactos from './views/Contactos/items';
+import routes_cuentas from './views/Cuentas/items';
 
 const Inicio = React.lazy(()=> import('./views/Inicio'));
 const Perfil = React.lazy(()=> import('./views/Perfil'));
@@ -23,7 +24,7 @@ const routes_ini = [
   { path: '/inicio', name:'Inicio', component: Inicio},
   { path: '/perfil', name:'Mi Perfil', component: Perfil},
   { path: '/empresa', name:'Empresa', component: Empresa},
-  { path: '/cuentas', name:'Cuentas', component: Cuentas},
+  { path: '/cuentas', exact: true, name:'Cuentas', component: Cuentas},
   { path: '/usuarios', name:'Usuarios', component: Usuarios},
   { path: '/contactos', exact:true, name:'Contactos', component: Contactos},
   { path: '/emailmarketing', name:'eMail Marketing', component: Email},
@@ -35,7 +36,7 @@ const routes_ini = [
   { path: '/soporte', name: 'Redes Sociales', component: Soporte },
 ];
 
-const routes =  [...routes_ini, ...routes_contactos];
+const routes =  [...routes_ini, ...routes_contactos,...routes_cuentas];
 
 
 

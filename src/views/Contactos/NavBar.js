@@ -16,14 +16,14 @@ const NavBar = (props) => {
        <Row>
         <Col md="12" xs="12">
           <Navbar color="light" light expand="md">
-            <NavbarBrand><p className="h3">Contactos |</p></NavbarBrand>
+            <NavbarBrand><p className="h3"><i className="fa fa-users"></i> Contactos |</p></NavbarBrand>
             <NavbarToggler onClick={toggle} />
             <Collapse isOpen={isOpen} navbar>
               <Nav navbar>
                 {items.map((item, indx) => {
                   return (
                       <NavItem className="h5 ml-3 mr-3" key={indx}>
-                        <Link to={item.path}>{item.nombre}</Link>
+                        <Link to={item.path}>{item.name}</Link>
                       </NavItem>
                   );
                 })}
