@@ -3,9 +3,7 @@ import { Button, Card, CardBody, CardFooter, Col, Container, Form, Input, InputG
 import { Redirect } from 'react-router-dom';
 import user_images from '../../../components/UserImages.js';
 
-//Importacion de axos para las peticiones
-import axios from 'axios';
-
+import Modelo from '../../../models/Marketing.js';
 class Register extends Component {
 
   //Constructor de la clase Register
@@ -13,6 +11,7 @@ class Register extends Component {
     super(props);
     this.validar = this.validar.bind(this);
     this.store = require('store');
+    this.model = new Modelo();
 
     //State de la clase que almacena los valores del formulario
     this.state = {
@@ -100,41 +99,37 @@ class Register extends Component {
   crear = () => {
     
     //Objeto de los datos que se enviara con el Post
-    const datos = {
-      correo: this.state.correo,
-      usuario: this.state.usuario,
-      password: this.state.passw1,
+    const datos_cliente = {
       nombre: this.state.nombre,
       razon_social: this.state.razon,
       direccion: this.state.direccion,
       telefono: this.state.telefono,
       dominio: this.state.dominio,
       giro: this.state.giro,
-      imagen: this.state.imagen
-    }
+    };
 
-    //Peticion Post para crear el nuevo usuario
-    axios.post("http://localhost:8000/api/usuario/", datos)
-      .then(res => {
-        
-        //Se creo con exito
-        if (res.status === 201) {
-          alert("Ha sido creado con éxito!");
-          let path = `/login`;
-          this.props.history.push(path);
-        //Ocurrio un error
+    const datos_usuario = {
+      correo: this.state.correo,
+      usuario: this.state.usuario,
+      password: this.state.passw1,
+      nombre: this.state.nombre,
+      tipo: "Administrador",
+      estatus:"Activo",
+      imagen: this.state.imagen,
+      id_cliente: 0,
+    };
+
+    //Creando el cliente y en seguida el usuario
+    this.model.nuevo_cliente(datos_cliente,datos_usuario)
+      .then((r)=>{
+        if (r.statusText === 'Created') {
+          alert("Creado correctamente");
+          this.setState({redirect:true})
         } else {
-          alert("Ha ocurrido un error en el proceso");
-          let path = `/register`;
-          this.props.history.push(path);
+          alert("Asegurate que el campo de correro electrónico esté correcto o que el campo de Dominio inicie con: http://www.");
         }
+      })
         
-      })
-      //Si falla la peticion
-      .catch(error => {
-        alert("Asegurate que el campo de correro electrónico esté correcto o que el campo de Dominio inicie con: http://www.");
-      })
-      
 
   }
 

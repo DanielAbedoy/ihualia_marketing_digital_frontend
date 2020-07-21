@@ -17,12 +17,18 @@ const defaultProps = {};
 class DefaultHeader extends Component {
 
   state = {
-      datosUser: {}
+    datosUser: {},
+    cuenta_en_uso: {
+      nombre:""
+    }
+      
+    
   }
 
 
   componentDidMount() {
     this.getUserData();
+    this.get_cuenta_en_uso();
   }
 
   //Obtnener datos del User
@@ -37,6 +43,11 @@ class DefaultHeader extends Component {
     this.setState({
       datosUser: datos
     })
+  }
+
+  get_cuenta_en_uso = () => {    
+    let cuenta = require('store').get('cuenta_en_uso');
+    if (cuenta !== undefined) this.setState({ cuenta_en_uso: cuenta });
   }
 
   render() {
@@ -55,7 +66,7 @@ class DefaultHeader extends Component {
 
         <Nav className="d-md-down-none" navbar>
           <NavItem className="px-3">
-            <strong>Cuenta:</strong> Samsung Mexicana<Badge href="#/cuentas" className="ml-1" color="warning">Cambiar</Badge>
+            <strong>Cuenta:</strong> {this.state.cuenta_en_uso.nombre} <Badge href="#/cuentas" className="ml-1" color="warning">{this.state.cuenta_en_uso.nombre == "" ? "Seleccionar" : "Cambiar"}</Badge>
           </NavItem>
         </Nav>
 

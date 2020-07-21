@@ -56,7 +56,6 @@ class DefaultLayout extends Component {
         redirec: false,
       })
     }
-    
   }
 
   //Funcion para redireccionar por si no se ha iniciado secion
