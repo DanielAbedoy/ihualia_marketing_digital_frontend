@@ -24,6 +24,7 @@ class Administrar extends Component {
 
 
   componentDidMount = () => {
+    if (require('store').get('usuario_guardado').tipo.toLowerCase() !== "administrador") this.props.history.pus('/usuarios');
     try {
 
       let user = this.props.location.state;

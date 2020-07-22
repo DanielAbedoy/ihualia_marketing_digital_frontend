@@ -21,6 +21,9 @@ class Administrar extends Component {
 
 
   componentDidMount = () => {
+    
+    if (require('store').get('usuario_guardado').tipo.toLowerCase() !== "administrador") this.props.history.push('/cuentas');
+    
     try {
 
       new Modelo().get_cuenta(this.props.location.state.id_cuenta)
@@ -59,8 +62,10 @@ class Administrar extends Component {
   desactivar_activar = (e) => {
     e.preventDefault();
 
-    if ((require('store').get('cuenta_en_uso').id + "") === e.target.id) {
-      return alert("No puedes desactivar esta cuenta porque está en uso");
+    if ((require('store').get('cuenta_en_uso') !== undefined)) {
+      if ((require('store').get('cuenta_en_uso').id + "") === e.target.id) {
+        return alert("No puedes desactivar esta cuenta porque está en uso");
+      }  
     }
 
     const estatus = this.state.cuenta.estatus.toLowerCase() === "activo" ? "Inactivo" : "Activo";

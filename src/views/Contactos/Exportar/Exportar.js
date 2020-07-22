@@ -29,9 +29,18 @@ class Exportar extends Component {
         }
 
         this.grupoId = 0;
-        this.cuenta = 1;
+        this.cuenta = 0;
         this.modelo = new Contactos();
         this.variables = new Variables();
+    }
+
+    componentDidMount = () => {
+        if ((require('store').get('cuenta_en_uso') === undefined)) {
+            alert("Debes tener una cuenta en uso");
+            this.props.history.push('/contactos');
+        } else {
+            this.cuenta = require('store').get('cuenta_en_uso').id 
+        }
     }
 
     //Funcion para cargar el archivo y acomodarlos datos en la tabla
@@ -285,6 +294,9 @@ class Exportar extends Component {
         );
     }
 
+    send_export_data = datos => this.setState({ exportData: datos });
+    
+
     //Componente importacion
     exportar = () => {
         return (
@@ -315,6 +327,7 @@ class Exportar extends Component {
                                 sendCampos={(campos_prin, campos_ex, ) => {
                                     this.setState({ campos: campos_prin, campos_extra: campos_ex })
                                 }}
+                                send_export_data={this.send_export_data}
                             />
                         </Col>
                     </Row>
@@ -336,9 +349,9 @@ class Exportar extends Component {
                         data={this.state.exportData}
                         filename={`Contactos_Grupo_Clave_${this.grupoId}.csv`}
                         className="btn btn-primary"
-                        onClick={() => {
+                        /* onClick={() => {
                             this.setState({ exportData: [...[this.state.campos], ...this.tabla.getDatosBody()] })
-                        }}
+                        }} */
                     >
                         Descargar
                     </CSVLink>

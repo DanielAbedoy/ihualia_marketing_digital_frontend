@@ -8,6 +8,11 @@ import Modelo from '../../../../models/Marketing';
 
 class CrearUsuario extends Component {
 
+
+  componentDidMount = () => {
+    if (require('store').get('usuario_guardado').tipo.toLowerCase() !== "administrador") this.props.history.pus('/usuarios');
+  }
+
   crear = () => {
     //Validar
     if (!this.validar_datos_usuario(this.formulario.get_datos())) return;

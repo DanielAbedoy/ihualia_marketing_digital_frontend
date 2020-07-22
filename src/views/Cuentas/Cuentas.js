@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-class Cuentas extends Component {
 
-  state = {
-    vista_option:'',
-  }
+import MisCuentas from './MisCuentas/MisCuentas.js';
+class Cuentas extends Component {
+ 
 
   render() {
     return (
-      <Redirect from="/cuentas" to="/cuentas/listado" />
+      <><MisCuentas
+        history={this.props.history}
+      /></>
     );
   }
+
 }
 export default Cuentas;

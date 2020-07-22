@@ -1,0 +1,152 @@
+import React, { Component } from 'react';
+import { Row, Col, Toast, ToastHeader, ToastBody, Button, Card, CardHeader, CardBody } from 'reactstrap';
+
+import NavBar from '../Administrador/navbar.js';
+import Modelo from '../../../models/Marketing.js';
+
+class MisCuentas extends Component {
+
+  //Si es admin(mostrar navbar)
+
+  state = {
+    tipo: '',
+    cuentas: []
+  }
+
+  //Conseguir las cuentas del usuario
+  componentDidMount = () => {
+
+    const user = require('store').get('usuario_guardado');
+    //MOSTRAR LAS CUENTAS DONDE COLABORA ESTE USUARIO
+    new Modelo().get_cuentas_usuario(user.correo)
+      .then((r) => {
+        let cuentas = [];
+        r.data.map((c) => {
+          new Modelo().get_cuenta(c.id_cuenta)
+            .then((r) => {
+              cuentas.push(r.data);
+              this.setState({ cuentas: cuentas,tipo:user.tipo })
+            })
+        })
+      })
+    
+  }
+
+  //Funcion para usar la cuenta seleccionada
+  usar_cuenta = (e) => {
+    e.preventDefault();
+
+    new Modelo().get_cuenta(e.target.id)
+      .then((r) => {
+        if (r.data.estatus.toLowerCase() !== "activo") {
+          alert("No puedes usar esta cuenta porque esta inactiva")
+        } else {
+          require('store').set('cuenta_en_uso', r.data);
+          this.props.history.push('/home'); 
+         
+        }
+      })
+  }
+
+
+  render() {
+    if (this.state.tipo.toLowerCase() == "administrador") { 
+      return (<>{this.componen_admin()}</>);
+    } else {
+      return (<>{this.componen_colaborador()}</>);
+    }
+  }
+
+  componen_admin = () => {
+    return (
+      <div className="animated fadeIn">
+        <Row>
+          <Col xs="12">
+            <Card>
+              <CardHeader>
+                <NavBar />
+              </CardHeader>
+              <CardBody>
+
+                <hr />
+                <Row>
+                  {this.state.cuentas.map((cuenta, indx) => {
+                    return (
+                      <Col key={indx} className="text-center text-dark mx-auto p-2 bg-info" lg="4" md="6" sm="6" xs="12">
+                        <Toast className="mx-auto">
+                          <ToastHeader>
+                            Clave de la Cuenta: {cuenta.id}
+                          </ToastHeader>
+                          <ToastBody>
+                            <b>Nombre:</b> {cuenta.nombre}<br />
+                            <b>Estatus:</b> <span className={cuenta.estatus.toLowerCase() == "activo" ? "text-success" : "text-danger"} >{cuenta.estatus}</span><br />
+                          </ToastBody>
+                          <Row>
+                            <Col className="p-2 mx-auto" md="6" xs="12">
+                              <Button id={cuenta.id} block color="primary" onClick={this.usar_cuenta}>Usar</Button>
+                            </Col>
+                          </Row>
+                        </Toast>
+                      </Col>
+                    );
+                  })}
+                </Row>
+
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+
+  componen_colaborador = () => {
+    return (
+      <div className="animated fadeIn">
+        <Row>
+          <Col xs="12">
+            <Card>
+              <CardHeader>
+                <p className="h3 p-2"><i className="fa fa-users"></i> Mis Cuentas |</p>
+              </CardHeader>
+              <CardBody>
+
+                <hr />
+                <Row>
+                  {this.state.cuentas.map((cuenta, indx) => {
+                    return (
+                      <Col key={indx} className="text-center text-dark mx-auto p-2 bg-info" lg="4" md="6" sm="6" xs="12">
+                        <Toast className="mx-auto">
+                          <ToastHeader>
+                            Clave de la Cuenta: {cuenta.id}
+                          </ToastHeader>
+                          <ToastBody>
+                            <b>Nombre:</b> {cuenta.nombre}<br />
+                            <b>Estatus:</b> <span className={cuenta.estatus.toLowerCase() == "activo" ? "text-success" : "text-danger"} >{cuenta.estatus}</span><br />
+                          </ToastBody>
+                          <Row>
+                            <Col className="p-2 mx-auto" md="6" xs="12">
+                              <Button id={cuenta.id} block color="primary" onClick={this.usar_cuenta}>Usar</Button>
+                            </Col>
+                            <Col className="p-2 mx-auto" md="6" xs="12">
+                              <Button id={cuenta.id} onClick={this.administrar_cuenta} block color="primary" >Administrar</Button>
+                            </Col>
+                          </Row>
+                        </Toast>
+                      </Col>
+                    );
+                  })}
+                </Row>
+
+              </CardBody>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+    );
+  }
+
+
+}
+
+export default MisCuentas;

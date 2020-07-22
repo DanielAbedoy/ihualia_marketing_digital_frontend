@@ -12,6 +12,10 @@ class Crear extends Component{
     nombre_cuenta:'',
   }
 
+  componentDidMount = () => {
+    if (require('store').get('usuario_guardado').tipo.toLowerCase() !== "administrador") this.props.history.push('/cuentas');
+  }
+
   crear = (e) => {
     e.preventDefault();
     //Validar //0 sin nombre - 1 sin usuarios - 2 sin cargos - 3 todo bien

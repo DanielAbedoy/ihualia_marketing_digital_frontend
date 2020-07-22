@@ -12,7 +12,7 @@ class Listado extends Component {
     this.user = require('store').get('usuario_guardado');
 
     this.state = {
-      
+
       vista_option: '',
       cuentas: [],  // JSON = id, nombre, tipo, estatus, id_cliente
     }
@@ -21,37 +21,21 @@ class Listado extends Component {
   //Conseguir las cuentas del usuario
   componentDidMount = () => {
 
-    if (this.user.tipo.toLowerCase() === "admistrador") {//CAMBIAR AQUI
-      //MOSTRAR TODAS LAS CUENTAS DEL CLIENTE(EMPRESA)
-      new Modelo().get_cuentas_cliente(this.user.id_cliente)
-        .then((r) => {
-          this.setState({cuentas: r.data.results})
-        })
+    if (this.user.tipo.toLowerCase() !== "administrador") this.props.history.push('/cuentas');
 
-
-    } else if (this.user.tipo.toLowerCase() === "colaborador") {
-       //MOSTRAR LAS CUENTAS DONDE COLABORA ESTE USUARIO
-       new Modelo().get_cuentas_usuario(this.user.correo)
+    new Modelo().get_cuentas_cliente(this.user.id_cliente)
       .then((r) => {
-        let cuentas = [];
-        r.data.map((c) => {
-          new Modelo().get_cuenta(c.id)
-            .then((r) => {
-              cuentas.push(r.data);
-              this.setState({ cuentas: cuentas })
-            })
-        })
+        this.setState({ cuentas: r.data.results })
       })
-    }
   }
 
   //Funcion para administrar la cuenta seleccionada
   administrar_cuenta = (e) => {
     e.preventDefault();
-    
+
     this.props.history.push({
       pathname: '/cuentas/administrar',
-      state: { 
+      state: {
         id_cuenta: e.target.id
       }
     });
@@ -71,9 +55,6 @@ class Listado extends Component {
           this.props.history.push('/home');
         }
       })
-
-    
-    
   }
 
 
@@ -90,18 +71,18 @@ class Listado extends Component {
 
                 <Row>
                   <Col lg="8" md="8" sm="6" xs="12">
-                    <p className="h4">Opciones</p>
+                    <p className="h4">Todas Las Cuentas</p>
                   </Col>
                   <Col lg="2" md="2" sm="3" xs="12" className="p-0">
                     <Button className="bg-transparent text-dark border border-white"
-                      onClick={()=>{this.setState({vista_option:'table'})}}
+                      onClick={() => { this.setState({ vista_option: 'table' }) }}
                     >
                       <i className="fa fa-table"></i>  Vista de Tabla
                     </Button>
                   </Col>
                   <Col lg="2" md="2" sm="3" xs="12" className="p-0">
                     <Button className="bg-transparent text-dark border border-white"
-                      onClick={()=>{this.setState({vista_option:'graphic'})}}
+                      onClick={() => { this.setState({ vista_option: 'graphic' }) }}
                     >
                       <i className="fa fa-eye"></i>  Vista Gráfica
                     </Button>
@@ -159,7 +140,7 @@ class Listado extends Component {
                         <td className={cuenta.estatus.toLowerCase() == "activo" ? "bg-success" : "bg-danger"} >{cuenta.estatus}</td>
                         <td className="m-0">
                           <i id={cuenta.id} onClick={this.usar_cuenta} className="fa fa-check-square-o border rounded bg-success p-1 mr-2" style={{ cursor: "pointer" }}></i>
-                          <i id={cuenta.id} onClick={this.administrar_cuenta} className="fa fa-cog border rounded bg-primary p-1 ml-2" style={{cursor:"pointer"}}></i>
+                          <i id={cuenta.id} onClick={this.administrar_cuenta} className="fa fa-cog border rounded bg-primary p-1 ml-2" style={{ cursor: "pointer" }}></i>
                         </td>
                       </tr>
                     );

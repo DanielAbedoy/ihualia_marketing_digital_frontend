@@ -17,11 +17,15 @@ class Example extends Component {
     }
 
     //Cuenta que esta siendo utilizada
-    this.cuenta = 1;
+    this.cuenta = 0;
 
   }
 
   componentDidMount() {
+    if ((require('store').get('cuenta_en_uso') !== undefined)) {
+      this.cuenta = require('store').get('cuenta_en_uso').id;
+    }
+    
     this.getGrupos();
   }
 

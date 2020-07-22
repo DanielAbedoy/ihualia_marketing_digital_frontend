@@ -27,14 +27,24 @@ class Crear extends Component {
             vals_extras: [],
         }
 
-        this.idCuenta = 1
-        this.cuenta = 1;
+        this.idCuenta = 0;
+        this.cuenta = 0;
         this.modelo = new ModeloContactos();
         this.variables = new Variables();
 
         this.setUsuarioTabla.bind(this);
         this.agregarContactos.bind(this)
 
+    }
+
+    componentDidMount=()=>{
+        if ((require('store').get('cuenta_en_uso') === undefined)) {
+            alert("Debes tener una cuenta en uso");
+            this.props.history.push('/contactos');
+        } else {
+            this.cuenta = require('store').get('cuenta_en_uso').id
+            this.idCuenta = require('store').get('cuenta_en_uso').id
+        }
     }
 
     getGrupos = () => {

@@ -177,6 +177,8 @@ class Marketing {
         return await peticion();
     }
 
+    
+
 }
 
 export default Marketing;

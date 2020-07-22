@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, CardHeader, CardBody, Row, Col, Navbar } from 'reactstrap';
+import { Card, CardHeader, CardBody, Row, Col } from 'reactstrap';
 
 import NavBar from '../navbar.js';
 import Modelo from '../../../../models/Marketing.js';
@@ -10,14 +10,17 @@ class ListadoUsuario extends Component {
     usuarios: []
   }
 
-  componentDidMount = () => this.peticion_usuarios();
+  componentDidMount = () => {
+    if (require('store').get('usuario_guardado').tipo.toLowerCase() !== "administrador") this.props.history.pus('/usuarios');
+    this.peticion_usuarios()
+  };
 
   peticion_usuarios = () => {
     new Modelo().get_usuarios_cliente(require('store').get('usuario_guardado').id_cliente)
       .then(r => this.setState({ usuarios: r }))
   }
 
-  administrar_cuenta = (e) => {
+  administrar_usuario = (e) => {
     new Modelo().getUsuario(e.target.id)
       .then(r => {
         this.props.history.push({
@@ -63,7 +66,7 @@ class ListadoUsuario extends Component {
                                 <td>{usuario.correo}</td>
                                 <td className={usuario.estatus.toLowerCase() == "activo" ? "bg-success" : "bg-danger"} >{usuario.estatus}</td>
                                 <td className="">
-                                  <i id={usuario.correo} onClick={this.administrar_cuenta} className="fa fa-cog border rounded bg-primary p-1" style={{ cursor: "pointer" }}></i>
+                                  <i id={usuario.correo} onClick={this.administrar_usuario} className="fa fa-cog border rounded bg-primary p-1" style={{ cursor: "pointer" }}></i>
                                 </td>
                               </tr>
                             );

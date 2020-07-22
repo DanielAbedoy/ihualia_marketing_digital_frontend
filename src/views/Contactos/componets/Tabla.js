@@ -41,6 +41,10 @@ class Tabla extends Component {
         return this.state.datosBody;
     }
 
+    get_datos_export = () => {
+        return [...this.state.header, ...this.state.datosBody];
+    };
+
     //Funcion para dar los headers de la tabla
     getDatosTablaHeader = (id_grupo, shift = false, only_header = false ) => {
         //Validacion
@@ -83,7 +87,7 @@ class Tabla extends Component {
     }
 
      //Funcion para acomodar los datos de los usuarios para la tabla
-     getDatosTablaBody = (id_grupo) => {
+    getDatosTablaBody = (id_grupo) => {
         //Contactos de La tabal
         const informacion = []
         this.modelo.getContactosDelGrupo(id_grupo)
@@ -125,7 +129,11 @@ class Tabla extends Component {
                                     }
                                 }
                             });
-                            this.setState({ datosBody: body,sty:{maxHeight:400}});
+                            this.setState({ datosBody: body, sty: { maxHeight: 400 } }, () => {
+                                if (this.props.send_export_data !== undefined) {
+                                    this.props.send_export_data([this.state.header, ...this.state.datosBody]);
+                                }
+                            });
                         })
                 });
             })

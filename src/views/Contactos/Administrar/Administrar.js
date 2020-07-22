@@ -22,7 +22,7 @@ class Administrar extends Component {
             valores: [],
         }
 
-        this.cuenta = 1;
+        this.cuenta = 0;
         this.modelo = new Modelo();
         this.variables = new Variables();
         this.usuarioSeleccionado = [];
@@ -30,6 +30,14 @@ class Administrar extends Component {
 
     //DidMount para saver si se paso un usuario por parametros
     componentDidMount() {
+
+        if ((require('store').get('cuenta_en_uso') === undefined)) {
+            alert("Debes tener una cuenta en uso");
+            this.props.history.push('/contactos');
+        } else {
+            this.cuenta = require('store').get('cuenta_en_uso').id
+        }
+
         try {
 
             const user = this.props.location.state.usuario;

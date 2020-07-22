@@ -7,12 +7,22 @@ import Tabla from '../componets/Tabla.js';
 
 class ListaContactos extends Component {
 
-    cuenta = 1;
+
     grupoId = 0;
 
     state = {
         campos: [],
-        grupos:[]
+        grupos: [],
+        cuenta: 0,
+    }
+
+    componentDidMount = () => {
+        if ((require('store').get('cuenta_en_uso') === undefined)) {
+            alert("Debes tener una cuenta en uso");
+            this.props.history.push('/contactos');
+        } else {
+            this.setState({ cuenta: require('store').get('cuenta_en_uso').id })
+        }
     }
 
     //Funcion para saber el grupo que esta seleccionado
@@ -61,7 +71,7 @@ class ListaContactos extends Component {
                                             ref={element => { this.tabla = element }}
                                             option={'GET'}
                                             action={this.setSeleccionado}
-                                            sendCampos={(campos_prin,campos_ex)=>{this.setState({campos:campos_prin})}}
+                                            sendCampos={(campos_prin, campos_ex) => { this.setState({ campos: campos_prin }) }}
                                         />
                                     </Col>
                                 </Row>
