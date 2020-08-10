@@ -43,7 +43,7 @@ class Usuarios extends Component {
                   <p className="h3 p-2"><i className="fa fa-users"></i> Usuarios |</p>
                 </CardHeader>
                 <CardBody>
-
+                  <p className="h4">Todos Los Usuarios</p><hr/>
                   <Row>
                     <Col md="12">
                       <div className={"table-responsive table-bordered table-hover"} >

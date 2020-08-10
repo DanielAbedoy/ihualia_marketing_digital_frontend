@@ -4,6 +4,7 @@ import React from 'react';
 import routes_contactos from './views/Contactos/items';
 import routes_cuentas from './views/Cuentas/Administrador/items';
 import routes_usuarios_admin from './views/Usuarios/Administrador/items';
+import routes_eventos from './views/Eventos/items';
 
 const Inicio = React.lazy(()=> import('./views/Inicio'));
 const Perfil = React.lazy(()=> import('./views/Perfil'));
@@ -30,14 +31,14 @@ const routes_ini = [
   { path: '/contactos', exact:true, name:'Contactos', component: Contactos},
   { path: '/emailmarketing', name:'eMail Marketing', component: Email},
   { path: '/redessociales', name:'Redes Sociales', component: Redes},
-  { path: '/encuestas', name:'Redes Sociales', component: Encuestas},
-  { path: '/eventos', name:'Redes Sociales', component: Eventos},
+  { path: '/encuestas', name:'Encuentas', component: Encuestas},
+  { path: '/eventos',exact:true, name:'Eventos', component: Eventos},
   { path: '/campanas', name:'Redes Sociales', component: Campanas},
   { path: '/reportes', name:'Redes Sociales', component: Reportes},
   { path: '/soporte', name: 'Redes Sociales', component: Soporte },
 ];
 
-const routes =  [...routes_ini, ...routes_contactos,...routes_cuentas,...routes_usuarios_admin];
+const routes =  [...routes_ini, ...routes_contactos,...routes_cuentas,...routes_usuarios_admin, ...routes_eventos];
 
 
 

@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
 import { Card, CardBody, CardHeader, Col, Row } from 'reactstrap';
 
+import NavBar from './components/NavBar.js';
+
 class Eventos extends Component{
   render(){
     return(
@@ -9,8 +11,7 @@ class Eventos extends Component{
           <Col xs="12">
             <Card>
               <CardHeader>
-                <i className="cui-calendar"></i>
-                <strong>Eventos</strong>
+                <NavBar />
               </CardHeader>
               <CardBody>
                 <h3>Eventos</h3>

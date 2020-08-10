@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { HashRouter, Route, Switch} from 'react-router-dom';
 import "bootswatch/dist/flatly/bootstrap.min.css";
 import './App.scss';
+import './index.css';
+
 
 import Load from './components/Load.js';
 

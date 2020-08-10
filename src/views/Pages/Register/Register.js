@@ -42,7 +42,7 @@ class Register extends Component {
       return(
         <Redirect
             to={{
-              pathname: "/inicio",
+              pathname: "/login",
             }}
         />  
       )

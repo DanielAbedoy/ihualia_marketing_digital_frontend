@@ -25,11 +25,11 @@ class MisCuentas extends Component {
           new Modelo().get_cuenta(c.id_cuenta)
             .then((r) => {
               cuentas.push(r.data);
-              this.setState({ cuentas: cuentas,tipo:user.tipo })
+              this.setState({ cuentas: cuentas })
             })
         })
       })
-    
+    this.setState({tipo:user.tipo})
   }
 
   //Funcion para usar la cuenta seleccionada
@@ -67,7 +67,7 @@ class MisCuentas extends Component {
                 <NavBar />
               </CardHeader>
               <CardBody>
-
+                <p className="h4">Mis Cuentas</p>
                 <hr />
                 <Row>
                   {this.state.cuentas.map((cuenta, indx) => {

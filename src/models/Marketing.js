@@ -177,6 +177,14 @@ class Marketing {
         return await peticion();
     }
 
+    get_cliente = async (id_cliente) => {
+        const peticion = () => {
+            return axios.get(`${this.urls.getUrlPrincipal()}/api/cliente/${id_cliente}/`)
+                .then(r => r.data)
+                .catch(e=>e)
+        }
+        return await peticion();
+    }
     
 
 }

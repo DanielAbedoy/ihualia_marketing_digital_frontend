@@ -17,7 +17,10 @@ class ListadoUsuario extends Component {
 
   peticion_usuarios = () => {
     new Modelo().get_usuarios_cliente(require('store').get('usuario_guardado').id_cliente)
-      .then(r => this.setState({ usuarios: r }))
+      .then(r => {
+        console.log(r)
+        this.setState({ usuarios: r })
+      })
   }
 
   administrar_usuario = (e) => {
@@ -43,7 +46,7 @@ class ListadoUsuario extends Component {
 
               </CardHeader>
               <CardBody>
-
+              <p className="h4">Todos Los Usuarios</p><hr/>
                 <Row>
                   <Col md="12">
                     <div className={"table-responsive table-bordered table-hover"} >
