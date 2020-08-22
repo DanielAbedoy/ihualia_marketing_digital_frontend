@@ -46,10 +46,6 @@ class InformacionBasica extends Component {
 
   }
 
-  show_tipos = e => {
-    console.log("Encima")
-  }
-
   validar = () => {
     //Datos iniciales
     const cate = document.getElementById("cbox_categoria").value;

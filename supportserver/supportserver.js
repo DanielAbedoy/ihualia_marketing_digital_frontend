@@ -6,12 +6,11 @@ const app = express();
 //Ajustes
 app.set('port', process.env.PORT || 4000);
 app.use(cors());
-app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 
 //Rutas
-app.use('/eventos', require('./rutas/evento'));
+app.use('/ev', require('./rutas/evento'));
 //app.use('/evento', require('./rutas/load_image'));
 
 

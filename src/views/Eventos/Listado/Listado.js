@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { Component, useEffect } from 'react';
 import { Card, CardBody, CardHeader, Col, Row, Input, Button, Badge, Collapse } from 'reactstrap';
 
+import modelo from '../../../models/Eventos';
 
 import NavBar from '../components/NavBar.js';
 
 class Listado extends Component {
-
 
   render() {
     return (
@@ -17,7 +17,8 @@ class Listado extends Component {
                 <NavBar />
               </CardHeader>
               <CardBody>
-                Gestionar
+
+                Listado
               </CardBody>
             </Card>
           </Col>

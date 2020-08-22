@@ -7,7 +7,7 @@ class Video extends React.Component {
   state = {
     id: '',
     opts: {
-      height: '240px',
+      height: '250px',
       width: '100%',
       playerVars: { autoplay: 1, }
     },
@@ -16,6 +16,7 @@ class Video extends React.Component {
   }
 
   setURL = (e) => {
+    e.preventDefault();
     try {
       let video_id = e.target.value.split('v=')[1];
       let ampersandPosition = video_id.indexOf('&');
@@ -36,7 +37,8 @@ class Video extends React.Component {
     if (this.props.indx) {
       this.props.valores[this.props.indx] = {
         tipo_component: 'video',
-        valor: valor
+        valor: valor,
+        posicion: this.props.indx
       }
     }
   }

@@ -10,12 +10,6 @@ class ImageUpload extends Component {
       complete_file: ''
     };
     this._handleImageChange = this._handleImageChange.bind(this);
-    this._handleSubmit = this._handleSubmit.bind(this);
-  }
-
-  _handleSubmit(e) {
-    e.preventDefault();
-    // TODO: do something with -> this.state.file
   }
 
   _handleImageChange(e) {
@@ -36,7 +30,8 @@ class ImageUpload extends Component {
     if (this.props.indx) {
       this.props.valores[this.props.indx] = {
         tipo_component: 'imagen',
-        valor: file
+        valor: file,
+        posicion: this.props.indx
       }
     }
 

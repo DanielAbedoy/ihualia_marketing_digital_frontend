@@ -4,6 +4,7 @@ import axios from 'axios';
 
 import Evento_Model from '../../../models/Eventos.js'
 
+
 import NavBar from '../components/NavBar.js';
 import InformacionBasica from './InformacionBasica/InformacionBasica.js'
 import Ubicacion from './Ubicacion/Ubicacion.js'
@@ -13,6 +14,11 @@ import Boletos from './Boletos/Boletos.js'
 
 class Crear extends Component {
 
+
+  componentDidMount = () => window.onbeforeunload = () => '';
+  
+
+  componentWillUnmount = () => window.onbeforeunload = () => { };
 
   validar = e => {
     e.preventDefault();
@@ -33,15 +39,14 @@ class Crear extends Component {
         }
       }
     }
-
-
   }
-
 
   crear_evento = (datos_basicos, datos_ubicacion, datos_horas, datos_detalles,boletos) => {
 
+    const id_cliente = require('store').get('usuario_guardado').id_cliente;
+    const id_cuenta = require('store').get('cuenta_en_uso').id;
     //Subir la imagen del evento en el servidor
-    new Evento_Model().upluad_image_principal( require('store').get('usuario_guardado').id_cliente,require('store').get('cuenta_en_uso').id,datos_detalles.imagen)
+    new Evento_Model().upluad_image_principal(id_cliente,id_cuenta,datos_detalles.imagen)
       .then(r => {
         //Crear info básica(nombre, tipo, categoria, sub_categoria, tipo_ubicacion,fecha_hora_inicio,fecha_hora_fin,zona_horaria,imagen,resumen,cuenta)
         return {
@@ -50,21 +55,15 @@ class Crear extends Component {
           fecha_hora_inicio: datos_horas.fecha_hora_inicio, fecha_hora_fin: datos_horas.fecha_hora_fin,
           zona_horaria: datos_horas.zona_horaria,
           directorio_imagen: r.directorio, nombre_imagen: r.nombre,
-          resumen: datos_detalles.resumen, id_cuenta: require('store').get('cuenta_en_uso').id,
+          resumen: datos_detalles.resumen, id_cuenta: id_cuenta
         }
       })
       .then(datos => new Evento_Model().crear_evento(datos))
       .then(r => r.data)
       .then(evento => {
 
-        this.InformacionBasica.reiniciar();
-        this.fecha_hora.reiniciar();
-
         //Verificar si existen etiquetas
-        datos_basicos.etiquetas.forEach(etiqueta => {
-          new Evento_Model().add_etiqueta_evento(etiqueta,evento.id)
-            .then(r => r)    
-        });
+        this.agregar_etiquetas(datos_basicos, evento.id);
 
         //Crear la ubicacion Lugar() Online()
         if (datos_ubicacion.tipo_ubicacion === 'lugar') {
@@ -78,25 +77,26 @@ class Crear extends Component {
         }
 
         //Comprovar si existen items imagenes, parrafos, videos
+        const len = datos_detalles.componentes.length -1;
         if(datos_detalles.componentes.length === 0) this.detalles.reiniciar();
         datos_detalles.componentes.forEach((c,i) => {
           if (c.valor !== '') {
           
             if (c.tipo_component === "parrafo") {//Parrafo
-              new Evento_Model().add_parrafo_evento(evento.id, c.valor).then(r => {
-                if (i === (datos_detalles.componentes.length - 1)) this.detalles.reiniciar();
+              new Evento_Model().add_parrafo_evento(evento.id, c.valor,c.posicion).then(r => {
+                if (i === len) this.detalles.reiniciar();
               });
             } else if (c.tipo_component === "imagen") {//Imagen
-              new Evento_Model().upluad_image_extra(require('store').get('usuario_guardado').id_cliente, require('store').get('cuenta_en_uso').id, evento.id, c.valor)
-                .then(r => {
-                  new Evento_Model().add_imagen_evento(evento.id, r.directorio, r.nombre).then(r => {
-                    if (i === (datos_detalles.componentes.length - 1)) this.detalles.reiniciar();
+              new Evento_Model().upluad_image_extra(id_cliente, id_cuenta, evento.id, c.valor)
+                .then(res => {
+                  new Evento_Model().add_imagen_evento(evento.id, res.directorio, res.nombre,c.posicion).then(r => {
+                    if (i === len) this.detalles.reiniciar();
                   });
                 })
 
             } else if (c.tipo_component === "video") {//Video
-              new Evento_Model().add_video_evento(evento.id, c.valor).then(r => {
-                if (i === (datos_detalles.componentes.length - 1)) this.detalles.reiniciar();
+              new Evento_Model().add_video_evento(evento.id, c.valor,c.posicion).then(r => {
+                if (i === len) this.detalles.reiniciar();
               });
             }
           }
@@ -116,11 +116,18 @@ class Crear extends Component {
         })
         alert("Agregado correctamente");
         window.scrollTo(0, 0);
-        
+        this.InformacionBasica.reiniciar();
+        this.fecha_hora.reiniciar();
 
       })
       .catch(console.log)
 
+  }
+
+  agregar_etiquetas = (datos_basicos,id_evento) => {
+    datos_basicos.etiquetas.forEach(etiqueta => {
+      new Evento_Model().add_etiqueta_evento(etiqueta, id_evento).then(r=>r);
+    });
   }
 
   render() {
@@ -178,6 +185,7 @@ class Crear extends Component {
                 <Row>
                   <Col md="5" xs="12" className="mx-auto p-0">
                     <Button block color="success"
+                      type="button"
                       onClick={this.validar}
                     > Crear Evento </Button>
                   </Col>

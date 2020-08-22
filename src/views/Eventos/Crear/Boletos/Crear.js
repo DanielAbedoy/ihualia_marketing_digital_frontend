@@ -76,13 +76,13 @@ class Crear extends Component {
 
               <span className="h5">Cantidad de boletos en venta al público</span><br />
               <Input className="mt-2" type="number"
-                id="txt_cantidad"
+                id="txt_cantidad" min="1" max="10000000"
                 onChange={e => this.setState({ cantidad: e.target.value })}
               /><br />
 
               <span className="h5">Precio</span><br />
               <Input className="mt-2" type="number"
-                id="txt_precio"
+                id="txt_precio" 
                 placeholder={this.state.tipo_boleto === 'pago' ? "$ 0,00" : this.state.tipo_boleto === "gratis" ? "Gratis" : "Los aistentes puden donar lo que deseen"}
                 disabled={this.state.tipo_boleto === 'pago' ? false : true}
                 onChange={e => this.setState({ precio: e.target.value })}
@@ -97,13 +97,13 @@ class Crear extends Component {
 
               <span className="h5">Cantidad mínima de boletos por pedido</span><br />
               <Input className="mt-2" type="number"
-                id="txt_cantidad_minima"
+                id="txt_cantidad_minima" min="1" max={this.state.cantidad}
                 onChange={e => this.setState({ cantidad_minima: e.target.value })}
               /><br />
 
               <span className="h5">Cantidad máxima de boletos por pedido</span><br />
               <Input className="mt-2" type="number"
-                id="txt_cantidad_maxima"
+                id="txt_cantidad_maxima" min="1" max={this.state.cantidad}
                 onChange={e => this.setState({ cantidad_maxima: e.target.value })}
               /><br />
 

@@ -8,17 +8,17 @@ import {
 } from "react-google-maps";
 
 // reactstrap components
-import { Row, Col} from "reactstrap";
+import { Row, Col } from "reactstrap";
 
 
-const MapWrapper = withScriptjs(
+const MapWrapper = 
   withGoogleMap(props => (
     <GoogleMap
-      defaultZoom={13}
-      defaultCenter={{ lat: props.lat, lng:props.lng }}
+      defaultZoom={15}
+      defaultCenter={{ lat: props.lat, lng: props.lng }}
       defaultOptions={{
         scrollwheel: true,
-        disableDefaultUI:true,
+        disableDefaultUI: true,
         styles: [
           {
             featureType: "water",
@@ -97,7 +97,7 @@ const MapWrapper = withScriptjs(
     >
       <Marker position={{ lat: props.lat, lng: props.lng }} />
     </GoogleMap>
-  ))
+  )
 );
 
 class FullScreenMap extends React.Component {
@@ -105,19 +105,22 @@ class FullScreenMap extends React.Component {
   render() {
     return (
       <>
+        {this.props.lat !== 0 ?
           <Row>
             <Col xs={12}>
-            <MapWrapper
-              
-                      googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyAckO73zcRVsf6Ks1MKPdMoMW0qvO0tcCU"
-                      loadingElement={<div style={{ height: `100%` }} />}
-                      containerElement={<div style={{ height: `100%` }} />}
-                      mapElement={<div style={{ width: "100%", height: `200px` }} />}
-                      lat={this.props.lat}
-                      lng={this.props.lng}
-                    />
+              <MapWrapper
+
+                loadingElement={<div style={{ height: `100%` }} />}
+                containerElement={<div style={{ height: `100%` }} />}
+                mapElement={<div style={{ width: "100%", height: `200px` }} />}
+                lat={this.props.lat}
+                lng={this.props.lng}
+              />
             </Col>
           </Row>
+          :
+          <></>
+        }
       </>
     );
   }

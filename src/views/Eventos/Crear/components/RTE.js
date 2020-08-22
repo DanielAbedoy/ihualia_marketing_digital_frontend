@@ -34,7 +34,8 @@ class MyStatefulEditor extends Component {
     if (this.props.indx) {
       this.props.valores[this.props.indx] = {
         tipo_component: 'parrafo',
-        valor: value.toString('html')
+        valor: value.toString('html'),
+        posicion: this.props.indx
       }
     }
   };

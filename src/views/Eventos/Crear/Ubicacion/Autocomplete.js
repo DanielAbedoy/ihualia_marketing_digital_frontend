@@ -1,8 +1,9 @@
 import React from 'react';
-import { Row, Col } from 'reactstrap';
+
 
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
-import { number } from 'prop-types';
+
+
 
 class LocationSearchInput extends React.Component {
   constructor(props) {
@@ -122,15 +123,20 @@ class LocationSearchInput extends React.Component {
                   const style = suggestion.active
                     ? { backgroundColor: '#eeeeee', cursor: 'pointer' }
                     : { backgroundColor: '#ffffff', cursor: 'pointer' };
+                  this.n++;
                   return (
-                    <div key={suggestion.placeId}
+                    <React.Fragment key={i} >
+                      <div
                       {...getSuggestionItemProps(suggestion, {
                         className,
                         style,
+                        key: this.n + ""
                       })}
                     >
-                      <span>{suggestion.description}</span>
+                      <span><i className="fa fa-map-marker"></i> {suggestion.description}</span>
                     </div>
+                  </React.Fragment>
+                    
                   );
                 })}
               </div>
