@@ -24,21 +24,56 @@ class FechaHora extends Component {
 
   }
 
-  get_datos = () => {
+  get_datos = (borrador) => {
 
-    if (!this.validar()) {
-      alert("Debe llenar las fechas y horas del evento");
-      return undefined;
+    if (!borrador) {
+      if (!this.validar()) {
+        alert("Debe llenar las fechas y horas del evento");
+        return undefined;
+      }
     }
-    const fecha_hora_inicio = `${this.state.fecha_ini} ${this.state.hora_ini}`;
-    const fecha_hora_fin = `${this.state.fecha_fin} ${this.state.hora_fin}`;
+    const fecha_hora_inicio = `${this.is_empty(this.state.fecha_ini,'f')} ${this.is_empty(this.state.hora_ini,'h')}`;
+    const fecha_hora_fin = `${this.is_empty(this.state.fecha_fin,'f')} ${this.is_empty(this.state.hora_fin,'h')}`;
 
     return {
       fecha_hora_inicio: fecha_hora_inicio,
       fecha_hora_fin: fecha_hora_fin,
-      zona_horaria:this.state.zona_horaria
+      zona_horaria:this.is_empty(this.state.zona_horaria)
     }
 
+  }
+
+  is_empty = (word,tipo) => {
+    if (word === '' && tipo === 'f') return "1111-01-01";
+    if (word === '' && tipo === 'h') return "00:00";
+    else if (word === '') return '-';
+    
+    else return word;
+  }
+
+  set_datos_borrador = datos => {
+
+    if (datos.fecha_inicial === '1111-01-01') datos.fecha_inicial= "";
+    if (datos.fecha_final === '1111-01-01') datos.fecha_final ="";
+    if (datos.hora_inicial === '00:00:00')  datos.hora_inicial='';
+    if (datos.hora_final === '00:00:00') datos.hora_final = "";
+    if (datos.zona_horaria === '-') datos.zona_horaria ="";
+
+    this.setState({
+      fecha_ini:datos.fecha_inicial,
+      fecha_fin:datos.fecha_final,
+      hora_ini:datos.hora_inicial,
+      hora_fin: datos.hora_final,
+      zona_horaria:datos.zona_horaria
+    }, () => {
+        
+      if (datos.fecha_inicial !== '1111-01-01') document.getElementById("fecha_ini").value = datos.fecha_inicial;
+      if (datos.fecha_final !== '1111-01-01') document.getElementById("fecha_fin").value =  datos.fecha_final;
+      if (datos.hora_inicial !== '00:00:00') document.getElementById("hora_ini").value =  datos.hora_inicial;
+      if (datos.hora_final !== '00:00:00') document.getElementById("hora_fin").value =  datos.hora_final;
+      if (datos.zona_horaria !== '-') document.getElementById("cbox_zona").value =datos.zona_horaria;
+        
+    })
   }
 
   reiniciar = () => {

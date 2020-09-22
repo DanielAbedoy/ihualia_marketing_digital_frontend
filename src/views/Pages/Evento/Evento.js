@@ -86,10 +86,10 @@ class Evento extends Component {
 
     new EventoModel().get_info_basica(id_evento)
       .then(r => {
-        if (r === "error") {
+        if (r === "error" || r.data.estatus === "borrador") {
           this.props.history.push('/404');
           return;
-        };
+        }
         return r.data;
       })
       .then(r => {

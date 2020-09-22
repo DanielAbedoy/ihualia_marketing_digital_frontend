@@ -11,7 +11,11 @@ class Eventos {
     bodyFromData.append('cuenta', id_cuenta);
     bodyFromData.append('file', file, file.name);
 
+
+
     const peticion = () => {
+      if (file === '-') return "no image";
+    
       return axios.post(`${new URLs().supporserver()}/ev/upload-image`, bodyFromData)
         .then(r => r.data)
         .catch(e => e)
@@ -284,6 +288,61 @@ class Eventos {
     return await peticion();
   }
 
+  //Nuevos Cambios
+
+  get_eventos_cuenta = async(id_cuenta) => {
+    const peticion = () => {
+       return axios.get(`${new URLs().getUrlPrincipal()}/api/evento/?id_cuenta=${id_cuenta}`)
+        .then(r => r.data)
+        .catch(e=> "error");
+    }
+    return await peticion();
+  }
+
+  get_asistente_evento = async(id_aistente_vento)=>{
+    const peticion = () => {
+      return axios.get(`${new URLs().getUrlPrincipal()}/api/asistente-evento/${id_aistente_vento}/`)
+        .then(r=>r.data )
+        .catch(e=>"error")
+    }
+    return await peticion();
+  }
+
+  get_asistentes_evento = async (id_evento) => {
+    const peticion = () => {
+      return axios.get(`${new URLs().getUrlPrincipal()}/api/asistente-evento/?id_evento=${id_evento}`)
+        .then(r=>r.data )
+        .catch(e=>"error")
+    }
+    return await peticion();
+  }
+
+  get_boleto_asistente_evento = async(id_asistencia) => {
+    const peticion = () => {
+      return axios.get(`${new URLs().getUrlPrincipal()}/api/boleto-asistente-evento/?id_asistencia=${id_asistencia}`)
+        .then(r=>r.data)
+        .catch(e=>"error")
+    }
+    return await peticion();
+  }
+
+  get_donacion_asistente = async(id_asistente) => {
+    const peticion = () => {
+      return axios.get(`${new URLs().getUrlPrincipal()}/api/donacion_evento/?id_asistencia=${id_asistente}`)
+        .then(r=>r.data)
+        .catch(e=>"error")
+    }
+    return await peticion();
+  }
+
+  remove_evento = async(id_evento) => {
+    const peticion = () => {
+      return axios.delete(`${new URLs().getUrlPrincipal()}/api/evento/${id_evento}/`)
+        .then(r=>r.statusText)
+        .catch(e=>"error")
+    }
+    return await peticion();
+  }
 }
 
 export default Eventos;

@@ -70,20 +70,23 @@ class Detalles extends Component {
     return true;
   }
 
-  get_datos = () => {
+  get_datos = (borrador) => {
     
     const imagen = this.image_prin.get_imagefile();
 
-    if (!this.validar(imagen)) {
-      return undefined;
-    }
+    if (!borrador) if (!this.validar(imagen)) return undefined;
 
     return {
-      imagen: imagen,
-      resumen: this.state.resumen,
+      imagen: this.is_empty(imagen),
+      resumen: this.is_empty(this.state.resumen),
       componentes: this.valores
     }
 
+  }
+
+  is_empty = word => {
+    if (word === '') return "-";
+    else return word;
   }
 
   reiniciar = () => {
@@ -100,6 +103,26 @@ class Detalles extends Component {
         this.image_prin.reiniciar();
     })
   }
+
+
+ /*  set_datos_borrador = datos => {
+    
+    if (datos.resumen === '-') datos.resumen = '';
+    if (datos.image_principal === '-') datos.image_principal = '';
+
+    this.setState({
+      resumen: datos.resumen
+    }, () => {
+        document.getElementById("resumen").value = datos.resumen;
+
+        //Trayendoimg principal
+        if (datos.image_principal !== '') {
+          this.image_prin.set_image(datos.image_principal)
+        }
+
+    })
+
+  } */
 
   render() {
     return (

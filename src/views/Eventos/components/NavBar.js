@@ -21,6 +21,7 @@ const NavBar = (props) => {
             <Collapse isOpen={isOpen} navbar>
               <Nav navbar>
                 {items.map((item, indx) => {
+                  if (item.visible === false) return;
                   return (
                       <NavItem className="h5 ml-3 mr-3" key={indx}>
                         <Link to={item.path}>{item.name}</Link>

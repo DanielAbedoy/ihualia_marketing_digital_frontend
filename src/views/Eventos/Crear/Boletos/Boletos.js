@@ -28,10 +28,15 @@ class Boletos extends Component {
     return true;
   }
 
-  get_boletos = () => {
-    if (this.validar()) return this.state.boletos;
-    alert("Debe agregar almenos un boleto")
-    return undefined;
+  get_boletos = (borrador) => {
+
+    if (!borrador) {
+      if (this.validar()) return this.state.boletos;
+      alert("Debe agregar almenos un boleto")
+      return undefined;
+    }
+
+    return this.state.boletos;
   }
 
   reiniciar = () => {
@@ -39,6 +44,14 @@ class Boletos extends Component {
       toggle_boletos: false,
       boletos: []
     })
+  }
+
+  set_datos_borrador = boletos => {
+    boletos.forEach(boleto => {
+      boleto.tipo_boleto = boleto.tipo;
+      boleto.cantidad = boleto.cantidad_total;
+    });
+    this.setState({boletos:boletos})
   }
 
   render() {

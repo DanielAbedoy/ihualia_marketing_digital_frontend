@@ -30,7 +30,7 @@ class InformacionBasica extends Component {
   }
 
   añadir_tag = e => {
-    let arr = this.state.etiquetas.slice()
+    let arr = this.state.etiquetas.slice();
     if (arr.length === 5) return;
     arr.push(this.state.tag);
     this.setState({ etiquetas: arr, tag: '' }, () => {
@@ -46,7 +46,7 @@ class InformacionBasica extends Component {
 
   }
 
-  validar = () => {
+  validar = (borrador) => {
     //Datos iniciales
     const cate = document.getElementById("cbox_categoria").value;
     const sub_cate = document.getElementById("cbox_sub_categoria").value;
@@ -57,24 +57,22 @@ class InformacionBasica extends Component {
       cate === 'Categoria:' ||
       sub_cate === 'Sub Categoria:'
     ) {
-      alert("Debe llenar toda la información básica");
+      if (borrador) alert("Para agregar un borrador debe llenar almenos toda la información básica");
+      else alert("Debe llenar toda la información básica");
       return false;
     }
     if (this.state.etiquetas.length === 0) {
-      if (window.confirm("¿ Seguro que no agregaras tags a el evento ?")) {
-        return true;
+      if (!borrador) {
+        if (window.confirm("¿ Seguro que no agregaras tags a el evento ?")) return true;
+        return false;
       }
-      return false;
     }
-
-
     return true;
 
   }
 
-  get_datos = () => {
-
-    if (!this.validar()) return undefined;
+  get_datos = (borrador) => {
+    if (!this.validar(borrador)) return undefined;
 
     return {
       nombre: this.state.nombre,
@@ -86,6 +84,32 @@ class InformacionBasica extends Component {
       etiquetas: this.state.etiquetas,
     }
   }
+
+  set_datos_borrador = datos => {
+    
+    let arr = [];
+    datos.etiquetas.forEach(palabra => {
+      arr.push(palabra.palabra);
+    });
+
+    this.setState({
+      nombre: datos.nombre,
+      tipo: datos.tipo,
+      categoria: datos.categoria,
+      sub_categoria: datos.sub_categoria,
+      etiquetas: arr,
+      sub_categorias:[datos.sub_categoria]
+    },()=>{
+      document.getElementById("nombre").value = datos.nombre;
+      document.getElementById("tipo").value = datos.tipo;
+      document.getElementById("cbox_categoria").value = datos.categoria;
+      document.getElementById("cbox_sub_categoria").value = datos.sub_categoria;
+    })
+    
+
+    
+  }
+
 
   reiniciar = () => {
     this.setState({
@@ -195,7 +219,7 @@ class InformacionBasica extends Component {
               </Row>
               <br />
               <span className="h5">Nombre del Organizador</span><br />
-              <Input className="mt-2" type="text" placeholder={require('store').get('cuenta_en_uso').nombre} disabled={true}
+              <Input className="mt-2" type="text" placeholder={require('store').get('cuenta_en_uso') ? require('store').get('cuenta_en_uso').nombre : ""} disabled={true}
                 onChange={e => this.setState({ organizador_cuenta: e.target.value })}
               /><br />
 

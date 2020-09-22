@@ -62,16 +62,20 @@ class Ubicacion extends Component {
 
   }
 
-  get_datos = () => {
+  get_datos = (borrador) => {
 
-    if (this.state.tipo_evento === '') {
-      alert("Debe seleccionar un tipo de ubicación");
-      return undefined;
+    if (borrador) {
+      if (this.state.tipo_evento === "") return { tipo_ubicacion: "empty" };
     }
 
+    if (!borrador) {
+      if (this.state.tipo_evento === '') {
+        alert("Debe seleccionar un tipo de ubicación");
+        return undefined;
+      }
+    }
     if (this.state.tipo_evento === 'lugar') {
       //validacion    
-
       try {
         const direccion1 = document.getElementById("direccion-1").value;
         let direccion2 = document.getElementById("direccion-2").value;
@@ -81,41 +85,55 @@ class Ubicacion extends Component {
         const pais = document.getElementById("pais").value;
         const codigo_postal = document.getElementById("codigo-postal").value;
 
-        if (!this.validar(direccion1, direccion2, ciudad, estado, pais, codigo_postal)) {
-          return undefined;
-        }
+        if (!borrador) if (!this.validar(direccion1, direccion2, ciudad, estado, pais, codigo_postal)) return undefined;
 
 
         return {
-          direccion1: direccion1,
-          direccion2: direccion2,
-          ciudad: ciudad,
-          estado: estado,
-          pais: pais,
-          codigo_postal: codigo_postal,
+          direccion1: this.is_empty(direccion1),
+          direccion2: this.is_empty(direccion2),
+          ciudad: this.is_empty(ciudad),
+          estado: this.is_empty(estado),
+          pais: this.is_empty(pais),
+          codigo_postal: this.is_empty(codigo_postal),
           latitud: this.state.lat,
           longitud: this.state.lng,
           tipo_ubicacion: this.state.tipo_evento,
         }
       } catch (e) {
-        alert("Debe buscar una ubicación");
-        return undefined;
+        if (!borrador) {
+          alert("Debe buscar una ubicación");
+          return undefined;
+        }
+        return { tipo_ubicacion: "empty" };
       }
 
 
     } else {
 
       const link = document.getElementById("link").value;
-      if (link === '') {
-        alert("Debes agregar un link del evento online");
-        return undefined;
+      if (!borrador) {
+        if (link === '') {
+          alert("Debes agregar un link del evento online");
+          return undefined;
+        }
       }
+
+
+      if (link === '') {
+        return { tipo_ubicacion: "empty" };
+      }
+
       return {
         tipo_ubicacion: this.state.tipo_evento,
         link: link
       }
 
     }
+  }
+
+  is_empty = word => {
+    if (word === '') return "-";
+    else return word;
   }
 
   reiniciar = () => {
@@ -147,6 +165,29 @@ class Ubicacion extends Component {
       lat: 0,
       lng: 0,
     })
+  }
+
+  set_datos_borrador = datos => {
+    if (datos.tipo_ubicacion === "no") return;
+    else if (datos.tipo_ubicacion === "online") {
+      this.setState({ tipo_evento: "online" }, () => {
+        document.getElementById("exampleCustomSwitch2").checked = true;
+        if(datos.link !== '-')document.getElementById("link").value = datos.link;
+      })
+    } else if (datos.tipo_ubicacion === "lugar") {
+      this.setState({ tipo_evento: "lugar",lat:(datos.latitud*1),lng:(datos.longitud*1),show_inputs:true, find_manual:true,looking:true }, () => {
+        document.getElementById("exampleCustomSwitch").checked = true;
+        
+        if (datos.direccion1 !== '-') document.getElementById("direccion-1").value = datos.direccion1;
+        if (datos.direccion2 !== '-') document.getElementById("direccion-2").value = datos.direccion2;
+        if (datos.ciudad !== '-') document.getElementById("ciudad").value = datos.ciudad;
+        if (datos.estado !== '-') document.getElementById("estado").value = datos.estado;
+        if (datos.pais !== '-') document.getElementById("pais").value = datos.pais;
+        if (datos.codigo_postal !== '-') document.getElementById("codigo-postal").value = datos.codigo_postal;
+        
+      })
+    }
+
   }
 
   render() {
