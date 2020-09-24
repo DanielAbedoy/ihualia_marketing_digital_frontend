@@ -128,9 +128,6 @@ class MisCuentas extends Component {
                             <Col className="p-2 mx-auto" md="6" xs="12">
                               <Button id={cuenta.id} block color="primary" onClick={this.usar_cuenta}>Usar</Button>
                             </Col>
-                            <Col className="p-2 mx-auto" md="6" xs="12">
-                              <Button id={cuenta.id} onClick={this.administrar_cuenta} block color="primary" >Administrar</Button>
-                            </Col>
                           </Row>
                         </Toast>
                       </Col>
