@@ -258,6 +258,19 @@ class Contactos {
         return await peticion();
     }
 
+    getContactosDelLosGrupos = async (gruposIds) => {
+        const peticion = () => {
+            return gruposIds.map((id) => {
+                return axios.get(`${this.urls.getUrlPrincipal()}/api/grupo-contacto/?grupo=${id}`)
+                .then(res => res.data.results)
+                .catch(err=> "error")
+            });
+            
+        }
+        return await peticion();
+    }
+
+
 }
 
 export default Contactos;

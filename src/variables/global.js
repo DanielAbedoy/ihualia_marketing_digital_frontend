@@ -453,6 +453,18 @@ class Variables_Globales{
     ]
   }
 
+  key_words_boletin = () => {
+    let f = new Date();
+    return [
+      { key: "{{{remitente}}}"},
+      { key: "{{{fecha_hora}}}", valor:f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear() + " " + f.getHours() + ":" + f.getMinutes()},
+      { key: "{{{fecha}}}", valor: f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear() },
+      { key: "{{{hora}}}", valor:f.getHours() + ":" + f.getMinutes() },
+      { key: "{{{legal}}}", valor:"Informacion legal" },
+
+    ];
+  }
+
 
 }
 

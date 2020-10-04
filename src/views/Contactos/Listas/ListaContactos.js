@@ -5,6 +5,8 @@ import NavBar from '../NavBar.js';
 import ComboBox from '../componets/ComboBox.js';
 import Tabla from '../componets/Tabla.js';
 
+import Table from './Hooks/Table';
+
 class ListaContactos extends Component {
 
 
@@ -65,7 +67,7 @@ class ListaContactos extends Component {
                                     </Col>
                                 </Row>
                                 <br />
-                                <Row>
+                               {/*  <Row>
                                     <Col lg="11" md="11" sm="12" xs="12" className="bg-white mx-auto">
                                         <Tabla
                                             ref={element => { this.tabla = element }}
@@ -74,8 +76,11 @@ class ListaContactos extends Component {
                                             sendCampos={(campos_prin, campos_ex) => { this.setState({ campos: campos_prin }) }}
                                         />
                                     </Col>
-                                </Row>
+                                </Row> */}
+                                <Table />
                             </CardBody>
+
+                                
                         </Card>
                     </Col>
                 </Row>

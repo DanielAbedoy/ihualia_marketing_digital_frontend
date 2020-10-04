@@ -7,11 +7,11 @@ const app = express();
 app.set('port', process.env.PORT || 4000);
 app.use(cors());
 app.use(express.json());
-
+app.use(express.static('public'));
 
 //Rutas
 app.use('/ev', require('./rutas/evento'));
-//app.use('/evento', require('./rutas/load_image'));
+app.use('/email', require('./rutas/emailmarketing'));
 
 
 app.listen(app.get('port'), () => {

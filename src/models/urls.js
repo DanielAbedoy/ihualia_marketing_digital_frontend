@@ -8,7 +8,8 @@ class URLS {
         return "http://localhost:8000"
     }
 
-    supporserver = () => "http://localhost:4000";
+    //supporserver = () => "http://localhost:4000";
+    supporserver = () => "http://localhost:7777";
 }
 
 export default URLS;
