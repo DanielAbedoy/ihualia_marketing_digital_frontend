@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-
+const https = require('https');
+const fs = require('fs');
 
 const app = express(); 
 //Ajustes
@@ -13,7 +14,13 @@ app.use(express.static('public'));
 app.use('/ev', require('./rutas/evento'));
 app.use('/email', require('./rutas/emailmarketing'));
 
-
-app.listen(app.get('port'), () => {
+https.createServer(({
+    cert: fs.readFileSync("../Lets_Encrypt_app.ihualia.com.mx.pem"),
+    key: fs.readFileSync("../Lets_Encrypt_app.ihualia.com.mx.pem")
+}),app).listen(app.get('port'), () => {
     console.log("Support server corriendo en el puerto " + app.get('port'));
 });
+
+/* app.listen(app.get('port'), () => {
+    console.log("Support server corriendo en el puerto " + app.get('port'));
+}); */

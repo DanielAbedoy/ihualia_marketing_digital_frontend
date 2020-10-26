@@ -27,16 +27,11 @@ class Gestionar extends Component {
       this.props.history.push('/eventos');
       return;
     } 
-
     const id_evento = this.props.location.state.evento.id;
     //const id_evento = 54;
-    this.setState({ id_evento: id_evento, evento:this.props.location.state.evento }, () => {
-
+    this.setState({ id_evento: id_evento, evento: this.props.location.state.evento }, () => {
       this.get_boletos_vendidos();
-      
     })
-
-
   }
 
   get_boletos_vendidos = () => {
@@ -166,6 +161,13 @@ class Gestionar extends Component {
     this.modal_relacion.set_datos(datos);
   }
 
+  acomodarFehca = fecha => {
+    if (!fecha) return;
+    const f = fecha.split("T");
+    const hora = f[1].split("-");
+    return `${f[0]} ${hora[0]}`
+  }
+
   render() {
     return (
       <div className="animated fadeIn">
@@ -187,8 +189,9 @@ class Gestionar extends Component {
                 <hr />
                 <Row>
                   <Col md="12"><p className="text-center h4">{ this.state.evento.nombre}</p> </Col>
-                  <Col md="12"><p className="text-center h6">Evento por llevarse a cabo</p> </Col>
-                  <Col md="12"><p className="text-center h6">Fechas y horas del eventos</p> </Col>
+                  <Col md="12"><p className="text-center h6">{this.state.evento.fecha_estatus === "normal" ? "Por llevarse a cabo" : "Pasado"}</p> </Col>
+                  <Col md="12"><p className="text-center h6">Inicio: {this.acomodarFehca(this.state.evento.fecha_hora_inicio)} </p> </Col>
+                  <Col md="12"><p className="text-center h6">Fin: {this.acomodarFehca(this.state.evento.fecha_hora_fin)}</p> </Col>
                   <Col md="12"><p className="text-center h6">{this.state.evento.tipo}</p> </Col>
                 </Row>
 

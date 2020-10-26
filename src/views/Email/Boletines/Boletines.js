@@ -1,37 +1,32 @@
 import React, { Component } from 'react';
-import { Row, Col, Card, CardHeader, CardBody } from 'reactstrap';
+import { Row, Col, Card, CardHeader, CardBody, Input } from 'reactstrap';
 //import { Link } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import ModelEmail from '../../../models/EmailMarketing';
 
 import Table from './Hooks/Table';
 
-class Boletines extends Component{
+class Boletines extends Component {
 
   state = {
-    boletines: []
+    boletines: [],
+    fecha_start: '',
+    fecha_end:''
   }
 
-  componentDidMount = () => this.getDatosBoletines();
+  componentDidMount = () => {
+    this.setState({fecha_start: this.getFecha("start"), fecha_end: this.getFecha("end")}, () => {
+      this.getDatosBoletines();  
+    })
+  }
 
   getDatosBoletines = () => {
-    const id_cuenta = require('store').get("cuenta_en_uso").id;
-    const fecha_start = this.getFecha("start");
-    const fecha_end = this.getFecha("end");
-    //new ModelEmail().get_boletines_fecha_cuenta(fecha_start, fecha_end, id_cuenta)
-    new ModelEmail().get_boletines_fecha_cuenta("2020-10-01", "2020-10-30",id_cuenta)
-      .then(boletines => {
-        if(boletines !== "error"){
-        boletines.forEach(boletin => {
-          new ModelEmail().get_envios_boletin(boletin.id)
-            .then(envio => {
-              if (envio[0]) { boletin.ids_contactos = envio[0].ids_contactos; boletin.ids_grupos = envio[0].ids_grupos }
-              this.setState({ boletines: this.state.boletines.concat(boletin) });
-            })
-        });
-        }
-      })
 
+    const id_cuenta = require('store').get("cuenta_en_uso").id;
+    new ModelEmail().get_boletines_fecha_cuenta(this.state.fecha_start, this.state.fecha_end, id_cuenta)
+      .then(boletines => {
+        if (boletines !== "error") this.setState({ boletines: boletines });
+      })
   }
 
   getFecha = tipo => {
@@ -46,36 +41,58 @@ class Boletines extends Component{
   gestionarBoletin = (boletin) => {
     this.props.history.push({
       pathname: "/emailmarketing/gestionar",
-      state: { data:boletin }
+      state: { data: boletin }
     })
   }
 
-  render(){
-    return(
+  render() {
+    return (
       <div className="animated fadeIn">
         <Row>
           <Col xs="12">
             <Card>
-              <CardHeader>
-                <NavBar />
+              <CardHeader className="bg-primary text-white p-4">
+                <p className="h3"><i className="fa fa-envelope-o"></i> EmailMarketing |</p>
+                {/* <NavBar /> */}
               </CardHeader>
               <CardBody>
-                
+                <Row>
+                  <Col md="6" xs="12">
+                    <p className="h4 mb-0">Boletines</p>
+                    <p className="h6 text-muted">Boletines generados en la cuenta</p>
+                  </Col>
+                  <Col md="3" xs="8" className="mx-auro">
+                    <p className="mb-0 text-muted"><b>Desde</b></p>
+                    <Input type="date" value={this.state.fecha_start}
+                      onChange={(e)=> {this.setState({fecha_start:e.target.value, boletines:[]},()=> this.getDatosBoletines() )}}
+                    />
+                  </Col>
+                  <Col md="3" xs="8" className="mx-auro">
+                    <p className="mb-0 text-muted"><b>Hasta</b></p>
+                    <Input type="date" value={this.state.fecha_end}
+                      onChange={(e)=> {this.setState({fecha_end:e.target.value, boletines:[]},()=> this.getDatosBoletines() )}}
+                    />
+                  </Col>
+
+                </Row>
+                <hr />
+
                 <Row>
                   <Col md="12" >
 
                     <Table
                       boletines={this.state.boletines}
                       event_gestionarBoletin={this.gestionarBoletin}
+                      history={this.props.history}
                     />
-                  
+
                   </Col>
                 </Row>
               </CardBody>
             </Card>
           </Col>
         </Row>
-      </div>
+      </div >
     );
   }
 

@@ -6,9 +6,9 @@ const Gestionar = React.lazy(() => import('./Gestionar/Gestionar'));
 
 const items = [
 
-  {name:'Listado', path:'/eventos/listado', component:Listado,visible:true, img:require('../../assets/img/fondos/eventos/fondo-listado.png')},
-  {name:'Gestionar', path:'/eventos/gestionar', component:Gestionar, visible:false},
-  {name:'Crear', path:'/eventos/crear', component:Crear,visible:true, img:require('../../assets/img/fondos/eventos/fondo-crear.png')},
+  {name:'Listado', path:'/eventos/listado', component:Listado,visible:true, img:require('../../assets/img/fondos/eventos/fondo-listado.png'), authCount:true},
+  {name:'Gestionar', path:'/eventos/gestionar', component:Gestionar, visible:false,  authCount:true},
+  {name:'Crear', path:'/eventos/crear', component:Crear,visible:true, img:require('../../assets/img/fondos/eventos/fondo-crear.png'),  authCount:true},
   
 
 ]

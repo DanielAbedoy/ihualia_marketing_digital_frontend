@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Col, Input, Row, FormGroup, CustomInput, Button } from 'reactstrap';
-
-import ModeloContactos from '../../../../models/Contactos'
-import { element } from 'prop-types';
+import { Col,  Row,  CustomInput } from 'reactstrap';
+import { useToasts } from 'react-toast-notifications';
+import ModeloContactos from '../../../../models/Contactos';
 
 const Grupos = props => {
 
   const [grupos, setGrupos] = useState([]);
+  const { addToast } = useToasts();
 
   useEffect(() => {
     get_grupos();
@@ -16,9 +16,19 @@ const Grupos = props => {
 
   const get_grupos = () => {
     new ModeloContactos().getGrupos(require('store').get('cuenta_en_uso').id)
-      .then(grupos => {
-        if (grupos) setGrupos(grupos);
+      .then(gruposR => {
+        if (gruposR) {
+          //grupos.forEach(grupo => { grupos_ids.push(grupo.id); str_grupos_ids += `${grupo.id},` });    
+          gruposR.map(grupo => {
+            new ModeloContactos().getContactosDelGrupo(grupo.id)
+              .then(contactos => {
+                if (contactos) grupo.contactos = contactos;
+                setGrupos(gruposR)
+              })
+          });
+        };
       })
+    
   }
 
   const setGruposSeleccionados = () => {
@@ -27,7 +37,19 @@ const Grupos = props => {
     grupos.forEach(grupo => {
       if (document.getElementById(`switch-grupo${grupo.id}`).checked) grupos_seleccionados.push(grupo);
     });
-    props.event_setGrupos(grupos_seleccionados)
+
+    //validar
+    if (!validar(grupos_seleccionados)) props.event_setGrupos([])
+    else props.event_setGrupos(grupos_seleccionados);
+    
+  }
+
+  const validar = (arr) => {
+    if (arr.length === 0) {
+      addToast("Debe agregar los grupos", { appearance: "info", autoDismiss: true });
+      return false;
+    }
+    return true;
   }
 
 
@@ -44,7 +66,7 @@ const Grupos = props => {
               <Row>
                 {grupos.map((grupo, indx) => {
                   return (
-                    <Col key={indx} md="6" xs="9" className="my-3">
+                    <Col key={indx} md="12" xs="12" className="my-2 p-2 rounded bg-info text-white h5" style={{boxShadow:"0px 0px 10px 1px rgba(0,0,0,0.75)"}} >
                       <CustomInput onChange={e=>{setGruposSeleccionados()}} type="switch" id={`switch-grupo${grupo.id}`} label={`${grupo.nombre}`} />
                     </Col>
                   );

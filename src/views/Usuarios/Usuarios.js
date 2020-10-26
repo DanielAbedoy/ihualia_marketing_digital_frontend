@@ -17,7 +17,7 @@ class Usuarios extends Component {
 
   peticion_usuarios = () => {
     new Modelo().get_usuarios_cliente(require('store').get('usuario_guardado').id_cliente)
-      .then(r => this.setState({ usuarios: r, tipo_usuario:require('store').get('usuario_guardado').tipo }))
+      .then(r => this.setState({ usuarios: r, tipo_usuario: require('store').get('usuario_guardado').tipo }))
   }
 
   administrar_usuario = (e) => {
@@ -43,13 +43,20 @@ class Usuarios extends Component {
                   <p className="h3 p-2"><i className="fa fa-users"></i> Usuarios |</p>
                 </CardHeader>
                 <CardBody>
-                  <p className="h4">Todos Los Usuarios</p><hr/>
+                  <Row>
+                    <Col md="12">
+                      <p className="h4 mb-0">Usuarios de la empresa</p>
+                      <p className="h6 text-muted">Todos los usuarios pertenecientes a la empresa</p>
+                    </Col>
+                  </Row>
+                  <hr />
+
                   <Row>
                     <Col md="12">
                       <div className={"table-responsive table-bordered table-hover"} >
                         <table className="table text-center">
                           <thead>
-                            <tr className="thead-dark">
+                            <tr className="bg-primary">
                               <th>Nombre</th>
                               <th>Usuario</th>
                               <th>Correo</th>

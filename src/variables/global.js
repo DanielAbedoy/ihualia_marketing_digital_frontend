@@ -456,12 +456,11 @@ class Variables_Globales{
   key_words_boletin = () => {
     let f = new Date();
     return [
-      { key: "{{{remitente}}}"},
-      { key: "{{{fecha_hora}}}", valor:f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear() + " " + f.getHours() + ":" + f.getMinutes()},
-      { key: "{{{fecha}}}", valor: f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear() },
-      { key: "{{{hora}}}", valor:f.getHours() + ":" + f.getMinutes() },
-      { key: "{{{legal}}}", valor:"Informacion legal" },
-
+      { key: "{{{remitente}}}", description: "Nombre con el que esta guardado el contacto"},
+      { key: "{{{fecha_hora}}}", valor:f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear() + " " + f.getHours() + ":" + f.getMinutes(), description: "Fecha y hora de envio con el formato 'dd/mm/aa/ hh:mm'"},
+      { key: "{{{fecha}}}", valor: f.getDate() + "/" + (f.getMonth() +1) + "/" + f.getFullYear() , description: "Fecha de envio con el formato: 'dd/mm/aa'"},
+      { key: "{{{hora}}}", valor:f.getHours() + ":" + f.getMinutes(), description: "Hora de envio con el formato: 'hh:mm'" },
+      { key: "{{{legal}}}", valor:"Informacion legal" , description: "Información legal de la empresa"},
     ];
   }
 

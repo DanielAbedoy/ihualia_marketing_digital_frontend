@@ -67,7 +67,8 @@ class MisCuentas extends Component {
                 <NavBar />
               </CardHeader>
               <CardBody>
-                <p className="h4">Mis Cuentas</p>
+                <p className="h4 mb-0">Tus Cuentas</p>
+                <p className="h6 text-muted">Solo son visibles las cuentas activas en las es estas dado de alta</p>
                 <hr />
                 <Row>
                   {this.state.cuentas.map((cuenta, indx) => {
@@ -107,10 +108,12 @@ class MisCuentas extends Component {
           <Col xs="12">
             <Card>
               <CardHeader>
-                <p className="h3 p-2"><i className="fa fa-users"></i> Mis Cuentas |</p>
+                <p className="h3 p-2"><i className="fa fa-users"></i> Cuentas |</p>
               </CardHeader>
               <CardBody>
 
+                <p className="h4 mb-0"><b>Tus cuentas</b></p>
+                <p className="h6 text-muted">Solo seran visibles las cuentas activas</p>
                 <hr />
                 <Row>
                   {this.state.cuentas.map((cuenta, indx) => {

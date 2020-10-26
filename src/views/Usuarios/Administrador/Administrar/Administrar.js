@@ -63,7 +63,7 @@ class Administrar extends Component {
         return;
       }
     }
-    
+
 
     //Inactivor
     let datos = this.state.usuario;
@@ -123,7 +123,7 @@ class Administrar extends Component {
         id_cuenta: c.id
       }
       new Modelo().nuevo_usuario_cuenta(data)
-        .then((r)=>{})
+        .then((r) => { })
     });
 
     alert("Asignado con éxito")
@@ -148,7 +148,7 @@ class Administrar extends Component {
     e.preventDefault();
 
     if (window.confirm("¿ Seguro que desea desvincular el usuario de la cuenta ?")) {
-      new Modelo().desvincular_usuario_cuenta(e.target.id,this.state.usuario.correo)
+      new Modelo().desvincular_usuario_cuenta(e.target.id, this.state.usuario.correo)
         .then(r => {
           if (r.statusText === "No Content") alert("Desvinculada con éxito");
           this.props.history.push('/usuarios');
@@ -167,6 +167,13 @@ class Administrar extends Component {
             <NavBar />
           </CardHeader>
           <CardBody>
+            <Row>
+              <Col md="12">
+                <p className="h4 mb-0">Administrador de usuario</p>
+                <p className="h6 text-muted">Puedes activar o desactivar elusuario, y puedes asignarle o quitar cuentas</p>
+              </Col>
+            </Row>
+            <hr />
             <Row>
               <Col md="6" xs="12" className="text-center mx-auto">
                 <Badge onClick={this.desactivar_activar} style={{ cursor: "pointer" }} className="m-0"

@@ -72,6 +72,7 @@ class Listado extends Component {
                 <Row>
                   <Col lg="8" md="8" sm="6" xs="12">
                     <p className="h4">Todas Las Cuentas</p>
+                    <p className="h6 text-muted">Todas las cuentas pertenecientes a la empresa</p>
                   </Col>
                   <Col lg="2" md="2" sm="3" xs="12" className="p-0">
                     <Button className="bg-transparent text-dark border border-white"
@@ -124,7 +125,7 @@ class Listado extends Component {
             <div className={"table-responsive table-bordered table-hover"} >
               <table className="table text-center">
                 <thead>
-                  <tr className="thead-dark">
+                  <tr className="bg-primary">
                     <th>Clave</th>
                     <th>Nombre</th>
                     <th>Estatus</th>
@@ -139,7 +140,7 @@ class Listado extends Component {
                         <td>{cuenta.nombre}</td>
                         <td className={cuenta.estatus.toLowerCase() == "activo" ? "bg-success" : "bg-danger"} >{cuenta.estatus}</td>
                         <td className="m-0">
-                          <i id={cuenta.id} onClick={this.usar_cuenta} className="fa fa-check-square-o border rounded bg-success p-1 mr-2" style={{ cursor: "pointer" }}></i>
+                          {/* <i id={cuenta.id} onClick={this.usar_cuenta} className="fa fa-check-square-o border rounded bg-success p-1 mr-2" style={{ cursor: "pointer" }}></i> */}
                           <i id={cuenta.id} onClick={this.administrar_cuenta} className="fa fa-cog border rounded bg-primary p-1 ml-2" style={{ cursor: "pointer" }}></i>
                         </td>
                       </tr>
@@ -172,9 +173,9 @@ class Listado extends Component {
                     <b>Estatus:</b> <span className={cuenta.estatus.toLowerCase() == "activo" ? "text-success" : "text-danger"} >{cuenta.estatus}</span><br />
                   </ToastBody>
                   <Row>
-                    <Col className="p-2 mx-auto" md="6" xs="12">
+                    {/* <Col className="p-2 mx-auto" md="6" xs="12">
                       <Button id={cuenta.id} block color="primary" onClick={this.usar_cuenta}>Usar</Button>
-                    </Col>
+                    </Col> */}
                     <Col className="p-2 mx-auto" md="6" xs="12">
                       <Button id={cuenta.id} onClick={this.administrar_cuenta} block color="primary" >Administrar</Button>
                     </Col>

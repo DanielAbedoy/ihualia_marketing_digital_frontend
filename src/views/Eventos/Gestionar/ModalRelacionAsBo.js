@@ -10,7 +10,7 @@ class ModalRelacionAsBo extends Component {
 
   toggle_event = () => this.setState({ toggle: !this.state.toggle });
 
-  set_datos = (datos) => this.setState({ datos: datos }, () => console.log(this.state));
+  set_datos = (datos) => this.setState({ datos: datos });
 
   format_corrency = new Intl.NumberFormat('es-MX', {
     style: 'currency',

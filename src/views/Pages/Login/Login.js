@@ -8,39 +8,10 @@ class Login extends Component {
 
   store = require('store');
 
-  //Constructor de la clase
-  constructor(props) {
-    super(props);
-
-    //State dela clase
-    this.state = {
-      redirect: false,
-    }
-
-  }
-
-  componentWillMount = () => {
-    if (this.store.get('isSesionIniciada')) {
-      this.setState({ redirect: true })
-    }
-  }
-
-  //Funcion que redireccionara una vez se haya comprobado la infromacion del user
-  redireccionar = () => {
-    if (this.state.redirect === true) {
-      return (
-        <Redirect
-          to={{
-            pathname: "/inicio",
-          }}
-        />
-      )
-    }
-  }
 
   guardarSesion = (user) => {
-    this.store.set('isSesionIniciada', true);
     this.store.set('usuario_guardado', user);
+    this.props.history.push("/inicio");
   }
 
   //Funcion que comprobara si existe el usuario en la DataBase
@@ -65,11 +36,6 @@ class Login extends Component {
       } else {
         //Guardando el usuario en el Store
         this.guardarSesion(usuario);
-
-        //Pasando los datos y redireccionando al inicio
-        this.setState({
-          redirect: true,
-        })
       }
     })
   }
@@ -78,7 +44,6 @@ class Login extends Component {
   render() {
     return (
       <div className="app flex-row align-items-center">
-        {this.redireccionar()}
         <Container>
           <Row className="justify-content-center">
             <Col md="8" xs={12} >

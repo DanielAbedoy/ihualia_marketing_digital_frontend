@@ -162,6 +162,13 @@ class Administrar extends Component {
             <NavBar />
           </CardHeader>
           <CardBody>
+          <Row>
+                  <Col md="12">
+                    <p className="h4 mb-0">Administrador de cuentas</p>
+                    <p className="text-muted">Puedes desactivar o activar la cuenta, eliminarla, y quitar o asignar nuevos usuarios</p>
+                  </Col>
+                </Row>
+              <hr/>
             <Row>
               <Col md="6" xs="12" className="text-center mx-auto">
                 <Badge id={this.state.cuenta.id} onClick={this.desactivar_activar} style={{ cursor: "pointer" }} className="m-0"

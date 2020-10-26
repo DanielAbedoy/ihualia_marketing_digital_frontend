@@ -28,7 +28,7 @@ class Contactos extends Component {
                       
                       <CardStandar key={indx}
                         class="card-user text-dark"
-                        colLg="3" colMd="6" colSm="6" colXs="12"
+                        colLg="4" colMd="6" colSm="6" colXs="12"
                         contenidoHeader={
                           <CardImg top width="100%" src={item.img} alt={`Imagen: ${item.name}`} title={item.name} />
                         }

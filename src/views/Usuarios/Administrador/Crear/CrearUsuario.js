@@ -136,6 +136,13 @@ class CrearUsuario extends Component {
                 />
               </CardHeader>
               <CardBody>
+              <Row>
+                    <Col md="12">
+                      <p className="h4 mb-0">Crea un nuevo usuario</p>
+                      <p className="h6 text-muted">Solo agrega su información y puedes asignarle cuentas</p>
+                    </Col>
+                  </Row>
+                  <hr />
                 < Row>
                   <Col md="12">
                     <p className="h4 text-center"> Datos del Usuario </p>

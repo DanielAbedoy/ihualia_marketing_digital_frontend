@@ -46,13 +46,19 @@ class ListadoUsuario extends Component {
 
               </CardHeader>
               <CardBody>
-              <p className="h4">Todos Los Usuarios</p><hr/>
+              <Row>
+                    <Col md="12">
+                      <p className="h4 mb-0">Usuarios de la empresa</p>
+                      <p className="h6 text-muted">Todos los usuarios pertenecientes a la empresa, puedes administrarlos</p>
+                    </Col>
+                  </Row>
+                  <hr />
                 <Row>
                   <Col md="12">
                     <div className={"table-responsive table-bordered table-hover"} >
                       <table className="table text-center">
                         <thead>
-                          <tr className="thead-dark">
+                          <tr className="bg-primary">
                             <th>Nombre</th>
                             <th>Usuario</th>
                             <th>Correo</th>

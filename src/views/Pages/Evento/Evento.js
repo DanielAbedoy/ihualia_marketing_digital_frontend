@@ -104,7 +104,7 @@ class Evento extends Component {
 
         this.setState({
           id_evento: id_evento,
-          nombre_imagen: r.nombre_imagen, nombre: r.nombre, resumen: r.resumen, tipo_ubicacion: r.tipo_ubicacion,
+          directorio_imagen: r.directorio_imagen, nombre: r.nombre, resumen: r.resumen, tipo_ubicacion: r.tipo_ubicacion,
           fecha_inicio: fecha_ini, fecha_fin: fecha_fin, hora_inicio: hora_ini, hora_fin: hora_fin,
           found:true
         })
@@ -232,7 +232,8 @@ class Evento extends Component {
 
                     <Col md="8" xs="12" className="">
                       <ImageContent
-                        src ={process.env.PUBLIC_URL + `/eventos/${this.state.id_cliente}/${this.state.id_cuenta}/${this.state.nombre_imagen}`}
+                        //src ={process.env.PUBLIC_URL + `/eventos/${this.state.id_cliente}/${this.state.id_cuenta}/${this.state.nombre_imagen}`}
+                        src={`http://localhost:7777/ev/getimg/?imagen=${this.state.directorio_imagen}`}
                       />
                     </Col>
 
@@ -256,6 +257,7 @@ class Evento extends Component {
                     <Col md="8" xs="12">
                       <InfoContent 
                         ref={element => { this.contenedor_info = element }}
+                        evento={this.state.id_evento}
                         etiquetas={this.state.etiquetas}
                         parrafos={this.state.parrafos}
                         imagenes={this.state.imagenes}

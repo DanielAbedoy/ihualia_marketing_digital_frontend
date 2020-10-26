@@ -55,7 +55,8 @@ class InfoContent extends Component {
                   <Col md="8" sm="9" xs="12" className="mx-auto">
                     <img
                       style={{ width: "100%" }}
-                      src={process.env.PUBLIC_URL + `/eventos/${this.props.id_cliente}/${this.props.id_cuenta}/${componente.id_evento}/${componente.nombre_imagen}`}
+                      //src={process.env.PUBLIC_URL + `/eventos/${this.props.id_cliente}/${this.props.id_cuenta}/${componente.id_evento}/${componente.nombre_imagen}`}
+                      src={`http://localhost:7777/ev/getimg/?imagen=${componente.nombre_imagen}&evento=${this.props.evento}`}
                     />
                   </Col>
                 </Row>

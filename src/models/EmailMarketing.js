@@ -95,6 +95,18 @@ class EmailMarketing{
     .then(r => r.data)
     .catch(err => "error");
   }
+
+  update_boletin = (id, data) => {
+    return axios.put(`${new URLs().getUrlPrincipal()}/api/boletin/${id}/`, data)
+      .then(r => r.data)
+      .catch(err => "error");
+  }
+
+  delete_boletin = (id) => {
+    return axios.delete(`${new URLs().getUrlPrincipal()}/api/boletin/${id}/`)
+      .then(r => r.statusText)
+      .catch(err => err.response.data);
+  }
 }
 
 export default EmailMarketing;

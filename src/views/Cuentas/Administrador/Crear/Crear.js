@@ -100,6 +100,13 @@ class Crear extends Component{
                 <NavBar />
               </CardHeader>
               <CardBody>
+                <Row>
+                  <Col md="12">
+                    <p className="h4 mb-0">Crea una nueva cuenta</p>
+                    <p className="h6 text-muted">Solo agrega un nombre y asigna los usuarios</p>
+                  </Col>
+                </Row>
+              <hr/>
 
               < Row>
                   <Col md="12">

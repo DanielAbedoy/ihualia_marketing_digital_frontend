@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Card, CardHeader, CardBody, Col, Row } from 'reactstrap';
+import { Card, CardHeader, CardBody, Col, Row, Button } from 'reactstrap';
+import axios from 'axios';
 
 //CardStandar
 import Load from '../../components/Load.js';

@@ -103,9 +103,9 @@ class Eventos {
     return await peticion();
   }
 
-  add_imagen_evento = async (id_evento, directorio, nombre, posicion) => {
+  add_imagen_evento = async (id_evento, nombre, posicion) => {
     const peticion = () => {
-      return axios.post(`${new URLs().getUrlPrincipal()}/api/imagen-evento/`, { id_evento: id_evento, directorio_imagen: directorio, nombre_imagen: nombre, posicion: posicion })
+      return axios.post(`${new URLs().getUrlPrincipal()}/api/imagen-evento/`, { id_evento: id_evento, nombre_imagen: nombre, posicion: posicion })
         .then(r => r)
         .catch(e => e)
     }

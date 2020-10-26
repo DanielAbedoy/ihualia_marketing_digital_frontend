@@ -19,14 +19,6 @@ class Crear extends Component {
     id_borrador: 0
   }
 
-  componentWillMount = () => {
-    if ((require('store').get('cuenta_en_uso') === undefined)) {
-      alert("Debes tener una cuenta en uso");
-      this.props.history.push('/eventos');
-      return;
-    }
-  }
-
   componentDidMount = () => {
     window.onbeforeunload = () => '';
 
@@ -39,12 +31,10 @@ class Crear extends Component {
       this.setState({ borrador: true, id_borrador: id_evento }, () => {
         borrador.get_info_event(id_evento)
           .then(datos => {
-            console.log(datos);
 
             this.InformacionBasica.set_datos_borrador(datos.informacion_basica);
             this.ubicacion.set_datos_borrador(datos.ubicacion);
             this.fecha_hora.set_datos_borrador(datos.horas);
-            //this.detalles.set_datos_borrador(datos.detalles);
             this.boletos.set_datos_borrador(datos.boletos);
           });
       })
@@ -207,7 +197,8 @@ class Crear extends Component {
           tipo_ubicacion: datos_ubicacion.tipo_ubicacion,
           fecha_hora_inicio: datos_horas.fecha_hora_inicio, fecha_hora_fin: datos_horas.fecha_hora_fin,
           zona_horaria: datos_horas.zona_horaria,
-          directorio_imagen: r.directorio, nombre_imagen: r.nombre,
+          //directorio_imagen: r.directorio, nombre_imagen: r.nombre,
+          directorio_imagen: r.ref,
           resumen: datos_detalles.resumen,
           estatus: "completo",
           id_cuenta: id_cuenta
@@ -244,7 +235,7 @@ class Crear extends Component {
             } else if (c.tipo_component === "imagen") {//Imagen
               new Evento_Model().upluad_image_extra(id_cliente, id_cuenta, evento.id, c.valor)
                 .then(res => {
-                  new Evento_Model().add_imagen_evento(evento.id, res.directorio, res.nombre, c.posicion).then(r => {
+                  new Evento_Model().add_imagen_evento(evento.id, res.ref, c.posicion).then(r => {
                     if (i === len) this.detalles.reiniciar();
                   });
                 })
@@ -296,6 +287,13 @@ class Crear extends Component {
                 <NavBar />
               </CardHeader>
               <CardBody>
+                <Row>
+                  <Col md="12">
+                    <p className="h4 mb-0">Crea un nuevo evento</p>
+                    <p className="h6 text-muted">Solo rellena toda la información necesaria y publicalo</p>
+                  </Col>
+                </Row>
+                <hr />
                 <Row>
 
                   {/* //Informacion Basica */}
@@ -353,7 +351,7 @@ class Crear extends Component {
                   }
 
                   <Col md="5" xs="12" className="mx-auto p-0">
-                    <Button blo12ck color="success"
+                    <Button block color="success"
                       type="button"
                       onClick={e => this.validar(e, "completo")}
                     > Publicar Evento </Button>

@@ -23,16 +23,13 @@ import Load from '../../components/Load.js';
 
 // routes config
 import routes from '../../routes';
+import Auth from '../../auth';
 
 const DefaultAside = React.lazy(() => import('./DefaultAside'));
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 class DefaultLayout extends Component {
-
-  state = {
-    redirec: false,
-  }
 
   loading = () => <Load />
 
@@ -43,36 +40,18 @@ class DefaultLayout extends Component {
     this.props.history.push('/login')
   }
 
-  isSesionIniciada() {
-    var store = require('store');
-    return store.get('isSesionIniciada');
-  }
-
-  componentWillMount(){
-    if (this.isSesionIniciada() === undefined) {
-      this.setState({ redirec: true })
-    } else {
-      this.setState({
-        redirec: false,
-      })
+  authCountFunction = (component, props) => {
+    if (!new Auth().isAuthUseCuenta()) {
+      alert("Debes tener una cuenta en uso")
+      const location = props.location.pathname.split("/");
+      return (<Redirect to={`/${location[1]}`}/>);
     }
-  }
-
-  //Funcion para redireccionar por si no se ha iniciado secion
-  isSecionIniciada = () => {
-    if (this.state.redirec) {
-      return (
-        <Redirect to="/login" />
-      );
-    }
+    return (component);
   }
 
   render() {
     return (
       <div className="app">
-
-        {this.isSecionIniciada()}
-
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
             <DefaultHeader onLogout={e => this.signOut(e)} />
@@ -100,9 +79,10 @@ class DefaultLayout extends Component {
                         path={route.path}
                         exact={route.exact}
                         name={route.name}
-                        render={props => (
-                          <route.component {...props} />
-                        )} />
+                        render={props => {
+                          if (route.authCount) return this.authCountFunction(<route.component {...props} />, props);
+                          else return (<route.component {...props} />);
+                        }} />
                     ) : (null);
                   })}
                   <Redirect from="/" to="/login" />
