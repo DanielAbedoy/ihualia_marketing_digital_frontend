@@ -25,20 +25,14 @@ class Listado extends Component {
 
   get_eventos = () => {
     const id_cuenta = require('store').get('cuenta_en_uso').id;
-    new ModelEvento().get_eventos_cuenta(id_cuenta)
-      .then(r => {
-        if (r !== "error") {
-          r.forEach(evento => {
-            const fecha_fin = evento.fecha_hora_fin;
-            let dates = fecha_fin.split("-");
-            let d = dates[2].split("T");
-            let fecha = { year: dates[0], month: dates[1], day: d[0] };
-            this.comparar_fecha(fecha, evento);
-          });
-          this.show_todos();
-        }
+    new ModelEvento().get_info_eventos_cuenta(id_cuenta)
+      .then(eventos => {
+        if (eventos === "error") return;
+        const eventos_pub = eventos.filter(e => e.estatus === "publicado");
+        const eventos_pasados = eventos.filter(e => e.estatus === "pasado");
+        const eventos_borr = eventos.filter(e => e.estatus === "borrador");
+        this.setState({ eventos_todos: eventos, eventos_publicados: eventos_pub, eventos_borradores: eventos_borr, eventos_pasados: eventos_pasados,option:"" },()=>this.show_todos());
       })
-
   }
 
   show_todos = e => {
@@ -64,41 +58,12 @@ class Listado extends Component {
   gestionar_evento = (evento) => this.props.history.push({ pathname: '/eventos/gestionar', state: { evento: evento } });
 
 
-
-  comparar_fecha = (fecha, evento) => {
-    let d = new Date();
-
-    let fecha_hoy = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    let fecha_comparacion = new Date(fecha.year, fecha.month, fecha.day);
-
-
-    if (fecha_hoy.getTime() > fecha_comparacion.getTime()) {
-      if (evento.estatus !== "borrador") evento.fecha_estatus = "pasado";
-      if (evento.estatus === 'borrador') this.setState({ eventos_borradores: [...this.state.eventos_borradores.slice(), evento] });
-      else this.setState({ eventos_pasados: [...this.state.eventos_pasados.slice(), evento] })
-    } else {
-      evento.fecha_estatus = "normal";
-      if (evento.estatus === 'completo') this.setState({ eventos_publicados: [...this.state.eventos_publicados.slice(), evento] });
-      if (evento.estatus === 'borrador') this.setState({ eventos_borradores: [...this.state.eventos_borradores.slice(), evento] });
-    }
-    //let arr = this.state.eventos.slice();
-    //arr.push(evento);
-    //this.setState({ eventos: arr, eventos_todos: [...this.state.eventos_todos.slice(), evento] });
-    this.setState({ eventos: [...this.state.eventos.slice(), evento], eventos_todos: [...this.state.eventos_todos.slice(), evento] });
-  }
-
-
   ir_a_evento = (id) => this.props.history.push(`/evento/?event=${id}`);
-
 
   contunuar_borrador = (id) => {
     this.props.history.push({
       pathname: '/eventos/crear',
-      state: {
-        id_evento: id,
-        borrador: true
-      }
-
+      state: { evento: id }
     })
   }
 
@@ -161,10 +126,10 @@ class Listado extends Component {
                 </Row>
                 {/* Titulo */}
                 <hr />
-                {/*                 <Row>
-                  <Col md="12"><p className="h4">{this.state.option}</p></Col>
+                <Row>
+                  <Col md="12"><p className="h4 text-center">{this.state.option}</p></Col>
                 </Row>
-                <hr /> */}
+                <hr />
 
                 {/* Listado */}
                 <Row>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Button } from 'reactstrap';
+import { useToasts } from 'react-toast-notifications';
 
 import CSVReader from 'react-csv-reader';
 
@@ -9,16 +10,14 @@ const ImportacionComponent = props => {
 
   const [campos, setCampos] = useState(["nombre", "correo"]);
   const [contactos, setContactos] = useState([]);
+  const { addToast } = useToasts();
 
   useEffect(() => {
     getCampos();
   }, [])
 
   const getCampos = async () => {
-    const _campos = await new ModelContactos().getCamposGrupo(props.id_grupo);
-    let c = campos.slice();
-    _campos.forEach(campo => { c.push(campo.campo_extra) });
-    setCampos(c);
+    setCampos([...campos.slice(), ...props.grupo.campos_extra]);
   }
 
   const cargarArchivo = (data, fileInfo) => {
@@ -60,11 +59,12 @@ const ImportacionComponent = props => {
     e.preventDefault();
 
     contactos.forEach(async(contacto,i) => {
-      const data_prin = { nombre: contacto.nombre, correo: contacto.correo };
+      const data_prin = { nombre: contacto.nombre, correo: contacto.correo, grupo: props.grupo.id };
       let campos_extra = [];
-      for (let i = 2; i < campos.length; i++) campos_extra.push({ nombre: campos[i], valor: contacto[`${campos[i]}`] });
-      await new ModelContactos().crearNuevoContacto(props.id_grupo, data_prin, campos_extra);
-      if ((i + 1) === contactos.length) alert("Sea generado todo");
+      for (let i = 2; i < campos.length; i++) campos_extra.push({ campo: campos[i], valor: contacto[`${campos[i]}`] });
+      const response = await new ModelContactos().crearNuevoContacto(data_prin, campos_extra);
+      if (response === "OK") addToast(`Sea a ingresado correctamente ${data_prin.nombre}`,{appearance:"success",autoDismiss:true});
+      else addToast(`Error al ingresar a ${data_prin.nombre}`,{appearance:"error",autoDismiss:true});
     })
   }
 

@@ -17,6 +17,7 @@ class ListaContactos extends Component {
         grupos: [],
         cuenta: 0,
 
+        grupo:'',
         campos_t: ["ID", "Nombre", "Correo"],
         campos_extra: [],
         contactos: []
@@ -28,72 +29,55 @@ class ListaContactos extends Component {
     }
 
     //Funcion para saber el grupo que esta seleccionado
-    setGrupoId = (id) => {
-        this.grupoId = id;
-        this.setState({ campos_t: ["ID", "Nombre", "Correo"], contactos: [] }, () => {
-            Promise.all([new ModelContactos().getCamposGrupo(id), new ModelContactos().getContactosDelGrupo(id)])
-                .then(promises => { return { campos: promises[0], contactos: promises[1] } })
-                .then(arreglo => {
-                    arreglo.campos.forEach(campo => { this.setState({ campos_t: this.state.campos_t.concat(campo.campo_extra), campos_extra: this.state.campos_extra.concat(campo.campo_extra) }) })
-                    arreglo.contactos.forEach(contacto => {
-                        new ModelContactos().getValorDelCampoDelContacto(contacto.contacto.id)
-                            .then(valores => {
-                                valores.forEach(valor => {
-                                    contacto.contacto[`${valor.campo}`] = valor.valor
-                                })
-                                this.setState({ contactos: this.state.contactos.concat(contacto.contacto) });
-                            })
-                    });
-                })
-
-        })
-
+    setGrupoId = (grupo) => {
+        console.log(grupo)
+        this.grupoId = grupo.id;
+        this.setState({ campos_t: ["ID", "Nombre", "Correo"], contactos: [], grupo:grupo }, async () => {
+            const campos_extra = this.state.campos_t.concat(grupo.campos_extra)
+            const contactos = await new ModelContactos().getContactosDelGrupo(grupo.id)
+            this.setState({campos_t:campos_extra, contactos: contactos})
+         })
     }
 
 
-    actulizarContacto = (datos) => {
-        let flag = false;
-        let new_json = {};
-        this.state.campos_t.forEach(campo => {
-
-            if (datos.datos_nuevos[`${campo.toLowerCase()}`]) {
-                new_json[`${campo.toLowerCase()}`] = datos.datos_nuevos[`${campo.toLowerCase()}`];
-                flag = true;
-            } else new_json[`${campo.toLowerCase()}`] = datos.datos_antes[`${campo.toLowerCase()}`];
-
+    actulizarContacto = async (datos) => {
+        const camposIniciales = ["nombre","correo"]
+        //Sber si se actualizo datos principales
+        let datosPrincipales = { id: datos.datos_antes.id, nombre: datos.datos_antes.nombre, correo: datos.datos_antes.correo, grupo: this.state.grupo.id };
+        let f = false;
+        camposIniciales.forEach(c => {
+            if (datos.datos_nuevos[`${c}`]) {
+                if (datos.datos_nuevos[`${c}`] !== datos.datos_antes[`${c}`]) {
+                    f = true;
+                    datosPrincipales[`${c}`] = datos.datos_nuevos[`${c}`]
+                }
+            }
         })
-        if (flag) { //Cambiar datos
-            const data_principal = { id: new_json.id, nombre: new_json.nombre, correo: new_json.correo };
-            //Actualizar el principal
-            new ModelContactos().actualizar_datosContacto(data_principal.id, data_principal)
-                .then(r => {
-                    if (r.statusText === 'OK') {
-                        return this.state.campos_extra.map((campo) => {
-                            return new ModelContactos().actualizar_campoExtra(data_principal.id, campo.toLowerCase(), new_json[`${campo.toLowerCase()}`])
-                        })
-                    }
-                })
-                .then(promises => Promise.all(promises))
-                .then(results => {
-                    let f = true
-                    results.forEach(res => { if (res !== "Actualizado") f = false; })
-                    if (!f) {
-                        alert("Algun campo no se actulizo de manera correcta")
-                        this.setGrupoId(this.grupoId);
-                    } else {
-                        alert("Actualizacion correcta")
-                        this.setGrupoId(this.grupoId);
-                    }
-                })
-                .catch(err => {
-                    alert("Algo ocurrio mal")
-                })
+
+        if (f) {
+            //Actualizar los principales
+            await new ModelContactos().actualizar_datosContacto(datos.datos_antes.id, datosPrincipales)
+        }
+
+        
+        let campos = [];
+        this.state.grupo.campos_extra.forEach(c => {
+            if(datos.datos_nuevos[`${c}`])campos.push({campo:c, valor:datos.datos_nuevos[`${c}`]})
+        })
+
+        if (campos.length > 0) {
+            //Actualizar campos
+            await new ModelContactos().add_new_values(datos.datos_antes.id, campos)
+
+        }
+
+        this.setGrupoId(this.state.grupo)
 
 
-            //Actualizar los campos
 
 
-        } else alert("No hay ningun cambio");
+        //Saber si se actualizaros campos extra
+        
 
     }
 

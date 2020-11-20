@@ -38,23 +38,9 @@ const UpdateGrupo = props => {
       return;
     }
     //Agregar el campo a "campo-extra" si existe el campo saltar
-    await new ModelContactos().add_campo_extra(nuevoCampo.toLocaleLowerCase());
-
-    //Relacionar el campo con el grupo
-    const relacion_resp = await new ModelContactos().add_campo_grupo(nuevoCampo.toLocaleLowerCase(), props.id_grupo)
-    if (relacion_resp === "Created") {
-      //Relacionar el campo con el contacto y dar valor de "-" (TODOS LOS CONTACTOS DEL GRUPO)
-      const contactos = await new ModelContactos().getContactosDelGrupo(props.id_grupo);
-
-      contactos.forEach((contacto,i) => {
-        new ModelContactos().set_valor_campo_contacto(nuevoCampo.toLocaleLowerCase(), contacto.contacto.id,"-");
-        if (i + 1 === contactos.length) alert("Campo agregado");
-      });
-
-    } else {
-      alert("Error al agregar el campo");
-    }    
-
+    const resp = await new ModelContactos().add_campo_extra(nuevoCampo.toLocaleLowerCase(), props.id_grupo);
+    console.log(resp)
+    if(resp === "OK")alert("Creado")
   }
 
 

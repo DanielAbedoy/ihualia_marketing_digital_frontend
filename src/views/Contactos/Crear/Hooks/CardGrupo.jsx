@@ -70,6 +70,7 @@ const GrupoComponent = (props) => {
           <Collapse isOpen={openAdd}>
             <AddContacto
               id_grupo={grupo.id}
+              campos_extra={grupo.campos_extra}
             />
 
           </Collapse>

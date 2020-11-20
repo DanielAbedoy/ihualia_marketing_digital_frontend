@@ -13,7 +13,7 @@ const Enviar = ({ datosBoletin, grupos, _fecha }) => {
     if (grupos === '') return false
     if (datosBoletin.tipo_publicacion ==="programado" && !_fecha.date) {
       addToast("Debes agregar la fecha de nuevo", { appearance: "info", autoDismiss: true })
-      return false;
+      return false; 
     }
     return true;
   }

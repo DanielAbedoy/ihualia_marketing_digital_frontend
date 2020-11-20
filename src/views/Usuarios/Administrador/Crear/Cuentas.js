@@ -14,26 +14,16 @@ class Cuentas extends Component {
 
   peticion_cuentas = () => {
     new Modelo().get_cuentas_cliente(require('store').get('usuario_guardado').id_cliente)
-      .then(r => r.data.results)
       .then(r => this.setState({ cuentas: r },()=>{this.clasificar_cuentas()}))
   }
 
-  asignar_cuenta = (e) => {
+  asignar_cuenta = (e,cuenta) => {
     e.preventDefault();
 
     //buscar si ya existe la cuenta
-    if (this.buscar_cuenta(e.target.id)) return;
+    if (this.buscar_cuenta(cuenta.id)) return;
 
-    new Modelo().get_cuenta(e.target.id)
-      .then((r) => {
-        if (this.state.cuentas_asignadas.length === 0) this.setState({ cuentas_asignadas: [r.data]});
-        else {
-          let arr = this.state.cuentas_asignadas.slice();
-          arr.push(r.data);
-          this.setState({cuentas_asignadas:arr})
-        }
-        
-      })
+    this.setState({ cuentas_asignadas: [...this.state.cuentas_asignadas.slice(), cuenta] });
 
   }
 
@@ -50,9 +40,9 @@ class Cuentas extends Component {
     this.setState({cuentas_asignadas:filters})
   }
 
-  dar_cargo = (e) => {
+  dar_cargo = (e,cuenta, cargo) => {
     this.state.cuentas_asignadas.filter((c) => {
-      if (c.id == e.target.id) c.cargo = e.target.value;
+      if (c.id == cuenta.id) c.cargo = cargo;
     })
   }
 
@@ -101,7 +91,7 @@ class Cuentas extends Component {
                         </ToastBody>
                         <Row>
                           <Col className="p-2 mx-auto" md="6" xs="12">
-                            <Button id={cuenta.id} block color="success" onClick={this.asignar_cuenta}>Asignar</Button>
+                            <Button block color="success" onClick={(e)=>this.asignar_cuenta(e,cuenta)}>Asignar</Button>
                           </Col>
                         </Row>
                       </Toast>
@@ -139,13 +129,15 @@ class Cuentas extends Component {
                         <b>Cargo:</b>
                         <FormGroup check>
                           <Label check>
-                            <Input id={cuenta.id} type="radio" value="Responsable" name="radio1" onClick={this.dar_cargo} />{' '}
+                                <Input  type="radio" value="Responsable" name="radio1"
+                                  onClick={(e)=>this.dar_cargo(e,cuenta,"responsable")} />{' '}
                               Responsable
                           </Label>
                         </FormGroup>
                         <FormGroup check>
                           <Label check>
-                            <Input  id={cuenta.id} type="radio" value="Apoyo" name="radio1" onClick={this.dar_cargo}/>{' '}
+                                <Input  type="radio" value="Apoyo" name="radio1"
+                                  onClick={(e)=>this.dar_cargo(e,cuenta,"apoyo")} />{' '}
                               Apoyo
                             </Label>
                         </FormGroup>

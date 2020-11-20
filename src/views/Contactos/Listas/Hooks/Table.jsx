@@ -60,7 +60,6 @@ function Row_Table(props) {
         <TableCell align="center">{contacto.correo}</TableCell>
 
         {props.campos.map((campo, i) => {
-
           if (i > 2) {
             const valor = contacto[`${campo}`];
             return (
@@ -77,7 +76,7 @@ function Row_Table(props) {
       </TableRow>
 
       <TableRow style={open ? { boxShadow: "0px 9px 13px -4px rgba(0,0,0,0.75)" } : {}}>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={10000}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Row className="pt-3 rounded">
               <Col md="12">
@@ -87,8 +86,6 @@ function Row_Table(props) {
               <Col md="12" className="mx-auto m-0 p-0 border border-light"></Col>
               <Col md="9" xs="12" className="mx-auto">
                 <Row  >
-                  
-
                   {campos.map((campo, j) => {
                     if (j > 0) {
                       return (

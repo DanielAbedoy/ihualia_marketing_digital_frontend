@@ -13,7 +13,7 @@ class Example extends Component {
 
     //State de la clase
     this.state = {
-      options: []
+      grupos: []
     }
 
     //Cuenta que esta siendo utilizada
@@ -32,20 +32,16 @@ class Example extends Component {
   //Funcion para regresar cual elemento fue seleccionado - se regresa por medio del value del OPTION
   seleccionado = (e) => {
     e.preventDefault();
-    this.props.action(e.target.value);
+    //this.props.action(e.target.value);
+    const grupo = this.state.grupos.find(g => g.id == e.target.value);
+    this.props.action(grupo);
   }
 
   //Funcion que obtendra los grupos existentes en la DB
   getGrupos = () => {
     //Peticion al modelo para obtener los grupos 
     let grupos = this.modelo.getGrupos(this.cuenta);
-    let data = [];
-    grupos.then((grupo) => {
-      grupo.forEach((g) => {
-        data.push({ "id": g.id, "value": g.nombre });  
-      });
-      this.setState({options:data});
-    })
+    grupos.then((grupos) => this.setState({ grupos: grupos }))
   }
 
   render() {
@@ -55,9 +51,9 @@ class Example extends Component {
           <Label for="select"><p className="h5">Grupo:</p></Label>
           <Input type="select" name="select" id="select" className="text-center" onChange={this.seleccionado}>
             <option value={"no"}>Selecciona un grupo</option>
-            {this.state.options.map((val, indx) => {
+            {this.state.grupos.map((grupo, indx) => {
               return (
-                <option key={indx} value={val.id} >{val.id} - {val.value}</option>
+                <option key={indx} value={grupo.id} >{grupo.id} - {grupo.nombre}</option>
               );
             })}
           </Input>

@@ -19,17 +19,12 @@ class MisCuentas extends Component {
     const user = require('store').get('usuario_guardado');
     //MOSTRAR LAS CUENTAS DONDE COLABORA ESTE USUARIO
     new Modelo().get_cuentas_usuario(user.correo)
-      .then((r) => {
-        let cuentas = [];
-        r.data.map((c) => {
-          new Modelo().get_cuenta(c.id_cuenta)
-            .then((r) => {
-              cuentas.push(r.data);
-              this.setState({ cuentas: cuentas })
-            })
-        })
+      .then(cuentas => {
+        console.log(cuentas)
+        if (cuentas.length > 0) this.setState({ cuentas: cuentas});
+        this.setState({ tipo: user.tipo });
       })
-    this.setState({tipo:user.tipo})
+    
   }
 
   //Funcion para usar la cuenta seleccionada
@@ -118,8 +113,8 @@ class MisCuentas extends Component {
                 <Row>
                   {this.state.cuentas.map((cuenta, indx) => {
                     return (
-                      <Col key={indx} className="text-center text-dark mx-auto p-2 bg-info" lg="4" md="6" sm="6" xs="12">
-                        <Toast className="mx-auto">
+                      <Col key={indx} className="shadow-animate text-center text-dark mx-auto p-2 bg-info" lg="4" md="6" sm="6" xs="12">
+                        <Toast className="mx-auto ">
                           <ToastHeader>
                             Clave de la Cuenta: {cuenta.id}
                           </ToastHeader>

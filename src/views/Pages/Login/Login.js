@@ -22,6 +22,7 @@ class Login extends Component {
     const datos = modelo.getUsuario(this.state.correo);
 
     datos.then((usuario) => {
+      console.log(usuario)
       if (usuario === undefined) {
         alert("No existe el usuario");
         return;

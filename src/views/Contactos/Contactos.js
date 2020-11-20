@@ -10,43 +10,33 @@ import items from './items';
 
 class Contactos extends Component {
 
+  state = {
+    cuenta: false
+  }
+
+  componentWillMount = () => {
+    if (require('store').get("cuenta_en_uso")) this.setState({ cuenta: true });
+  }
+
   render() {
     return (
       <div className="animated fadeIn">
         <Row>
           <Col xs="12">
             <Card className="">
-              <CardHeader>
-                <NavBar
-                  title="Contactos"
-                />
+            <CardHeader className="text-white p-4" style={{backgroundColor:"rgb(44,96,186)"}}>
+                <p className="h3"><i className="fa fa-users"></i> Contactos |</p>
               </CardHeader>
               <CardBody>
+                {this.state.cuenta === false ?
+                  <Row className="py-5"><Col xl="6" md="8" xs="12" className="mx-auto d-flex flex-column justify-content-center"><img width="100%" src={require('../../assets/img/fondos/contactos-no-count.png')} alt="contactos-no-count" /></Col></Row>
+                  :
+                  <>
+                    Diseño web
+                  </>
+                }
                 <Row>
-                  {items.map((item, indx) => {
-                    return (
-                      
-                      <CardStandar key={indx}
-                        class="card-user text-dark"
-                        colLg="4" colMd="6" colSm="6" colXs="12"
-                        contenidoHeader={
-                          <CardImg top width="100%" src={item.img} alt={`Imagen: ${item.name}`} title={item.name} />
-                        }
-                        contenidoBody={
-                          <>
-                            <Link to={item.path}  >
-                              <h5 className="title">{item.name}</h5>
-                            </Link>
-                            <p className="description">Leyenda del Item</p>
-                            <p className="description text-center">
-                              Esto es una pequeña descripcion de lo que haces en este menu
-                            </p>
-                          </>
-                        }
-                      />
-                    );
-                  })
-                  }
+
                 </Row>
               </CardBody>
             </Card>

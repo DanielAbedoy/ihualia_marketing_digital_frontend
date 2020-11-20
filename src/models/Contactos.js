@@ -8,21 +8,6 @@ class Contactos {
     }
 
 
-    getGrupos = async (cuenta) => {
-
-        const peticion = () => {
-            //Peticion get para obtener los datos
-            return axios.get(`${this.urls.getUrlPrincipal()}/api/grupo/?cuenta=${cuenta}`)
-                .then((res) => {
-                    return res.data.results;
-                })
-                .catch(console.log)
-        }
-
-        
-        return await peticion();
-    }
-
     getCamposGrupo = async (grupoId) => {
 
         const peticion = () => {
@@ -37,15 +22,7 @@ class Contactos {
         return await peticion();
     }
 
-    getContactosDelGrupo = async (grupoId) => {
-        const peticion = () => {
-            return axios.get(`${this.urls.getUrlPrincipal()}/api/grupo-contacto/?grupo=${grupoId}`)
-                .then((res) => {
-                    return res.data.results;
-                }).catch(console.log)
-        }
-        return await peticion();
-    }
+
 
     getValorDelCampoDelContacto = async (contactoId) => {
         const peticion = () => {
@@ -59,18 +36,7 @@ class Contactos {
     }
 
 
-    crearGrupo = async (nombreGrupo, idCuenta) => {
-        const peticion = () => {
-            return axios.post(`${this.urls.getUrlPrincipal()}/api/post/grupo/`, {
-                nombre: nombreGrupo,
-                cuenta: idCuenta
-            })
-                .then((res) => {
-                    return res;
-                })
-        }
-        return await peticion();
-    }
+
 
 
     crearCampo_a_grupo = async (nombre_campo, id_grupo) => {
@@ -207,21 +173,7 @@ class Contactos {
         return await peticion();
     }
 
-    actualizar_datosContacto = async (id_contacto, data) => {
-        const peticion = () => {
-            return axios.put(`${this.urls.getUrlPrincipal()}/api/contacto/${id_contacto}/`, data)
-                .then((r) => {
-                    return r;
-                })
-                .catch((error) => {
-                    if (error.request) {
-                        console.log(error.request);
-                    }
-                })
-        }
 
-        return await peticion();
-    }
 
 
     actualizar_campoExtra = async (id_contacto, campo, nuevo_valor) => {
@@ -246,26 +198,15 @@ class Contactos {
         return await peticion();
     }
 
-    eliminarContacto = async (id_contacto) => {
-        const peticion = () => {
-            return axios.delete(`${this.urls.getUrlPrincipal()}/api/contacto/${id_contacto}/`)
-                .then((r) => {
-                    return r;
-                })
-                .catch(console.log)
-        }
-
-        return await peticion();
-    }
 
     getContactosDelLosGrupos = async (gruposIds) => {
         const peticion = () => {
             return gruposIds.map((id) => {
                 return axios.get(`${this.urls.getUrlPrincipal()}/api/grupo-contacto/?grupo=${id}`)
-                .then(res => res.data.results)
-                .catch(err=> "error")
+                    .then(res => res.data.results)
+                    .catch(err => "error")
             });
-            
+
         }
         return await peticion();
     }
@@ -277,41 +218,10 @@ class Contactos {
             .catch(err => "error")
     }
 
-    crearNuevoContacto = (id_grupo, datos_prin, campos_extra) => {
-        return axios.post(`${this.urls.getUrlPrincipal()}/api/contacto/`, datos_prin)
-            .then(resp1 => {
-                if (resp1.statusText === "Created") return this.relacionarContactoGrupo(resp1.data.id, id_grupo)
-                throw new Error();
-            })
-            .then(resp2 => {
-                if (resp2.statusText === "Created") {
-                    return campos_extra.map((campo) => {
-                        return this.nuevoCampoValor(resp2.data.contacto, campo.nombre, campo.valor)
-                    })
-                }
-                throw new Error();
-            })
-            .then(promises => Promise.all(promises))
-            .then(resultados => {
-                resultados.forEach(r => {
-                    if (r.statusText !== "Created") return "error";
-                })
-                return "OK";
-            })
-            .catch(err => "error")
-    }
 
-    cambiar_nombre_grupo = (id_grupo, nuevo_nombre) => {
-        return axios.put(`${this.urls.getUrlPrincipal()}/api/grupo/${id_grupo}/`, { nombre: nuevo_nombre })
-            .then(r => r.statusText)
-            .catch(err => "error");
-    }
 
-    add_campo_extra = (campo) => {
-        return axios.post(`${this.urls.getUrlPrincipal()}/api/campo-extra/`, { nombre: campo })
-            .then(r => r.statusText)
-            .catch(e => "error")
-    }
+
+
 
     add_campo_grupo = (campo, id_grupo) => {
         return axios.post(`${this.urls.getUrlPrincipal()}/api/post/campo-extra-grupo/`, { grupo: id_grupo, campo_extra: campo })
@@ -320,9 +230,83 @@ class Contactos {
     }
 
     set_valor_campo_contacto = (campo, id_contacto, valor) => {
-        return axios.post(`${this.urls.getUrlPrincipal()}/api/post/campo-contacto/`, { contacto: id_contacto, campo: campo, valor:valor })
+        return axios.post(`${this.urls.getUrlPrincipal()}/api/post/campo-contacto/`, { contacto: id_contacto, campo: campo, valor: valor })
             .then(r => r.statusText)
             .catch(e => "error")
+    }
+
+    
+
+
+    //Nuevos---------------------------------
+    getGrupos = (cuenta) => {
+        //Peticion get para obtener los datos
+        return axios.get(`${this.urls.getUrlPrincipal()}/api/grupo/?cuenta=${cuenta}`)
+            .then(res => res.data.results)
+            .catch(err => err.response.request);
+
+    }
+
+    getContactosDelGrupo = (grupoId) => {
+        return axios.get(`${this.urls.getUrlPrincipal()}/api/contacto/grupo/?grupo=${grupoId}`)
+            .then(res => res.data)
+            .catch(error => { return { error: error.response.request } })
+    }
+
+    add_new_values = (contacto, campos) => {
+        return axios.post(`${this.urls.getUrlPrincipal()}/api/campo-contacto/newvalues/`, { contacto: contacto, campos: campos })
+            .then(res => res.data)
+            .catch(error => { return { error: error.response.request } })
+    }
+
+    actualizar_datosContacto = (id_contacto, data) => {
+        return axios.put(`${this.urls.getUrlPrincipal()}/api/contacto/${id_contacto}/`, data)
+            .then((r) => r.data)
+            .catch((error) => {
+                if (error.request) {
+                    console.log(error.request);
+                }
+            })
+    }
+
+    eliminarContacto = (id_contacto) => {
+        return axios.delete(`${this.urls.getUrlPrincipal()}/api/contacto/${id_contacto}/`)
+            .then((r) => r)
+            .catch(console.log)
+
+    }
+
+    cambiar_nombre_grupo = (id_grupo, nuevo_nombre) => {
+        return axios.put(`${this.urls.getUrlPrincipal()}/api/grupo/${id_grupo}/`, { nombre: nuevo_nombre })
+            .then(r => r.statusText)
+            .catch(err => "error");
+    }
+
+    add_campo_extra = (campo, grupo) => {
+        return axios.post(`${this.urls.getUrlPrincipal()}/api/campo-extra/addcampo/`, { campo: campo, grupo: grupo })
+            .then(r => r.statusText)
+            .catch(e => "error")
+    }
+
+    crearNuevoContacto = (datos_prin, campos_extra) => {
+        return axios.post(`${this.urls.getUrlPrincipal()}/api/contacto/`, datos_prin)
+            .then(async resp => {
+                if (campos_extra.length > 0) {
+                    await this.add_new_values(resp.data.id, campos_extra);
+                    return "OK"
+                }else return "OK"
+                
+            })
+            .catch(err => err)
+    }
+
+    crearGrupo = async (nombreGrupo, idCuenta) => {
+        return axios.post(`${this.urls.getUrlPrincipal()}/api/grupo/`, {
+            nombre: nombreGrupo,
+            cuenta: idCuenta
+        })
+        .then((res) => res.statusText)
+        .catch(err=> err.request)
     }
 
     remove_grupo = (id_grupo) => {

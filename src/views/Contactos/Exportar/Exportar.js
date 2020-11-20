@@ -25,7 +25,7 @@ class Exportar extends Component {
             componente: '',
             exportData: [],
 
-            id_grupo: "",
+            grupo: "",
             accion: "",
         }
 
@@ -40,9 +40,9 @@ class Exportar extends Component {
     }
 
     //Funcion para traer el id del grupo que se selcciono
-    setGrupoId = (id) => {
-        this.setState({id_grupo:"", accion:""}, () => {
-            this.setState({ id_grupo: id });    
+    setGrupoId = (grupo) => {
+        this.setState({grupo:"", accion:""}, () => {
+            this.setState({ grupo: grupo });    
         })
         
     }
@@ -83,7 +83,7 @@ class Exportar extends Component {
 
 
                                 {/* Accion Component */}
-                                {this.state.id_grupo > 0 ?
+                                {this.state.grupo.id > 0 ?
                                     <>
                                         <hr />
                                         <SetAccionComponent
@@ -98,13 +98,13 @@ class Exportar extends Component {
                                 {this.state.accion === "Exportar" ?
                                     /* Esportar */
                                     <ExportacionComponent
-                                        id_grupo={this.state.id_grupo}
+                                        grupo={this.state.grupo}
                                     />
                                     :
 
                                     <>{this.state.accion === "Importar" ?
                                         <ImportacionComponent
-                                            id_grupo={this.state.id_grupo}
+                                            grupo={this.state.grupo}
                                         />
                                         /* Importar */
                                         :

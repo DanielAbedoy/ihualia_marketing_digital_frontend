@@ -7,41 +7,34 @@ import NavBar from './components/NavBar.js';
 import items from './items';
 
 class Eventos extends Component{
-  render(){
-    return(
+
+  state = {
+    cuenta: false
+  }
+
+  componentWillMount = () => {
+    if (require('store').get("cuenta_en_uso")) this.setState({ cuenta: true });
+  }
+
+  render() {
+    return (
       <div className="animated fadeIn">
         <Row>
           <Col xs="12">
-            <Card>
-              <CardHeader>
-                <NavBar />
+            <Card className="">
+            <CardHeader className="text-white p-4" style={{backgroundColor:"#21f077bb"}}>
+                <p className="h3"><i className="cui-calendar"></i> Eventos |</p>
               </CardHeader>
               <CardBody>
+                {this.state.cuenta === false ?
+                  <Row className="py-5"><Col xl="6" md="8" xs="12" className="mx-auto d-flex flex-column justify-content-center"><img width="100%" src={require('../../assets/img/fondos/eventos-no-count.png')} alt="eventos-no-count" /></Col></Row>
+                  :
+                  <>
+                    Diseño web
+                  </>
+                }
                 <Row>
-                {items.map((item, indx) => {
-                  if(item.visible) return (
-                      
-                      <CardStandar key={indx}
-                        class="card-user text-dark mx-auto"
-                        colLg="5" colMd="6" colSm="6" colXs="12"
-                        contenidoHeader={
-                          <CardImg top width="100%" src={item.img} alt={`Imagen: ${item.name}`} title={item.name} />
-                        }
-                        contenidoBody={
-                          <>
-                            <Link to={item.path}  >
-                              <h5 className="title">{item.name}</h5>
-                            </Link>
-                            <p className="description">Leyenda del Item</p>
-                            <p className="description text-center">
-                              Esto es una pequeña descripcion de lo que haces en este menu
-                            </p>
-                          </>
-                        }
-                      />
-                    );
-                  })
-                  }
+
                 </Row>
               </CardBody>
             </Card>

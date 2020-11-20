@@ -16,7 +16,7 @@ class Crear extends Component{
     if (require('store').get('usuario_guardado').tipo.toLowerCase() !== "administrador") this.props.history.push('/cuentas');
   }
 
-  crear = (e) => {
+  crear = async (e) => {
     e.preventDefault();
     //Validar //0 sin nombre - 1 sin usuarios - 2 sin cargos - 3 todo bien
     const usuarios = this.comp_asignar.get_usuarios();
@@ -30,44 +30,32 @@ class Crear extends Component{
       return; 
     }
 
+    const cliente = require('store').get('usuario_guardado').id_cliente;
 
     if (result === 1) {
       if (window.confirm("¿ Seguro que desea crear la cuenta sin usuarios ?")) {
-        const datos = {
-          nombre: this.state.nombre_cuenta,
-          estatus: 'Activo',
-          id_cliente: require('store').get('usuario_guardado').id_cliente
-        }
-        new Modelo().nueva_cuenta(datos)
-          .then((r) => {
-            if (r.statusText === 'Created') alert("Creada con éxito");
-            this.props.history.push('/cuentas');
-          });
-        return;
+        const response = await new Modelo().add_cuenta(this.state.nombre_cuenta, "Activo", cliente);
+        if (response.statusText === 'Created') {
+          alert("Creada con éxito");
+          this.props.history.push('/cuentas');
+        } else alert(response);
       }
     }
+
+
     if (result === 3) {
-      const datos = {
-        nombre: this.state.nombre_cuenta,
-        estatus: 'Activo',
-        id_cliente: require('store').get('usuario_guardado').id_cliente
+
+      const response = await new Modelo().add_cuenta(this.state.nombre_cuenta, "Activo", cliente);
+      if (response.statusText === 'Created') { 
+        const cuenta_id = response.data.id;
+
+        let usuariosNuevos = [];
+        usuarios.forEach(u => usuariosNuevos.push({user:u.correo, tipo:u.cargo}) )
+
+        const agregados = await new Modelo().add_users_cuenta(cuenta_id, usuariosNuevos);
+        console.log(agregados)
+
       }
-      new Modelo().nueva_cuenta(datos)
-        .then(r => r.data.id)
-        .then(r => {
-          usuarios.forEach(u => {
-            const data = {
-              tipo: u.cargo,
-              id_usuario: u.correo,
-              id_cuenta: r
-            }
-            new Modelo().nuevo_usuario_cuenta(data)
-              .then(r => r)
-          });
-          alert("Creada con éxito")
-          this.props.history.push('/cuentas')
-        });
-      
     }
 
 

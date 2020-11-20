@@ -21,38 +21,14 @@ class Administrar extends Component {
 
 
   componentDidMount = () => {
-    
+
     if (require('store').get('usuario_guardado').tipo.toLowerCase() !== "administrador") this.props.history.push('/cuentas');
-    
+
     try {
-
-      new Modelo().get_cuenta(this.props.location.state.id_cuenta)
-        .then(r => {
-          this.setState({ cuenta: r.data }, () => {
-            new Modelo().get_usuarios_cuentas(this.state.cuenta.id)
-              //.then( r => this.setState({usuarios: r.data}))
-              .then(r => r.data)
-              .then((r) => {
-                let arr = [];
-                r.forEach(cuentas => {
-                  const cargo = cuentas.tipo;
-                  new Modelo().getUsuario(cuentas.id_usuario)
-                    .then(r => {
-                      arr.push({
-                        nombre: r.nombre,
-                        usuario: r.usuario,
-                        correo: r.correo,
-                        estatus: r.estatus,
-                        cargo: cargo,
-                      });
-                      this.setState({ usuarios: arr })
-                    })
-
-
-                });
-              })
-          })
-        })
+      this.setState({ cuenta: this.props.location.state.cuenta }, () => {
+        new Modelo().get_usuarios_cuenta(this.state.cuenta.id)
+          .then(users => this.setState({ usuarios: users }))
+      })
 
     } catch (e) {
       this.props.history.push('/cuentas')
@@ -65,7 +41,7 @@ class Administrar extends Component {
     if ((require('store').get('cuenta_en_uso') !== undefined)) {
       if ((require('store').get('cuenta_en_uso').id + "") === e.target.id) {
         return alert("No puedes desactivar esta cuenta porque está en uso");
-      }  
+      }
     }
 
     const estatus = this.state.cuenta.estatus.toLowerCase() === "activo" ? "Inactivo" : "Activo";
@@ -94,7 +70,7 @@ class Administrar extends Component {
     }
   }
 
-  asignar_cuentas = (e) => {
+  asignar_cuentas =async (e) => {
     e.preventDefault();
     //Validar //0 sin nombre - 1 sin usuarios - 2 sin cargos - 3 todo bien
     const usuarios = this.component_asig.get_usuarios();
@@ -109,7 +85,7 @@ class Administrar extends Component {
     }
     if (result === 3) {
 
-      usuarios.forEach(u => {
+      /* usuarios.forEach(u => {
         const data = {
           tipo: u.cargo,
           id_usuario: u.correo,
@@ -117,9 +93,14 @@ class Administrar extends Component {
         }
         new Modelo().nuevo_usuario_cuenta(data)
           .then(r => r)
-      });
+      });*/
+      
+
+      let nuevosUsuarios = [];
+      usuarios.forEach(u => nuevosUsuarios.push({ user: u.correo, tipo: u.cargo }))
+      await new Modelo().add_users_cuenta(this.state.cuenta.id, nuevosUsuarios)
       alert("Asigandos con éxito")
-      this.props.history.push('/cuentas')
+      this.props.history.push('/cuentas/listado') 
 
     }
 
@@ -145,7 +126,7 @@ class Administrar extends Component {
     e.preventDefault();
 
     if (window.confirm("¿ Seguro que desea desvincular el usuario de la cuenta ?")) {
-      new Modelo().desvincular_usuario_cuenta(this.state.cuenta.id,e.target.id)
+      new Modelo().desvincular_usuario_cuenta(this.state.cuenta.id, e.target.id)
         .then(r => {
           if (r.statusText === "No Content") alert("Desvinculada con éxito");
           this.props.history.push('/cuentas');
@@ -162,13 +143,13 @@ class Administrar extends Component {
             <NavBar />
           </CardHeader>
           <CardBody>
-          <Row>
-                  <Col md="12">
-                    <p className="h4 mb-0">Administrador de cuentas</p>
-                    <p className="text-muted">Puedes desactivar o activar la cuenta, eliminarla, y quitar o asignar nuevos usuarios</p>
-                  </Col>
-                </Row>
-              <hr/>
+            <Row>
+              <Col md="12">
+                <p className="h4 mb-0">Administrador de cuentas</p>
+                <p className="text-muted">Puedes desactivar o activar la cuenta, eliminarla, y quitar o asignar nuevos usuarios</p>
+              </Col>
+            </Row>
+            <hr />
             <Row>
               <Col md="6" xs="12" className="text-center mx-auto">
                 <Badge id={this.state.cuenta.id} onClick={this.desactivar_activar} style={{ cursor: "pointer" }} className="m-0"
@@ -200,7 +181,6 @@ class Administrar extends Component {
                         <thead>
                           <tr className="thead-dark">
                             <th>Nombre</th>
-                            <th>Usuario</th>
                             <th>Correo</th>
                             <th>Estatus</th>
                             <th>Cargo</th>
@@ -212,10 +192,9 @@ class Administrar extends Component {
                             return (
                               <tr key={i}>
                                 <td>{usuario.nombre}</td>
-                                <td>{usuario.usuario}</td>
                                 <td>{usuario.correo}</td>
                                 <td className={usuario.estatus.toLowerCase() == "activo" ? "bg-success" : "bg-danger"} >{usuario.estatus}</td>
-                                <td>{usuario.cargo}</td>
+                                <td>{usuario.tipo}</td>
                                 <td className="m-0">
                                   <i id={usuario.correo} onClick={this.desvincular_cuenta} className="fa fa-times border rounded bg-danger p-1 mr-2" style={{ cursor: "pointer" }}></i>
                                 </td>

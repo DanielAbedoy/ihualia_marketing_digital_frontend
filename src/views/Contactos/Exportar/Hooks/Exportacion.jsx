@@ -14,35 +14,17 @@ const ExportacionComponent = props => {
     getContactos();
   }, [])
 
-  const getCampos = async () => {
-    const _campos = await new ModelContactos().getCamposGrupo(props.id_grupo);
-    let c = headers.slice();
-    _campos.forEach(campo => { c.push(campo.campo_extra.toLowerCase()) });
-
+  const getCampos = () => {
+    let c = [...headers.slice(),...props.grupo.campos_extra];
     let h = [];
-    c.forEach(campo => {
-      h.push({ label: campo.toUpperCase(), key: campo.toLowerCase() })
-    })
+    c.forEach(campo => h.push({ label: campo.toUpperCase(), key: campo.toLowerCase() }))
     setHeaders(h);
   }
 
   const getContactos = async () => {
-    const contactos = await new ModelContactos().getContactosDelGrupo(props.id_grupo);
-    
-    let d = [];
-    contactos.forEach(contacto => {
-      let obj = { id: contacto.contacto.id, nombre: contacto.contacto.nombre, correo: contacto.contacto.correo };
-      contacto.contacto.campos_extra.forEach(c_e => {
-        const campo_valor = JSON.parse(c_e);
-        obj = { ...obj, [`${campo_valor["campo"]}`]: campo_valor["valor"] }
-      })
-      d.push(obj);
-    })
-    setData(d);
+    const contactos = await new ModelContactos().getContactosDelGrupo(props.grupo.id);
+    setData(contactos);
   }
-
-
-
 
   return (
     <Row>
@@ -58,7 +40,7 @@ const ExportacionComponent = props => {
               <CSVLink
                 data={data}
                 headers={headers}
-                filename={`Contactos_Grupo_Clave_${props.id_grupo}.csv`}
+                filename={`Contactos_Grupo_${props.grupo.nombre}.csv`}
                 className="btn btn-primary btn-block mt-4"
                 style={{height:"40px"}}
               >

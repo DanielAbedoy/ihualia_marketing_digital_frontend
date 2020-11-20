@@ -5,9 +5,9 @@ class Header extends Component{
 
   render() {
     return (
-      <header>
+      <header className={this.props.className}>
         <a href="https://ihualia.com.mx" >
-          <img src={require('../../assets/img/brand/logo_ihualia.png')} />
+          <img src={require('../../assets/img/brand/logo-no-fondo-balck.png')} />
         </a>
         <div className="social-buttons">
           <a className="fb"><i className="fa fa-facebook-official"></i></a>

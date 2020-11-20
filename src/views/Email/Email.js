@@ -13,22 +13,24 @@ import EmailMarketing from '../../models/EmailMarketing';
 
 class Email extends Component {
 
-  months = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  months = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
   state = {
+    cuenta: false,
     boletines: [],
     enviados: [],
     borradores: [],
     pendientes: [],
-    
-    labelsChat: [],
-    dataSetChart:[],
-  }
-  componentDidMount = () => {
-    
-    this.getBoletines();
-  }
 
+    labelsChat: [],
+    dataSetChart: [],
+  }
+  componentWillMount = () => {
+    if (require("store").get("cuenta_en_uso")) {
+      this.setState({ cuenta: true });
+      this.getBoletines(); 
+    }
+  }
   /* Obtener los boletintes el mes [X]
     Boletienes enviados [x]
     Boletienes borradores [x]
@@ -39,25 +41,21 @@ class Email extends Component {
   /* Agrregarlas opciones de crear, Administrar y Listado de los boletienes */
 
   getBoletines = async () => {
-    if (require("store").get("cuenta_en_uso")) {
-      alert("Debes usar unacuenta");
-      this.props.history.push("/inicio");
-      return;
-    }
+
     const id_cuenta = require("store").get("cuenta_en_uso").id;
     const fecha_start = this.getFecha("start");
     const fecha_end = this.getFecha("end");
 
-    const boletines = await new EmailMarketing().get_boletines_fecha_cuenta(fecha_start,fecha_end,id_cuenta);
+    const boletines = await new EmailMarketing().get_boletines_fecha_cuenta(fecha_start, fecha_end, id_cuenta);
     console.log(boletines)
-    this.setState({ boletines: boletines }, () => { this.filerBoletienesEnviados(); this.filterBorradores();this.filterProgramados()})
+    this.setState({ boletines: boletines }, () => { this.filerBoletienesEnviados(); this.filterBorradores(); this.filterProgramados() })
   }
 
   filerBoletienesEnviados = () => {
     let f = new Date();
-    const sends = this.state.boletines.filter(b => b.estatus == "enviado" && b.tipo_publicacion == "enviado" );
+    const sends = this.state.boletines.filter(b => b.estatus == "enviado" && b.tipo_publicacion == "enviado");
     console.log(sends);
-    this.setState({ enviados: sends },()=>{this.sortDataChart()});
+    this.setState({ enviados: sends }, () => { this.sortDataChart() });
   }
 
   filterBorradores = () => {
@@ -81,7 +79,7 @@ class Email extends Component {
     return null;
   }
 
-  
+
   /* Obtener los dias del mes
   Obtener los boletintes de cada uno de esos dias */
   sortDataChart = () => {
@@ -97,7 +95,7 @@ class Email extends Component {
       let arr = this.state.enviados.filter(b => b.fecha_creado == date);
       datSet.push(arr.length);
     }
-    this.setState({ labelsChat: lbs, dataSetChart:datSet});
+    this.setState({ labelsChat: lbs, dataSetChart: datSet });
   }
 
   render() {
@@ -111,69 +109,72 @@ class Email extends Component {
                 {/* <NavBar /> */}
               </CardHeader>
               <CardBody>
-                <Row>
-                  <Col xl="10" lg="12" xs="12" className="mx-auto">
-                  <br/>
-                    <Row>
-                      <Col md="6" xs="12">
-                        <Row style={{ height: "100%" }} className="align-items-center" >
-                          <CardMini title={this.state.boletines.length} subTitle="Boletines del mes" icon="calendar" />
-                          <CardMini title={this.state.enviados.length}subTitle="Enviados del mes" icon="calendar-o" color="#21f077bb" />
-                          <CardMini title={this.state.borradores.length} subTitle="Borradores del mes" icon="pencil-square-o" color="#21f077bb" />
-                          <CardMini title={this.state.pendientes.length} subTitle="Programados del mes" icon="clock-o" />
+                {this.state.cuenta === false ?
+                  <Row className="py-5"><Col xl="6" md="8" xs="12" className="mx-auto d-flex flex-column justify-content-center"><img width="100%" src={require('../../assets/img/fondos/email-no-count.png')} alt="email-no-count" /></Col></Row>
+                  :
+                  <Row>
+                    <Col xl="10" lg="12" xs="12" className="mx-auto">
+                      <br />
+                      <Row>
+                        <Col md="6" xs="12">
+                          <Row style={{ height: "100%" }} className="align-items-center" >
+                            <CardMini title={this.state.boletines.length} subTitle="Boletines del mes" icon="calendar" />
+                            <CardMini title={this.state.enviados.length} subTitle="Enviados del mes" icon="calendar-o" color="#21f077bb" />
+                            <CardMini title={this.state.borradores.length} subTitle="Borradores del mes" icon="pencil-square-o" color="#21f077bb" />
+                            <CardMini title={this.state.pendientes.length} subTitle="Programados del mes" icon="clock-o" />
 
-                        </Row>
-                      </Col>
-                      <Col md="6" xs="12">
-                        <Slide items={items} history={this.props.history} />
-                      </Col>
-                    </Row>
-                    <br/>
-                    <hr />
+                          </Row>
+                        </Col>
+                        <Col md="6" xs="12" className="d-flex flex-column justify-content-center">
+                          <Slide items={items} history={this.props.history} />
+                        </Col>
+                      </Row>
+                      <br />
+                      <hr />
 
-                    <Row>
-                      <Col md="10" xs="11" className="mx-auto">
-                        <ChartComponent 
-                          label="Boletitnes enviados"
-                          labels={this.state.labelsChat}
-                          dataSet={this.state.dataSetChart}
-                        />
-                      </Col>
-                    </Row>
-                    <br />
-                    <Row>
-                      <Col md="9" xs="11" className="mx-auto align-self-center" >
-                        <p style={{ color: "#21f077bb", background: `linear-gradient(184deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 80%, rgba(91,191,233,1) 82%, #21f077bb 100%)`, }}
-                          className="align-middle text-center rounded h1 shadow p-3 m-0">
-                          <b>Boletines enviados en el mes de {this.months[new Date().getMonth()]}</b></p>
-                      </Col>
+                      <Row>
+                        <Col md="10" xs="11" className="mx-auto">
+                          <ChartComponent
+                            label="Boletitnes enviados"
+                            labels={this.state.labelsChat}
+                            dataSet={this.state.dataSetChart}
+                          />
+                        </Col>
+                      </Row>
+                      <br />
+                      <Row>
+                        <Col md="9" xs="11" className="mx-auto align-self-center" >
+                          <p style={{ color: "#21f077bb", background: `linear-gradient(184deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 80%, rgba(91,191,233,1) 82%, #21f077bb 100%)`, }}
+                            className="align-middle text-center rounded h1 shadow p-3 m-0">
+                            <b>Boletines enviados en el mes de {this.months[new Date().getMonth()]}</b></p>
+                        </Col>
 
-                    </Row>
-                    <hr />
-                    <Row>
-                      <Col sm="4" xs="12" className="mx-auto">
-                        <InfoCard
-                          title="Crea un boletin nuevo" button="Crealo Ahora" fn={() => this.props.history.push("/emailmarketing/crear")}
-                          description="Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert"
-                        />
-                      </Col>
-                      <Col sm="4" xs="12" className="mx-auto">
-                        <InfoCard color="#21f077bb"
-                          title="Mira tus boletienes" button="Entra Y Mira" fn={() => this.props.history.push("/emailmarketing/boletines")}
-                          description="Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert"
-                        />
-                      </Col>
-                      <Col sm="4" xs="12" className="mx-auto">
-                      <InfoCard
-                          title="Gestiona tus boletines" button="Primero Crealo" fn={() => this.props.history.push("/emailmarketing/crear")}
-                          description="Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert"
-                        />
-                      </Col>
-                    </Row>
-                  </Col>
-                </Row>
+                      </Row>
+                      <hr />
+                      <Row>
+                        <Col sm="4" xs="12" className="mx-auto">
+                          <InfoCard
+                            title="Crea un boletin nuevo" button="Crealo Ahora" fn={() => this.props.history.push("/emailmarketing/crear")}
+                            description="Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert"
+                          />
+                        </Col>
+                        <Col sm="4" xs="12" className="mx-auto">
+                          <InfoCard color="#21f077bb"
+                            title="Mira tus boletienes" button="Entra Y Mira" fn={() => this.props.history.push("/emailmarketing/boletines")}
+                            description="Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert"
+                          />
+                        </Col>
+                        <Col sm="4" xs="12" className="mx-auto">
+                          <InfoCard
+                            title="Gestiona tus boletines" button="Primero Crealo" fn={() => this.props.history.push("/emailmarketing/crear")}
+                            description="Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert Lorem Iprso lore resm srty sdert"
+                          />
+                        </Col>
+                      </Row>
+                    </Col>
+                  </Row>
+                }
 
-                
               </CardBody>
             </Card>
           </Col>

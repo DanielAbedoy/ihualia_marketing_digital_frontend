@@ -65,7 +65,7 @@ class Crear extends Component {
 
         new ModeloContactos().crearGrupo(this.state.nombre_grupo_nuevo, require('store').get("cuenta_en_uso").id)
             .then(response => {
-                if (response.statusText !== "Created") {
+                if (response !== "Created") {
                     alert("Error al crear el grupo")
                 } else {
                     alert("Creado")

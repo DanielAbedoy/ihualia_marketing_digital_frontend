@@ -19,6 +19,7 @@ const Register = React.lazy(() => import('./views/Pages/Register'));
 const Page404 = React.lazy(() => import('./views/Pages/Page404'));
 const Page500 = React.lazy(() => import('./views/Pages/Page500'));
 const EventoPublic = React.lazy(() => import('./views/Pages/Evento/Evento'))
+const EncuestaPublic = React.lazy(() => import('./views/Pages/Encuesta/Encuesta'));
 
 class App extends Component {
 
@@ -37,7 +38,8 @@ class App extends Component {
           <Switch>
             <Route path="/login" name="Login Page" render={props => this.authFunction(<Login {...props} />, true, "inicio") } />
             <Route path="/register" name="Register Page" render={props => this.authFunction(<Register {...props} />, true, "inicio")} />
-            <Route path="/evento" exact={true} name="Evento" render={props => <EventoPublic {...props} />} />
+            <Route path="/evento" name="Evento" render={props => <EventoPublic {...props} />} />
+            <Route path="/encuesta/:id" name="Encuesta" render={props => <EncuestaPublic {...props} />} />
             <Route path="/404" name="Page 404" render={props => <Page404 {...props} />} />
             <Route path="/500" name="Page 500" render={props => <Page500 {...props} />} />
             <Route path="/" name="Home" render={props => this.authFunction(<DefaultLayout {...props} />, false, "login")} />

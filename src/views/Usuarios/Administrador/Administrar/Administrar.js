@@ -27,7 +27,7 @@ class Administrar extends Component {
     if (require('store').get('usuario_guardado').tipo.toLowerCase() !== "administrador") this.props.history.pus('/usuarios');
     try {
 
-      let user = this.props.location.state;
+      let user = this.props.location.state.usuario;
 
       const img = ImagenUser.filter(w => w.nombre === user.imagen)
       const nom_img = user.imagen;
@@ -41,19 +41,7 @@ class Administrar extends Component {
 
   peticion_cuentas = () => {
     new Modelo().get_cuentas_usuario(this.state.usuario.correo)
-      .then(r => {
-        let arr = [];
-        r.data.map((cuenta) => {
-          const cargo = cuenta.tipo;
-          new Modelo().get_cuenta(cuenta.id_cuenta)
-            .then(r => {
-              const datos = r.data;
-              datos.cargo = cargo;
-              arr.push(datos);
-              this.setState({ cuentas: arr })
-            })
-        });
-      })
+      .then(cuentas => this.setState({ cuentas: cuentas }))
   }
 
   desactivar_activar = (e) => {
@@ -102,7 +90,7 @@ class Administrar extends Component {
 
   }
 
-  asignar_cuentas = (e) => {
+  asignar_cuentas = async(e) => {
     //Validar
     e.preventDefault();
     const value = this.validar_cuentas_asignadas(this.cuentas.get_cuentas());
@@ -115,19 +103,12 @@ class Administrar extends Component {
       return;
     }
 
-
-    this.cuentas.get_cuentas().forEach(c => {
-      const data = {
-        tipo: c.cargo,
-        id_usuario: this.state.usuario.correo,
-        id_cuenta: c.id
-      }
-      new Modelo().nuevo_usuario_cuenta(data)
-        .then((r) => { })
-    });
-
+    let cuentasAsignadas = [];
+    this.cuentas.get_cuentas().forEach(c => cuentasAsignadas.push({ id: c.id, tipo: c.cargo }))
+    await new Modelo().add_cuentas_user(this.state.usuario.correo, cuentasAsignadas);
+    
     alert("Asignado con éxito")
-    this.props.history.push('/usuarios')
+    this.props.history.push('/usuarios/listado')
   }
 
   validar_cuentas_asignadas = (cuentas) => {
@@ -207,7 +188,7 @@ class Administrar extends Component {
                         <p className="m-0"><b>Clave: </b>{cuenta.id} <Badge id={cuenta.id} onClick={this.desvincular_usuario} style={{ cursor: "pointer" }} className="ml-1" color="danger"> Quitar</Badge></p>
                         <p className="m-0"><b>Nombre: </b>{cuenta.nombre}</p>
                         <p className="m-0"><b>Estatus: </b>{cuenta.estatus}</p>
-                        <p className="m-0"><b>Cargo: </b>{cuenta.cargo}</p>
+                        <p className="m-0"><b>Cargo: </b>{cuenta.tipo}</p>
                       </Col>
                     );
                   })}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Row, Col, Card, CardHeader, CardBody, Button } from 'reactstrap';
+import { useToasts } from 'react-toast-notifications';
 
 import TextField from '@material-ui/core/TextField'
 
@@ -9,6 +10,9 @@ const AddContacto = props => {
 
   const [campos, setCampos] = useState([]);
   const [nuevoContacto, setNuevoContacto] = useState({});
+
+  const { addToast } = useToasts();
+
   useEffect(() => {
     getCampos();
   }, [])
@@ -16,20 +20,13 @@ const AddContacto = props => {
 
 
   const getCampos = () => {
-    const { id_grupo } = props;
-    const campos = ["id", "nombre", "correo"];
-    new ModelContactos().getCamposGrupo(id_grupo)
-      .then(campos_api => {
-        campos_api.forEach(campo => {
-          campos.push(campo.campo_extra);
-        });
-        setCampos(campos);
-      })
+    const campos = ["id", "nombre", "correo", ...props.campos_extra];
+    setCampos(campos);
   }
 
 
   const validacionNuevoContacto = () => {
-    
+
     let f = false;
     campos.forEach((campo, i) => {
       if (i !== 0) {
@@ -49,21 +46,25 @@ const AddContacto = props => {
     e.preventDefault();
 
     if (validacionNuevoContacto()) {
-      const data_prin = { nombre: nuevoContacto.nombre, correo: nuevoContacto.correo };
+      const data_prin = { nombre: nuevoContacto.nombre, correo: nuevoContacto.correo, grupo: props.id_grupo };
       let campos_extra = [];
 
       for (let i = 3; i < campos.length; i++) {
-        campos_extra.push({ nombre: campos[i], valor: nuevoContacto[`${campos[i]}`] });
+        campos_extra.push({ campo: campos[i], valor: nuevoContacto[`${campos[i]}`] });
       }
 
-      new ModelContactos().crearNuevoContacto(props.id_grupo,data_prin,campos_extra) 
+      new ModelContactos().crearNuevoContacto(data_prin, campos_extra)
         .then(response => {
           if (response === "OK") {
-            alert("Creado correctamente");
-            
             //Limpiar campos
+            addToast("Se agrgo correctamente el contacto",{appearance:"success", autoDismiss:true})
             limpiarCampos();
+          } else {
+            addToast("Algo esta mal",{appearance:"error", autoDismiss:true})
           }
+
+
+
         })
     }
   }

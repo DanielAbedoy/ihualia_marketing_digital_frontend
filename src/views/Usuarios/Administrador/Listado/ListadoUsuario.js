@@ -17,20 +17,14 @@ class ListadoUsuario extends Component {
 
   peticion_usuarios = () => {
     new Modelo().get_usuarios_cliente(require('store').get('usuario_guardado').id_cliente)
-      .then(r => {
-        console.log(r)
-        this.setState({ usuarios: r })
-      })
+      .then(r => this.setState({ usuarios: r }))
   }
 
-  administrar_usuario = (e) => {
-    new Modelo().getUsuario(e.target.id)
-      .then(r => {
+  administrar_usuario = (e,usuario) => {
         this.props.history.push({
           pathname: '/usuarios/administrar',
-          state:r
+          state:{usuario}
         })
-      })
   }
 
   render() {
@@ -75,7 +69,7 @@ class ListadoUsuario extends Component {
                                 <td>{usuario.correo}</td>
                                 <td className={usuario.estatus.toLowerCase() == "activo" ? "bg-success" : "bg-danger"} >{usuario.estatus}</td>
                                 <td className="">
-                                  <i id={usuario.correo} onClick={this.administrar_usuario} className="fa fa-cog border rounded bg-primary p-1" style={{ cursor: "pointer" }}></i>
+                                  <i id={usuario.correo} onClick={e=> this.administrar_usuario(e,usuario)} className="fa fa-cog border rounded bg-primary p-1" style={{ cursor: "pointer" }}></i>
                                 </td>
                               </tr>
                             );

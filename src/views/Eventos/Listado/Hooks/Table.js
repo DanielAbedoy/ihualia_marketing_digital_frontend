@@ -26,12 +26,6 @@ const useRowStyles = makeStyles({
 });
 
 
-const acomodarFecha = fecha => {
-  const f = fecha.split("T");
-  const hora = f[1].split("-");
-  return `${f[0]} ${hora[0]}`
-}
-
 function Row_Table(props) {
   const { evento } = props;
   const [open, setOpen] = React.useState(false);
@@ -41,27 +35,23 @@ function Row_Table(props) {
     <React.Fragment > 
       <TableRow style={open ? {boxShadow:"0px -4px 13px -4px rgba(0,0,0,0.75)" }: {}} className={classes.root} hover >
         <TableCell align="center" >{evento.nombre}</TableCell>
-        <TableCell align="center" >{acomodarFecha(evento.fecha_hora_inicio)}</TableCell>
+        <TableCell align="center" >{evento.tipo}</TableCell>
         <TableCell align="center" >{evento.categoria}</TableCell>
         {/* Validar estatus */}
 
         {evento.fecha_estatus === 'pasado' ?
-          <TableCell align="center" className="bg-danger" ><b>PASADO</b></TableCell>
+          <TableCell align="center" className="bg-h-danger" ><b>PASADO</b></TableCell>
           :
           <>
             {evento.estatus === "borrador" ?
-              <TableCell align="center" className="bg-warning" ><b>BORRADOR</b></TableCell>
+              <TableCell align="center" className="bg-h-warning" ><b>BORRADOR</b></TableCell>
               :
-              <TableCell align="center" className="bg-success" ><b>PUBLICADO</b></TableCell>
+              <TableCell align="center" className="bg-h-success" ><b>PUBLICADO</b></TableCell>
             }
           </>
         }
 
         <TableCell>
-          {/* <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton> */}
-
           <Drop 
             gestionar={props.gestionar}
             eliminar={props.eliminar}
@@ -69,11 +59,8 @@ function Row_Table(props) {
             continuar={props.continuar}
             evento ={props.evento}
           />
-
         </TableCell>
       </TableRow>
-
-      
     </React.Fragment>
   );
 }
@@ -88,7 +75,7 @@ export default function CollapsibleTable(props) {
             <TableHead className="bg-primary">
               <TableRow>
                 <TableCell align="center" className="text-white h6 bg-primary"><b>Nombre</b></TableCell>
-                <TableCell align="center" className="text-white h6 bg-primary"><b>Fecha</b></TableCell>
+                <TableCell align="center" className="text-white h6 bg-primary"><b>Tipo</b></TableCell>
                 <TableCell align="center" className="text-white h6 bg-primary"><b>Categoria</b></TableCell>
                 <TableCell align="center" className="text-white h6 bg-primary"><b>Estatus</b></TableCell>
                 <TableCell  className="bg-primary"/>

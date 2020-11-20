@@ -39,22 +39,15 @@ class CrearUsuario extends Component {
       //Crear usuario (Colaborador)
       new Modelo().nuevo_usuario(this.acomodar_datos(this.formulario.get_datos()))
         .then(r => r.data.correo)
-        .then(r => {
+        .then(async usuario => {
           
-          this.cuentas.get_cuentas().forEach(c => {
-            const data = {
-              tipo: c.cargo,
-              id_usuario: r,
-              id_cuenta: c.id
-            }
-            new Modelo().nuevo_usuario_cuenta(data)
-              .then( (r)=>{})
-          });
+          let cuentasAsignadas = [];
+          this.cuentas.get_cuentas().forEach(c => cuentasAsignadas.push({ id: c.id, tipo: c.cargo }))
 
+          await new Modelo().add_cuentas_user(usuario, cuentasAsignadas);
           alert("Creado con éxito")
           this.props.history.push('/usuarios')
-        })
-        
+        })        
     }
   }
 
