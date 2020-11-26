@@ -1,7 +1,5 @@
 import React, { Component, useState } from 'react';
 import { Row, Col, Card, CardHeader, CardBody, Button, Collapse } from 'reactstrap';
-import { useToasts } from 'react-toast-notifications';
-import NavBar from '../components/NavBar';
 
 import DatosIniciales from './Hooks/DatosPrincipales';
 import Plantillas from './Hooks/Plantillas';
@@ -10,50 +8,27 @@ import Grupos from './Hooks/Grupos';
 
 import Model_Email from '../../../models/EmailMarketing';
 import Model_Contactos from '../../../models/Contactos';
-import Variables from '../../../variables/global';
-import URLs from '../../../models/urls';
-import Enviar from './Hooks/Enviar';
+
 
 
 
 class Boletines extends Component {
 
   state = {
-    plantilla: '',
-    grupos: '',
-
+    boletin:"",
     openDI: true,
     openBoletin: true,
 
-    datosBoletin: '',
-    fecha: '',
+    plantilla:""
   }
 
 
   componentDidMount = () => {
     if (this.props.location.state) {
-
       const b = this.props.location.state.boletin;
-      if (b.contenido !== "null") {
-        this.setState({ plantilla: { contenido: b.contenido } }, () => {
-          this.setDatosIniciales(b)
-        })
-      }
-      else this.setDatosIniciales(b)
+      if(b.contenido !== "")this.setState({ boletin: b, plantilla: b.contenido  });
+      else this.setState({ boletin: b  });
     }
-  }
-
-  setPlantilla = plantilla => this.setState({ plantilla: plantilla });
-  setGrupos = grupos => this.setState({ grupos: grupos });
-
-
-
-  setFecha = fecha => this.setState({ fecha: fecha });
-
-  setDatosIniciales = (datos) => {
-    this.setState({ datosBoletin: datos, openDI: false }, () => {
-      if (this.state.datosBoletin.contenido !== "null") this.setState({ openBoletin: false });
-    })
   }
 
   render() {
@@ -93,29 +68,27 @@ class Boletines extends Component {
 
                   <Collapse isOpen={this.state.openDI}>
                     <DatosIniciales
-                      setDatos={this.state.datosBoletin}
-                      event_setDatos={this.setDatosIniciales}
-                      getInfo={this.state.datosBoletin}
-                      setFecha={this.setFecha}
-
+                      boletin={this.state.boletin}
+                      setBoletin={(b) => this.setState({ boletin: b })}
+                      close={() => this.setState({ openDI: false })}
                     />
                   </Collapse>
                 </Row>
 
                 <br />
                 {/* Paso 2 Seleccionar plantilla */}
-                {this.state.datosBoletin !== "" ?
+                {this.state.boletin.id ?
                   <Row>
                     <Col  md="9" xs="12" className="mx-auto">
                       <p className="h5"><b> <span className="h2">②</span> Selecciona una plantilla </b>
                       </p>
                       <hr />
                     </Col>
-
-
                     <Plantillas
                       plantilla={this.state.plantilla}
-                      event_setPlantilla={this.setPlantilla}
+                      event_setPlantilla={(p) => { this.setState({ plantilla: p }) }}
+                      boletin={this.state.boletin}
+                      setBoletin={(b) => this.setState({ boletin: b })}
                     />
 
                   </Row>
@@ -127,7 +100,7 @@ class Boletines extends Component {
                     <Row>
                       <Col md="9" xs="12" className="mx-auto">
                         <p className="h5"><b> <span className="h2">③</span> Crea el Boletin</b>
-                            {this.state.datosBoletin.contenido !== 'null' ?
+                            {this.state.boletin.contenido !== '' ?
                             <span className="float-right mt-2"><i className={" " + (this.state.openBoletin ? "fa fa-chevron-up" : "fa fa-chevron-down")} style={{ cursor: "pointer" }}
                               onClick={() => { this.setState({ openBoletin: !this.state.openBoletin }) }}
                             ></i></span>
@@ -139,19 +112,17 @@ class Boletines extends Component {
                       <Collapse style={{ width: "100%" }} isOpen={this.state.openBoletin}>
                         <Boletin
                           plantilla={this.state.plantilla}
-                          event_setPlantilla={this.setPlantilla}
-                          event_setBoletin={this.setBoletin}
-
-                          getInfo={this.state.datosBoletin}
-                          event_setDatos={this.setDatosIniciales}
+                          changePlantilla={() => this.setState({ plantilla: "" })}
+                          boletin={this.state.boletin}
+                          setBoletin={(b) => this.setState({ boletin: b })}
+                          close={() => this.setState({ openBoletin: false })}
                         />
                       </Collapse>
                     </Row>
 
                     <br />
-
-                    {/* Paso 4 Seleccionar el grupo de contactos a enviar */}
-                    {this.state.datosBoletin.contenido !== "null" ?
+                  {/* Paso 4 Seleccionar el grupo de contactos a enviar */}
+                    {this.state.boletin.contenido && this.state.boletin.contenido !== "" ?
                       <Row>
                         <Col  md="9" xs="12" className="mx-auto">
                           <p className="h5"><b> <span className="h2">④</span> Selecciona el grupo de contactos al que se le enviara el boletin</b> </p>
@@ -160,7 +131,10 @@ class Boletines extends Component {
 
                         <Grupos
                           plantilla={this.state.plantilla}
-                          event_setGrupos={this.setGrupos}
+                          boletin={this.state.boletin}
+                          setBoletin={(b) => this.setState({ boletin: b })}
+                          _grupos={this.get_grupos}
+                          history={this.props.history}
                         />
                       </Row>
                       : <>  </>
@@ -169,18 +143,6 @@ class Boletines extends Component {
                   :
                   <></>
                 }
-                {/* Paso 5 Envia el evento */}
-
-                {this.state.grupos.length > 0 ?
-                  <Enviar
-                    datosBoletin={this.state.datosBoletin}
-                    grupos={this.state.grupos}
-                    _fecha={this.state.fecha}
-                  />
-                  :
-                  <></>
-                }
-
               </CardBody>
             </Card>
           </Col>

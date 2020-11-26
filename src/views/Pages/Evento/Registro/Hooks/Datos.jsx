@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Col, Row, Input, CustomInput, Form } from 'reactstrap';
 import { useToasts } from 'react-toast-notifications';
-
+import { confirmAlert } from 'react-confirm-alert';
+import d from '../../../../../assets/css/alert-confirm.css';
 
 import Personales from './Datos/Personales';
 import CreditCard from './Datos/CreditCard';
@@ -9,7 +10,7 @@ import SelectMethodPay from './Datos/SelectMethodPay';
 
 import EventoModel from '../../../../../models/Eventos';
 
-const Datos = ({ articulos, total, cancel, setTotal, evento, setCompletado }) => {
+const Datos = ({ articulos, total, cancel, setTotal, evento, setCompletado, history, url, MONTO }) => {
 
   const { addToast } = useToasts();
   const [areDonaciones, setAreDonaciones] = useState(false);
@@ -66,76 +67,60 @@ const Datos = ({ articulos, total, cancel, setTotal, evento, setCompletado }) =>
       return;
     }
 
-    sendData();
+    completar();
   }
 
-  const sendData = () => {
-    if (total === 0 && !areDonaciones) completado(datosPerson, false)
-    else if (pay_method === "card") completado(datosPerson, { pay_method: "card", datosCard: datosCard, donacion: areDonaciones, montos: { total: total, wDonacion: moneyData } });
-    else if (pay_method === "oxxo") completado(datosPerson, { pay_method: "oxxo", donacion: areDonaciones, montos: { total: total, wDonacion: moneyData } });
+  const error = () => {
+    confirmAlert({ title: "Error", message: "Lamentablemente algo salio mal", buttons: [{ label: "Continuar", onClick: () => history.push(`/evento/${url}`) }] });
   }
 
-  const completado = async (datosPersonales, datosPago) => {
-    //Verificar si noy hay pagos 
-    //Saber si hay donacion
-    let donacion = { are: false };
-    let TOTAL = 0;
-    if (datosPago && !datosPago.donacion) TOTAL = datosPago.montos.total;
-    if (datosPago && datosPago.donacion) { donacion = { are: true, monto: datosPago.montos.wDonacion.donacion }; TOTAL = datosPago.montos.wDonacion.total_money };
-    //Agregando los boletos
+  const completar =async () => {
     let bolets = [];
     articulos.forEach(a => bolets.push({ id: a.id, cantidad: a.cantidad, }));
+    const datosToSave = { "correo": datosPerson.correo,telefono:datosPerson.telefono, "nombre": datosPerson.nombre, "boletos": JSON.stringify({ data: bolets }), "id_evento": evento };
 
-
-    if (!datosPago) { //No hay quepagar nada
-
-      const resp = await new EventoModel().add_asistente(
-        { evento: evento, correo: datosPersonales.correo, nombre: datosPersonales.nombre, telefono: datosPersonales.telefono, metodo_pago: "no", monto_total: "no", estatus_pago: "pagado" },
-        bolets, donacion, { are: false }
-      )
-      if (resp.statusText === "OK") return alert("Credo correcatamente");
-      else return alert("Algo salio mal");
-
-    } else if (datosPago.pay_method === "oxxo") {
-
-      pagarOxxo(
-        { evento: evento, correo: datosPersonales.correo, nombre: datosPersonales.nombre, telefono: datosPersonales.telefono, metodo_pago: "oxxo", monto_total: TOTAL, estatus_pago: "por pagar" },
-        bolets, donacion
-      );
-
-    } else if (datosPago.pay_method === "card") {
-      pagarCard(
-        { evento: evento, correo: datosPersonales.correo, nombre: datosPersonales.nombre, telefono: datosPersonales.telefono, metodo_pago: "card", monto_total: TOTAL, estatus_pago: "pagado" },
-        datosPago.datosCard, bolets, donacion
-      );
+    if (!areDonaciones && total === 0) { 
+      const resp =await  new EventoModel().add_asistente(datosToSave)
+      if (resp.statusText === "Created") {
+        confirmAlert({ title: "Exito", message: "Todo salio correctamente", buttons: [{ label: "Continuar", onClick: () => history.push(`/evento/${url}`) }] });
+      }
+      else error();
     }
-    //verificar si hay donaciones
-    //generar token
+    else if (pay_method === "oxxo") pagarOxxo(datosToSave);
+    else if (pay_method === "card") pagarCard(datosToSave);
+    
   }
-
-  const pagarOxxo = async (dataPrin, boletos, donacion) => {
+  
+  const pagarOxxo = async (data) => {
     let items_names = '';
     articulos.forEach(a => items_names += `(id:${a.id}) ` + a.title + "; ");
 
-    const datos = { nombre: dataPrin.nombre, phone: dataPrin.telefono, email: dataPrin.correo, items_name: items_names, unit_price: (dataPrin.monto_total * 100), token_id: "" }
+    const datos = {
+      nombre: datosPerson.nombre, phone: datosPerson.telefono, email: datosPerson.correo,
+      items_name: items_names, unit_price: MONTO*100, token_id: ""
+    }
 
     const cargos = await new EventoModel().post_oxxo_pay(datos);
-    if (cargos.charges.data) {
+    if (cargos.charges) {
 
-      const resp = await new EventoModel().add_asistente(
-        dataPrin, boletos, donacion, { are: true, data: { tipo: "oxxo", referencia: cargos.charges.data[0].payment_method.reference } }
-      )
-      if (resp.statusText === "OK") {
+      //{ are: true, data: { tipo: "oxxo",} }
+      const resp = await new EventoModel().add_asistente({
+        ...data, donacion: areDonaciones ? moneyData.donacion : "", metodo_pago: "oxxo", monto_total: MONTO,
+        estatus_pago: "pendiente",
+        detalles: JSON.stringify({ referencia: cargos.charges.data[0].payment_method.reference, id: cargos.charges.data[0].id, order_id: cargos.charges.data[0].order_id })
+      })
+      if (resp.statusText === "Created") {
         const referencia = cargos.charges.data[0].payment_method.reference;
         const barcode = cargos.charges.data[0].payment_method.barcode_url;
         const monto = (cargos.amount / 100)
         setCompletado("oxxo", { referencia, barcode, monto });
       }
-      else return alert("Algo salio mal");
-    }
+      else error();
+    } 
   }
+  
 
-  const pagarCard = async (dataPrin,datosCard, boletos, donacion) => {
+  const pagarCard = async (data) => {
 
     let items_names = '';
     articulos.forEach(a => items_names += `(id:${a.id}) ` + a.title + "; ");
@@ -143,24 +128,25 @@ const Datos = ({ articulos, total, cancel, setTotal, evento, setCompletado }) =>
     const conekta = window.Conekta;
     conekta.setPublicKey("key_eYvWV7gSDkNYXsmr");
     conekta.setLanguage("es");
-    const tokenParams = { "card": { "number": "4242424242424242", "name": "Fulanito Pérez", "exp_year": "2020", "exp_month": "12", "cvc": "123" } };
+    const tokenParams ={ "card": { "number": "4242424242424242", "name": "Fulanito Pérez", "exp_year": "2020", "exp_month": "12", "cvc": "123" } };
 
     //Creadno el token
     conekta.Token.create(tokenParams, async (token) => {
-      const datos = { nombre: dataPrin.nombre, phone: dataPrin.telefono, email: dataPrin.correo, items_name: items_names, unit_price: (dataPrin.monto_total * 100), token_id: token.id }
-      const cargos = await new EventoModel().post_card_pay(datos);
-
-      if (cargos.charges.data) {
-        const resp = await new EventoModel().add_asistente(
-          dataPrin, boletos, donacion,
-          { are: true, data: { tipo: "card", id_pago: cargos.charges.data[0].id, id_orden: cargos.charges.data[0].order_id} }
-        )
-        if (resp.statusText === "OK") {
-          setCompletado("card", { data:cargos.charges.data[0] });
-        }
-        else return alert("Algo salio mal");
+      const datos = {
+        nombre: datosPerson.nombre, phone: datosPerson.telefono, email: datosPerson.correo,
+        items_name: items_names, unit_price: MONTO*100, token_id: token.id
       }
 
+      const cargos = await new EventoModel().post_card_pay(datos);
+      if (cargos.charges) {
+        const resp = await new EventoModel().add_asistente({
+          ...data, donacion: areDonaciones ? moneyData.donacion : "", metodo_pago: "card", monto_total: MONTO,
+          estatus_pago: "pagado",
+          detalles: JSON.stringify({ id_pago: cargos.charges.data[0].id, id_orden: cargos.charges.data[0].order_id})
+        })
+        if (resp.statusText === "Created") setCompletado("card", { data: cargos.charges.data[0] });
+        else error();
+      }else error();
     })
 
   }

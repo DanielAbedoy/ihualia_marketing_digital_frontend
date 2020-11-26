@@ -20,7 +20,8 @@ class ListaContactos extends Component {
         grupo:'',
         campos_t: ["ID", "Nombre", "Correo"],
         campos_extra: [],
-        contactos: []
+        contactos: [],
+        grupo_id:''
     }
 
     componentDidMount = () => {
@@ -30,8 +31,6 @@ class ListaContactos extends Component {
 
     //Funcion para saber el grupo que esta seleccionado
     setGrupoId = (grupo) => {
-        console.log(grupo)
-        this.grupoId = grupo.id;
         this.setState({ campos_t: ["ID", "Nombre", "Correo"], contactos: [], grupo:grupo }, async () => {
             const campos_extra = this.state.campos_t.concat(grupo.campos_extra)
             const contactos = await new ModelContactos().getContactosDelGrupo(grupo.id)
@@ -87,10 +86,9 @@ class ListaContactos extends Component {
                 .then(response => {
                     if (response.statusText === "No Content") {
                         alert("Eliminado correctamente")
-                        this.setGrupoId(this.grupoId);
+                        this.setGrupoId(this.state.grupo);
                     } else {
                         alert("No se pudo eliminar")
-                        this.setGrupoId(this.grupoId);
                     }
                 })
         }
@@ -104,10 +102,8 @@ class ListaContactos extends Component {
                 <Row>
                     <Col xs="12">
                         <Card className="">
-                            <CardHeader>
-                                <NavBar
-                                    title="Listas"
-                                />
+                            <CardHeader className="text-white p-4" style={{backgroundColor:"rgb(44,96,186)"}}>
+                                <p className="h3"><i className="fa fa-users"></i> Contactos |</p>
                             </CardHeader>
                             <CardBody>
                                 <Row>

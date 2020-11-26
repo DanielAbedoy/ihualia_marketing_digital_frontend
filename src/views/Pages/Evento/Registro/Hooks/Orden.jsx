@@ -29,7 +29,7 @@ const Orden = ({ carrito, total, datos, url }) => {
 
   return (
     <Row style={{ height: "100%" }} className="align-items-center">
-
+      
       {carrito.length > 0 ?
         <Col md="12" className="d-flex flex-column align-items-center x">
           <p className="h5 text-center text-muted m-0"><b>{datos.titulo}</b></p>
@@ -45,6 +45,8 @@ const Orden = ({ carrito, total, datos, url }) => {
           })}
           <hr />
           <p className="text-right"><b>Total: {!total ? format_corrency.format(0) : format_corrency.format(total)}</b></p>
+
+          
         </Col>
         :
         <Col md="12" className={`d-flex flex-column align-items-center p-3 ${carrito.length > 0 ? "boder border-bottom mt-2" : ""}`}>

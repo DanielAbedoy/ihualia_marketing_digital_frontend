@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Row, Col, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+
+import ModelContactos from '../../../../models/Contactos';
 
 import globals from '../../../../variables/global';
 
 const KeyWords = (props) => {
 
-  const words = new globals().key_words_boletin();
-
+  
+  const [words, setWords] = useState([]);
   const toggle = () => props.setOpen(!props.open);
+
+  useEffect(() => {
+    
+    new ModelContactos().getGrupos(require('store').get('cuenta_en_uso').id)
+      .then(grupos => {
+        let aux = [];
+        grupos.forEach(g => {
+          g.campos_extra.forEach(c => aux.push({ key: "{{{" +c+"}}}", description:`Esta key le pertenence al grupo #${g.id} - "${g.nombre}"`}))
+        });
+        setWords([...new globals().key_words_boletin(), ...aux]);
+      })
+  },[])
 
   return (
     <Modal size="lg" isOpen={props.open} toggle={toggle} >
@@ -58,8 +72,10 @@ const KeyWords = (props) => {
               <b>En redacción:</b><br />
               Hola {'{{{remitente}}}'}, es un gusto saludarle....<br/>
               Siendo hoy {'{{{fecha}}}'} le informo que .....
-              <hr/>
-              <b>Enviado:</b><br />
+            </p>
+            <p className="my-2 border-top"></p>
+            <p>
+            <b>Enviado:</b><br />
               Hola Luis Gómez Martínez, es un gusto saludarle....<br/>
               Siendo hoy 7/09/1999 le informo que .....
             </p>

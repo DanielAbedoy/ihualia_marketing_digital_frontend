@@ -15,22 +15,29 @@ class Video extends React.Component {
 
   }
 
-  setURL = (e) => {
-    e.preventDefault();
+  componentDidMount = () => {
+    if (this.props.contenido === undefined) return;
+    this.setURL(this.props.contenido, true);
+  }
+
+  setURL = (value, flag) => {
+    
     try {
-      let video_id = e.target.value.split('v=')[1];
+      let video_id = value.split('v=')[1];
       let ampersandPosition = video_id.indexOf('&');
       if (ampersandPosition != -1) {
         video_id = video_id.substring(0, ampersandPosition);
         this.setState({ id: video_id });       
       } else {
-        this.setState({ id: video_id, url_video: '' });
+        this.setState({ id: video_id});
       }
     } catch (error) {
-      this.setState({ url_video: e.target.value, id: '' })
+      this.setState({  id: '' })
     }
 
-    this.add_valor_component(e.target.value);
+    this.setState({ url_video: value });
+    if(!flag)this.add_valor_component(value);
+    
   }
 
   add_valor_component = (valor) => {
@@ -44,7 +51,8 @@ class Video extends React.Component {
       <Row>
         <Col md="12" className="mb-1">
           < Input type="text" placeholder="URL Del Video"
-            onChange={this.setURL}
+            value={this.state.url_video}
+            onChange={e => this.setURL(e.target.value)}
           />
         </Col>
         {this.state.id !== '' ?

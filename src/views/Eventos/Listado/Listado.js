@@ -58,7 +58,7 @@ class Listado extends Component {
   gestionar_evento = (evento) => this.props.history.push({ pathname: '/eventos/gestionar', state: { evento: evento } });
 
 
-  ir_a_evento = (id) => this.props.history.push(`/evento/?event=${id}`);
+  ir_a_evento = (url) => this.props.history.push(`/evento/${url}`);
 
   contunuar_borrador = (id) => {
     this.props.history.push({
@@ -90,9 +90,6 @@ class Listado extends Component {
 
   }
 
-  eliminarBorrador = (id) => {
-    console.log("Eliminando")
-  }
 
   render() {
     return (
@@ -100,8 +97,8 @@ class Listado extends Component {
         <Row>
           <Col xs="12">
             <Card>
-              <CardHeader>
-                <NavBar />
+            <CardHeader className="text-white p-4" style={{backgroundColor:"#21f077bb"}}>
+                <p className="h3"><i className="cui-calendar"></i> Eventos |</p>
               </CardHeader>
               <CardBody>
                 {/* Organizador */}
@@ -137,7 +134,7 @@ class Listado extends Component {
                     eventos={this.state.eventos}
                     gestionar={this.gestionar_evento}
                     ir={this.ir_a_evento}
-                    eliminar={this.eliminarBorrador}
+                    reload={this.get_eventos}
                     continuar={this.contunuar_borrador}
                   />
                 </Row>

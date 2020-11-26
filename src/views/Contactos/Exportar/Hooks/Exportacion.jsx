@@ -41,8 +41,8 @@ const ExportacionComponent = props => {
                 data={data}
                 headers={headers}
                 filename={`Contactos_Grupo_${props.grupo.nombre}.csv`}
-                className="btn btn-primary btn-block mt-4"
-                style={{height:"40px"}}
+                className="btn btn-block mt-4 text-white"
+                style={{height:"40px",backgroundColor:"rgba(44,96,186,0.95)"}}
               >
                 Descargar
                 </CSVLink>

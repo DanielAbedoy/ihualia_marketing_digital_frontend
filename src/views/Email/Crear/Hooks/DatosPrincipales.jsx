@@ -5,10 +5,9 @@ import store from 'store';
 
 import ModelEmail from '../../../../models/EmailMarketing';
 
-const DatosIniciales = props => {
+const DatosIniciales = ({boletin, setBoletin,close}) => {
 
-  const [publicacion, setPublicacion] = useState('');
-  const [datos, setDatos] = useState({});
+  const [datos, setDatos] = useState({asunto:"", tipo:"", fecha:"", hora:""});
   const { addToast } = useToasts();
   const [creado, setCreado] = useState(false);
 
@@ -20,44 +19,23 @@ const DatosIniciales = props => {
   ];
 
   useEffect(() => {
-    if (props.setDatos !== '') {
+    if (boletin.id !== undefined) {
+      const i = JSON.parse(boletin.publicacion);
+      if (i.tipo === "ahora") setDatos({ ...datos, asunto: boletin.asunto, tipo: "ahora" });
+      else setDatos({asunto:boletin.asunto, tipo:"programar", fecha:i.fecha, hora:i.hora});
       setCreado(true);
-      setDatos({ ...datos,asunto: props.setDatos.asunto, programacion: props.setDatos.tipo_publicacion });
-      if (props.setDatos.tipo_publicacion !== "enviado") {
-        setPublicacion('programar');
-        document.getElementById("exampleCustomSwitch2").checked = true;
-      }
-      else {
-        setPublicacion('ahora');
-        document.getElementById("exampleCustomSwitch").checked = true;
-      }
+      close();
     }
-  },[props.setDatos])
-
-  const guardar = async (e) => {
-    e.preventDefault();
-    //Validar que todo este completo
-    if (!validar()) return;
-    //Crear el boletincomo borrador mandar datos al padre
-    const id_cuenta = require('store').get("cuenta_en_uso").id;
-    const tipo = datos.programacion === 'programar' ? "programado" : "enviado";
-    const response = await new ModelEmail().add_boletin(datos.asunto, tipo, "null", "borrador", id_cuenta);
-    if (response !== "Error") {
-      setCreado(true);
-      props.setFecha({ date: datos.fecha, hour: datos.hora });
-      props.event_setDatos(response);
-      addToast("Todo salio correcatamente", { appearance: "success", autoDismiss: true });
-    }else addToast("Algo salio mal", { appearance: "error", autoDismiss: true });
-  }
+  },[boletin])
 
   const validar = () => {
-    if (!datos.asunto || !datos.programacion) {
+    if (datos.asunto === "" || datos.programacion === "") {
       addToast("Debe agregar todos los datos", { appearance: "error", autoDismiss: true });
       return false;
     }
 
-    if (datos.programacion === "programar") {
-      if (!datos.fecha || !datos.hora) {
+    if (datos.tipo === "programar") {
+      if (datos.fecha === "" || datos.hora ==="") {
         addToast("Debe agregar todos los datos", { appearance: "error", autoDismiss: true });
         return false;
       } 
@@ -65,16 +43,36 @@ const DatosIniciales = props => {
     return true;
   }
 
+  const guardar = async (e) => {
+    e.preventDefault();
+    //Validar que todo este completo
+    if (!validar()) return;
+    //Crear el boletincomo borrador mandar datos al padre
+    const id_cuenta = require('store').get("cuenta_en_uso").id;
+
+    const response = await new ModelEmail().add_boletin({
+      asunto: datos.asunto, estatus: "borrador", publicacion: datos.tipo === "ahora" ? JSON.stringify({ tipo: "ahora" }) : JSON.stringify({ tipo: "programado", fecha: datos.fecha, hora: datos.hora }),
+      id_cuenta: id_cuenta
+    })
+    if (response.statusText === "Created") {
+      setBoletin(response.data);
+      setCreado(true);
+      close();
+      addToast("Todo salio correcatamente", { appearance: "success", autoDismiss: true });
+    }else addToast("Algo salio mal", { appearance: "error", autoDismiss: true });
+  }
+
+
+
   const modificar = async () => {
     if (!validar()) return;
 
-    let datosI = props.getInfo;
-    const tipo = datos.programacion === 'programar' ? "programado" : "enviado";
-    const d = { asunto: datos.asunto, tipo_publicacion: tipo, contenido: datosI.contenido, estatus: datosI.estatus, id_cuenta: datosI.id_cuenta };
-    const response = await new ModelEmail().update_boletin(datosI.id, d);
-    if (response !== "Error") {
-      props.setFecha({ date: datos.fecha, hour: datos.hora });
-      props.event_setDatos(response, { date: datos.fecha, hour: datos.hora });
+    const response = await new ModelEmail().modificar_boletin(boletin.id,{
+      asunto: datos.asunto, estatus: "borrador", publicacion: datos.tipo === "ahora" ? JSON.stringify({ tipo: "ahora" }) : JSON.stringify({ tipo: "programado", fecha: datos.fecha, hora: datos.hora })
+    })
+    if (response.statusText === "OK") {
+      close();
+      setBoletin(response.data);
       addToast("Todo salio correcatamente", { appearance: "success", autoDismiss: true });
     }else addToast("Algo salio mal", { appearance: "error", autoDismiss: true });
   }
@@ -86,8 +84,7 @@ const DatosIniciales = props => {
         <Col md="7" xs="12" className="mx-auto">
           <span className="h5">Asunto del Boletin</span>
           <Input id="txt_asunto" className="mt-2" type="text" placeholder="motivo del boletin"
-            //onChange={e => props.event_setDatos({ asunto: e.target.value })}
-            value={datos["asunto"] ? datos["asunto"] : ""}
+            value={datos.asunto}
             onChange={e => setDatos({ ...datos, asunto: e.target.value })}
           /><br />
         </Col>
@@ -103,11 +100,8 @@ const DatosIniciales = props => {
                 <div className="mx-auto">
                   <CustomInput
                     className="h6"
-                    onChange={e => {
-                      setPublicacion('ahora');
-                      //props.event_setDatos({ programacion: "ahora" })
-                      setDatos({ ...datos, programacion: "ahora" })
-                    }}
+                    checked={datos.tipo === "ahora"?true:false}
+                    onChange={e => setDatos({ ...datos, tipo: "ahora" })}
                     type="radio" id="exampleCustomSwitch" name="customSwitch" label="Publicar ahora mismo"
                   />
                 </div>
@@ -117,12 +111,8 @@ const DatosIniciales = props => {
               <FormGroup>
                 <div>
                   <CustomInput
-                    className="h6"
-                    onChange={e => {
-                      setPublicacion('programar');
-                      //props.event_setDatos({ programacion: "programar" })
-                      setDatos({ ...datos, programacion: "programar" })
-                    }}
+                    className="h6" checked={datos.tipo === "programar"?true:false}
+                    onChange={e => setDatos({ ...datos, tipo: "programar" })}
                     type="radio" id="exampleCustomSwitch2" name="customSwitch" label="Publicación programada"
                   />
                 </div>
@@ -132,22 +122,20 @@ const DatosIniciales = props => {
         </Col>
 
 
-        {publicacion === 'programar' ?
+        {datos.tipo === 'programar' ?
           <Col md="7" xs="12" className="mx-auto">
             <span className="h5">Selecciona la fecha y hora de publicación</span>
             <Row>
               <Col md="7" xs="12" >
                 <Input id="txt-fecha-programacion" className="mt-2" type="date"
-                  value={datos["fecha"] ? datos["fecha"] : ""}
-                  //onChange={e => props.event_setDatos({ fecha: e.target.value })}
+                  value={datos.fecha}
                   onChange={e => setDatos({ ...datos, fecha: e.target.value })}
                 />
               </Col>
 
               <Col md="5" xs="12" >
                 <Input id="txt-hora-programacion" className="mt-2 text-center" type="select"
-                  //onChange={e => props.event_setDatos({ hora: e.target.value })}
-                  value={datos["hora"] ? datos["hora"] : ""}
+                  value={datos.hora}
                   onChange={e => setDatos({ ...datos, hora: e.target.value })}
                 >
                   {horas.map((hora, indx) => {

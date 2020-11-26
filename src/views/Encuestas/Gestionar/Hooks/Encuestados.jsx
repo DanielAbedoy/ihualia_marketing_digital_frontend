@@ -36,7 +36,7 @@ const useStyles = makeStyles({
 
 
 function Row_Table(props) {
-  const { respuestas, n, nombre, correo, creado, anonima, preguntas, encuesta } = props;
+  const { respuestas, id, nombre, correo, creado, anonima, preguntas, encuesta } = props;
   const [open, setOpen] = React.useState(false);
   const classes = useRowStyles();
 
@@ -44,14 +44,14 @@ function Row_Table(props) {
     <React.Fragment >
       <TableRow style={open ? { boxShadow: "0px -4px 13px -4px rgba(0,0,0,0.75)" } : {}} className={classes.root} hover >
         {anonima === true ?
-          <TableCell >{n}</TableCell>
+          <TableCell >{id}</TableCell>
           :
           <>
             <TableCell >{nombre} </TableCell>
             <TableCell>{correo}</TableCell>
           </>
         }
-        <TableCell >{creado}</TableCell>
+        <TableCell align="" >{creado}</TableCell>
         <TableCell>
           <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -128,6 +128,8 @@ function Row_Table(props) {
 
 
 const Encuestados = ({ open, setOpen, encuestados, anonima, preguntas, encuesta }) => {
+
+  
   const classes = useStyles();
 
   return (
@@ -146,23 +148,23 @@ const Encuestados = ({ open, setOpen, encuestados, anonima, preguntas, encuesta 
             <TableContainer className={classes.container} >
               <Table stickyHeader aria-label="collapsible table">
                 <TableHead >
-                  <TableRow className="bg-h-warning py-3">
+                  <TableRow className="py-3" >
                     {anonima === true ?
-                      <th scope="col">Encuestado #</th>
+                      <TableCell className="text-white" style={{backgroundColor:"orange"}} >Encuestado</TableCell>
                       :
                       <>
-                        <th scope="col">Nombre </th>
-                        <th scope="col">Correo</th>
+                        <TableCell className="text-white" style={{backgroundColor:"orange"}}>Nombre </TableCell>
+                        <TableCell className="text-white" style={{backgroundColor:"orange"}}>Correo</TableCell>
                       </>
                     }
-                    <th scope="col">Fecha</th>
-                    <th scope="col"></th>
+                    <TableCell className="text-white" style={{backgroundColor:"orange"}}>Fecha</TableCell>
+                    <TableCell className="text-white" style={{backgroundColor:"orange"}}></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {encuestados.map((e, i) => {
                     return (
-                      <Row_Table key={i} encuesta={encuesta} preguntas={preguntas} respuestas={JSON.parse(e.respuestas_json)} n={e.id} nombre={e.nombre} correo={e.correo} creado={e.creado} />
+                      <Row_Table key={i} encuesta={encuesta} preguntas={preguntas} respuestas={JSON.parse(e.respuestas_json)} id={e.id} nombre={e.nombre} correo={e.correo} creado={e.creado} anonima={anonima} />
                     );
                   })}
                 </TableBody>

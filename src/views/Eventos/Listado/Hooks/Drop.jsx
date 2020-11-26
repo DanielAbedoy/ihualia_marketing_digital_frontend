@@ -1,8 +1,35 @@
 import React from 'react';
 import { UncontrolledDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
+import { confirmAlert } from 'react-confirm-alert'
+import '../../../../assets/css/alert-confirm.css';
 
+import { useToasts } from 'react-toast-notifications';
+import ModelEventos from '../../../../models/Eventos';
 
-const Drop = ({ evento, gestionar, eliminar, ir, continuar }) => {
+const Drop = ({ evento, gestionar, ir, continuar, reload }) => {
+
+  const { addToast } = useToasts();
+
+  const eliminar = (evento) => {
+    confirmAlert({
+      message: "Seguro que deseas eliminar el borrador",
+      buttons: [
+        {
+          label: "Si", onClick: () => {
+            new ModelEventos().eliminar_evento(evento)
+              .then(status => {
+                if (status === "No Content") {
+                  addToast("Eliminado correctamente", { appearance: "success", autoDismiss: true });
+                  reload();
+                }
+                else addToast("Algo salio mal", { appearance: "error", autoDismiss: true });
+              })
+         } },
+        { label: "Cancelar", onClick: () => { } },
+      ]
+    })
+    
+  }
 
   return (
     < UncontrolledDropdown >
@@ -28,7 +55,7 @@ const Drop = ({ evento, gestionar, eliminar, ir, continuar }) => {
               :
               <>
                 <DropdownItem onClick={() => { gestionar(evento) }} >Gestionar</DropdownItem>
-                <DropdownItem onClick={() => { ir(evento.id) }} >Ir al evento</DropdownItem>
+                <DropdownItem onClick={() => { ir(evento.url) }} >Ir al evento</DropdownItem>
               </>
             }
           </>}

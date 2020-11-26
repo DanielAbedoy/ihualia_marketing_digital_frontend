@@ -86,29 +86,34 @@ const Preguntas = ({ nombre, instrucciones, preguntas, paginacion, anonima, punt
   }
 
   const sendResponses = () => {
-    if (!cmpPreguntas[pagina + 1]) {
-      return (
-        <Row className="mt-3">
-          <Col md="8" xs="10" className="mx-auto">
-            <div onClick={anonima ? ()=> responder(infoPersonal, datos) : () => setOpenModal(!openModal)}
-              className="btn-h text-white bg-primary" style={{ width: "100%" }}>Enviar Respuestas</div>
-          </Col>
-        </Row>
-      )
+
+    const cmp = (
+      <Row className="mt-3">
+        <Col md="8" xs="10" className="mx-auto">
+          <div onClick={anonima ? () => responder(infoPersonal, datos) : () => setOpenModal(!openModal)}
+            className="btn-h text-white bg-primary" style={{ width: "100%" }}>Enviar Respuestas</div>
+        </Col>
+      </Row>
+    )
+
+    if (anonima) return cmp;
+    else {
+      if (!cmpPreguntas[pagina + 1]) return cmp;
     }
+    
     return null;
   }
 
   const responder = async () => {
     const preg_json = JSON.stringify(datos);
-    const resp = await new ModelEncuesta().add_encuestado({ encuesta: encuesta ,nombre: infoPersonal.nombre, correo: infoPersonal.correo, respuestas_json: preg_json });
+    const resp = await new ModelEncuesta().add_encuestado({ encuesta: encuesta, nombre: infoPersonal.nombre, correo: infoPersonal.correo, respuestas_json: preg_json });
     if (resp.statusText === "Created") creado();
     else {
       setOpenModal(false);
       confirmAlert({
         title: "Upss",
         message: `Algo salio mal a la hora de guardar la informacion, te pedimos que vuelvas a intentarlo`,
-        buttons:[{label:"Volver a intentar", onClick:()=> ir()}]
+        buttons: [{ label: "Volver a intentar", onClick: () => ir() }]
       })
     }
   }
@@ -127,6 +132,7 @@ const Preguntas = ({ nombre, instrucciones, preguntas, paginacion, anonima, punt
                 </div>
               );
             })}
+            {sendResponses()}
           </>
           :
           <>
@@ -162,7 +168,7 @@ const Preguntas = ({ nombre, instrucciones, preguntas, paginacion, anonima, punt
         setOpen={(f) => { setOpenModal(f); setInfoPersonal({ nombre: "", correo: "" }) }}
         setInpoPersonal={setInfoPersonal}
         info={infoPersonal}
-        responder={()=> responder(infoPersonal, datos)}
+        responder={() => responder(infoPersonal, datos)}
       />
     </Row>
   );

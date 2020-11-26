@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col, Input, Collapse, Button, CustomInput } from 'reactstrap';
 import { useToasts } from 'react-toast-notifications';
 
@@ -18,27 +18,40 @@ const Ubucacion = props => {
   );
   const [url, setUrl] = useState('');
 
+  useEffect(() => {
+    if (props.evento.ubicacion === "" || props.evento.ubicacion === undefined) return;
+    const ub = JSON.parse(props.evento.ubicacion);
+
+    darAccion(ub.tipo);
+
+    if(ub.tipo === "lugar"){
+      setDatos({ ...datos, ...ub.data });
+      setCreado(true);
+    } else {
+      setUrl(ub.data);
+      setCreado(true);
+    }
+    
+  },[props.evento])
+
   const setPlace = (campos) => {
-    console.log(campos)
     setDatos({ ...datos, ...campos });
   }
 
   const cambiarAccion = (accion) => {
     darAccion(accion);
-    setDatos({ direccion1: "", direccion2: "", ciudad: "", estado: "", codigo_postal: "", pais: "", latitud: 0, longitud: 0 })
-    setUrl('');
   }
 
-  const crear = async() => {
-
+  const crear = async () => {
+    
     if (accion === "lugar") {
       if (!validarLugar()) return;
-      const resp = await new ModeloEvento().add_lugar_evento(props.evento.id, datos)
+      const resp = await new ModeloEvento().modificar_evento(props.evento.id, {ubicacion:JSON.stringify({tipo:accion, data:datos})})
       sendResponse(resp)
     }
     else if (accion === "online") {
       if (!validarOnline()) return;
-      const resp = await new ModeloEvento().add_ubicacion_link_evento(props.evento.id, url)
+      const resp = await new ModeloEvento().modificar_evento(props.evento.id, {ubicacion:JSON.stringify({tipo:accion, data:url})})
       sendResponse(resp)
     }
   }
@@ -64,38 +77,29 @@ const Ubucacion = props => {
     if (accion === "lugar") {
       if (!validarLugar()) return;
 
-      if (!props.evento.lugar[0]) {
-        crear();
-        return;
-      }
-      const resp = await new ModeloEvento().modificar_lugar_evento(props.evento.lugar[0].id, datos)
+      const resp = await new ModeloEvento().modificar_evento(props.evento.id, {ubicacion:JSON.stringify({tipo:accion, data:datos})})
       sendResponse(resp)
 
     }
     else if (accion === "online") {
       if (!validarOnline()) return;
 
-      if (!props.evento.sitio[0]) {
-        crear();
-        return;
-      }
-      const resp = await new ModeloEvento().modificar_ubicacion_link_evento(props.evento.sitio[0].id, url)
+      const resp = await new ModeloEvento().modificar_evento(props.evento.id, {ubicacion:JSON.stringify({tipo:accion, data:url})})
       sendResponse(resp)
     }
 
   }
 
   const sendResponse = async (resp) => {
-      if (resp.statusText === "Created" || resp.statusText === "OK") {
-        const r = await new ModeloEvento().modificar_evento(props.evento.id, { tipo_ubicacion: accion });
-        addToast("Guardado con exito", { appearance: "success", autoDismiss: true });
-        setCreado(true);
-        setOpen(false)
-        props.setEvento(r.data);
-      } else {
-        addToast(`Error: ${resp}`, { appearance: "error", autoDismiss: true });
-      }
-      
+    if (resp.statusText === "OK") {
+      addToast("Guardado con exito", { appearance: "success", autoDismiss: true });
+      setCreado(true);
+      setOpen(false)
+      props.setEvento(resp.data);
+    } else {
+      addToast(`Error: ${resp}`, { appearance: "error", autoDismiss: true });
+    }
+
   }
 
   return (
@@ -110,119 +114,120 @@ const Ubucacion = props => {
       }
     </p>
       <Collapse isOpen={open} >
-      <Row>
-        <Col className="mx-auto" md="9" xs="12">
-          <Row>
-            <Col md="12">
-              <Row className="mb-4">
-                <Col md="6" xs="12" className="mx-auto">
-                  <CustomInput
-                    onClick={() => cambiarAccion("lugar")} className="mx-auto"
-                    id="place" type="radio" name="rb_accion" label="Lugar" />
-                </Col>
-                <Col md="6" xs="12" className="mx-auto">
-                  <CustomInput
-                    onClick={() => cambiarAccion("online")} className="mx-auto"
-                    id="online" type="radio" name="rb_accion" label="Evento en linea" />
-                </Col>
-              </Row>
+        <Row>
+          <Col className="mx-auto" md="9" xs="12">
+            <Row>
+              <Col md="12">
+                <Row className="mb-4">
+                  <Col md="6" xs="12" className="mx-auto">
+                    <CustomInput
+                      checked={accion === "lugar" ? true : false}
+                      onChange={() => cambiarAccion("lugar")} className="mx-auto"
+                      id="place" type="radio" name="rb_accion" label="Lugar" />
+                  </Col>
+                  <Col md="6" xs="12" className="mx-auto">
+                    <CustomInput checked={accion === "online" ? true : false}
+                      onChange={() => cambiarAccion("online")} className="mx-auto"
+                      id="online" type="radio" name="rb_accion" label="Evento en linea" />
+                  </Col>
+                </Row>
 
-              {accion === "lugar" ?
-                <>
-                  <Autocomplete setPalce={setPlace} />
-                  <p className="text-center text-muted"><i>
-                    Puedes buscar la ubicaión con ayuda del autocompletador de lugares de Google, o tambien puedes llenar los campos
-                    manualmente. Si utilizas esta opcion se agregara el mapa geográfico de la zona al evento
+                {accion === "lugar" ?
+                  <>
+                    <Autocomplete setPalce={setPlace} />
+                    <p className="text-center text-muted"><i>
+                      Puedes buscar la ubicaión con ayuda del autocompletador de lugares de Google, o tambien puedes llenar los campos
+                      manualmente. Si utilizas esta opcion se agregara el mapa geográfico de la zona al evento
                   </i></p>
-                  <br />
+                    <br />
 
-                  <Row>
-                    <Col md="12" xs="12" className="mx-auto">
-                      <span className="h5">Direccion 1*</span>
-                      <Input
-                        value={datos.direccion1}
-                        onChange={e => setDatos({ ...datos, direccion1: e.target.value })}
-                        id="direccion-1" className="mt-2" type="text"
-                      /><br />
-                    </Col>
-                    <Col md="12" xs="12" className="mx-auto">
-                      <span className="h5">Direccion 2 (Op)</span>
-                      <Input
-                        value={datos.direccion2}
-                        onChange={e => setDatos({ ...datos, direccion2: e.target.value })}
-                        id="direccion-2" className="mt-2" type="text" placeholder="(campo opcional)"
-                      /><br />
-                    </Col>
-                    <Col md="6" xs="12" className="mx-auto">
-                      <span className="h5">Ciudad*</span>
-                      <Input
-                        value={datos.ciudad}
-                        onChange={e => setDatos({ ...datos, ciudad: e.target.value })}
-                        id="ciudad" className="mt-2" type="text"
-                      /><br />
-                    </Col>
-                    <Col md="6" xs="12" className="mx-auto">
-                      <span className="h5">Estado/Provincia*</span>
-                      <Input
-                        value={datos.estado}
-                        onChange={e => setDatos({ ...datos, estado: e.target.value })}
-                        id="estado" className="mt-2" type="text"
-                      /><br />
-                    </Col>
-                    <Col md="6" xs="12" className="mx-auto">
-                      <span className="h5">Código Postal*</span>
-                      <Input
-                        value={datos.codigo_postal}
-                        onChange={e => setDatos({ ...datos, codigo_postal: e.target.value })}
-                        id="codigo-postal" className="mt-2" type="text"
-                      /><br />
-                    </Col>
-                    <Col md="6" xs="12" className="mx-auto">
-                      <span className="h5">Pais*</span>
-                      <Input
-                        value={datos.pais}
-                        onChange={e => setDatos({ ...datos, pais: e.target.value })}
-                        id="pais" className="mt-2" type="text"
-                      /><br />
-                    </Col>
-                  </Row>
-
-                  {datos.longitud !== 0 && datos.latitud !== 0 ?
                     <Row>
-                      <Col md="12">
-                        <Mapa
-                          lat={datos.latitud}
-                          lng={datos.longitud}
-                        />
+                      <Col md="12" xs="12" className="mx-auto">
+                        <span className="h5">Direccion 1*</span>
+                        <Input
+                          value={datos.direccion1}
+                          onChange={e => setDatos({ ...datos, direccion1: e.target.value })}
+                          id="direccion-1" className="mt-2" type="text"
+                        /><br />
+                      </Col>
+                      <Col md="12" xs="12" className="mx-auto">
+                        <span className="h5">Direccion 2 (Op)</span>
+                        <Input
+                          value={datos.direccion2}
+                          onChange={e => setDatos({ ...datos, direccion2: e.target.value })}
+                          id="direccion-2" className="mt-2" type="text" placeholder="(campo opcional)"
+                        /><br />
+                      </Col>
+                      <Col md="6" xs="12" className="mx-auto">
+                        <span className="h5">Ciudad*</span>
+                        <Input
+                          value={datos.ciudad}
+                          onChange={e => setDatos({ ...datos, ciudad: e.target.value })}
+                          id="ciudad" className="mt-2" type="text"
+                        /><br />
+                      </Col>
+                      <Col md="6" xs="12" className="mx-auto">
+                        <span className="h5">Estado/Provincia*</span>
+                        <Input
+                          value={datos.estado}
+                          onChange={e => setDatos({ ...datos, estado: e.target.value })}
+                          id="estado" className="mt-2" type="text"
+                        /><br />
+                      </Col>
+                      <Col md="6" xs="12" className="mx-auto">
+                        <span className="h5">Código Postal*</span>
+                        <Input
+                          value={datos.codigo_postal}
+                          onChange={e => setDatos({ ...datos, codigo_postal: e.target.value })}
+                          id="codigo-postal" className="mt-2" type="text"
+                        /><br />
+                      </Col>
+                      <Col md="6" xs="12" className="mx-auto">
+                        <span className="h5">Pais*</span>
+                        <Input
+                          value={datos.pais}
+                          onChange={e => setDatos({ ...datos, pais: e.target.value })}
+                          id="pais" className="mt-2" type="text"
+                        /><br />
                       </Col>
                     </Row>
-                    : <></>
-                  }
 
-                </>
-                :
-                accion === "online" ?
-                  <Input type="url" id="link"
-                    value={url}
-                    onChange={e => { setUrl(e.target.value) }}
-                    placeholder="Ingresa el URL del evento"
-                  /> : <></>
-              }
-              {accion !== "" ?
-                <Row className="mt-4">
+                    {datos.longitud !== 0 && datos.latitud !== 0 ?
+                      <Row>
+                        <Col md="12">
+                          <Mapa
+                            lat={datos.latitud}
+                            lng={datos.longitud}
+                          />
+                        </Col>
+                      </Row>
+                      : <></>
+                    }
+
+                  </>
+                  :
+                  accion === "online" ?
+                    <Input type="url" id="link"
+                      value={url}
+                      onChange={e => { setUrl(e.target.value) }}
+                      placeholder="Ingresa el URL del evento"
+                    /> : <></>
+                }
+                {accion !== "" ?
+                  <Row className="mt-4">
                     <Col md="4" xs="7">
-                      <Button onClick={creado ? modificar:crear} color={creado ? "info":"success"} block >{creado ? "Modificar":"Continuar"}</Button>
+                      <Button onClick={creado ? modificar : crear} color={creado ? "info" : "success"} block >{creado ? "Modificar" : "Continuar"}</Button>
                     </Col>
-                </Row>
-                : <></>
+                  </Row>
+                  : <></>
 
-              }
+                }
 
-            </Col>
-          </Row>
-        </Col>
+              </Col>
+            </Row>
+          </Col>
 
-      </Row>
+        </Row>
       </Collapse>
       <Row><Col md="12" className="border border-light my-4"></Col></Row>
     </Col>

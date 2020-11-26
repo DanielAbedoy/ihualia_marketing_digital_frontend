@@ -244,7 +244,6 @@ class Contactos {
         return axios.get(`${this.urls.getUrlPrincipal()}/api/grupo/?cuenta=${cuenta}`)
             .then(res => res.data.results)
             .catch(err => err.response.request);
-
     }
 
     getContactosDelGrupo = (grupoId) => {
@@ -315,6 +314,19 @@ class Contactos {
             .catch(e => "error")
     }
 
+    getContactosGrupos = (grupos) => {
+        let str_param = "";
+        grupos.forEach(g => str_param += g+"-");
+        return axios.get(`${this.urls.getUrlPrincipal()}/api/grupo/contactos/?grupo=${str_param}`)
+        .then(r => r.data)
+        .catch(e => "error")
+    }
+    
+    getContactosGruposCuenta = (cuenta) => {
+        return axios.get(`${this.urls.getUrlPrincipal()}/api/grupo/contactos/?cuenta=${cuenta}`)
+        .then(r => r.data)
+        .catch(e => "error")
+    }
 }
 
 export default Contactos;

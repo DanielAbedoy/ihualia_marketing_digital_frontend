@@ -24,7 +24,7 @@ class Contactos extends Component {
         <Row>
           <Col xs="12">
             <Card className="">
-            <CardHeader className="text-white p-4" style={{backgroundColor:"rgb(44,96,186)"}}>
+              <CardHeader className="text-white p-4" style={{backgroundColor:"rgb(44,96,186)"}}>
                 <p className="h3"><i className="fa fa-users"></i> Contactos |</p>
               </CardHeader>
               <CardBody>

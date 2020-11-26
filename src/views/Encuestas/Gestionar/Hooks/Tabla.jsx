@@ -35,8 +35,8 @@ const Tabla = ({ n, encuestados, anonima, ponderacion, tipo, encuesta }) => {
                   if (encuestado.r.respuesta[res]) arrValues.push(`${res}`);
                 }
               }
-
               return (
+                
                 <tr key={i} >
                   {anonima ? <td scope="col">{encuestado.n}</td> : <td scope="col"><p className="text-center m-0">{encuestado.nombre}<br />{encuestado.correo}</p></td>}
                   <td scope="col">

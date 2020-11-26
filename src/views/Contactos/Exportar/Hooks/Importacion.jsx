@@ -106,7 +106,7 @@ const ImportacionComponent = props => {
             <div className={"table-responsive table-bordered table-hover"} >
               <table className="table text-center">
                 <thead>
-                  <tr className="bg-primary">
+                  <tr style={{backgroundColor:"rgba(44,96,186,0.75)"}}>
                     {campos.map((campo, i) => {
                       return (
                         <th key={i}>{campo.toUpperCase()}</th>

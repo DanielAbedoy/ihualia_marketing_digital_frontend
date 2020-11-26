@@ -26,8 +26,8 @@ const GrupoComponent = (props) => {
     {/* <Col  md={openAdd || openUpdate ? "8" : "6"} xs="12" className="mx-auto" style={openAdd || openUpdate ? { transition: "width 10s" } : {}}> */}
       {/* <Col key={indx} md="6" xs="12" className="mx-auto"> */}
       <Card style={openAdd || openUpdate ? { boxShadow: "0px 0px 20px 0px rgba(0,0,0,0.75)" } : {}}>
-        <CardHeader className="bg-primary">
-          <span className="h5"><b>{grupo.nombre}</b></span>
+        <CardHeader  style={{backgroundColor:"rgba(44,96,186,0.95)"}} >
+          <span className="h5 text-white"><b>{grupo.nombre}</b></span>
           {openAdd || openUpdate ?
             <Badge className="ml-auto float-right" color="secondary" overlap="circular" badgeContent="X"
               style={{ cursor: "pointer" }} onClick={() => { setOpenAdd(false); setOpenUpdate(false)}}

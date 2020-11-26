@@ -27,7 +27,7 @@ const Contenido = ({ open, setOpen, preguntas, encuestados, datos }) => {
             <Collapse isOpen={open}>
               <Row>
                 <Col md="12">
-                  <Tabla encuestados={encuestados} n={pregunta.n} ponderacion={true} anonima={false} 
+                  <Tabla encuestados={encuestados} n={pregunta.n} ponderacion={datos.ponderacion} anonima={datos.anonima} 
                     tipo={pregunta.tipo === "imageselector" ? "imagen" : "texto"}
                     encuesta={datos.id}
                   />

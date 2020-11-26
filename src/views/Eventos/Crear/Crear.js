@@ -19,14 +19,14 @@ class Crear extends Component {
   componentDidMount = () => {
     if (this.props.location.state) {
       new ModeloEventos().get_evento_to_continue(this.props.location.state.evento)
-        .then(console.log)
+        .then(ev => this.setState({ evento: ev }))
     }
   }
 
   setEvento = (evento) => this.setState({ evento });
 
   publicar = async () => {
-    await new ModeloEventos().modificar_evento(this.state.evento.id, { estatus: "publicado", url:this.generarUrl() });
+    await new ModeloEventos().modificar_evento(this.state.evento.id, { estatus: "publicado", url: this.generarUrl() });
     this.props.history.push("/eventos/listado")
   }
 
@@ -38,13 +38,16 @@ class Crear extends Component {
   }
 
   render() {
+
+    const e = this.state.evento;
+
     return (
       <div className="animated fadeIn">
         <Row>
           <Col xs="12">
             <Card>
-              <CardHeader>
-                <NavBar />
+            <CardHeader className="text-white p-4" style={{backgroundColor:"#21f077bb"}}>
+                <p className="h3"><i className="cui-calendar"></i> Eventos |</p>
               </CardHeader>
               <CardBody>
                 <Row>
@@ -58,7 +61,9 @@ class Crear extends Component {
 
                   {/* //Informacion Basica */}
                   <InformacionBasica
+                    evento={this.state.evento}
                     setEvento={this.setEvento}
+                    datosBorrador={{ nombre: e.nombre, tipo: e.tipo, categoria: e.categoria, subcategoria: e.sub_categoria, etiquetas: e.etiquetas }}
                   />
                 </Row>
 
@@ -74,20 +79,18 @@ class Crear extends Component {
 
                 <Row>
                   {/* FechaHora */}
-                  {this.state.evento.lugar || this.state.evento.sitio ?
-                    this.state.evento.lugar[0] || this.state.evento.sitio[0] ?
-                      <Fechas
-                        setEvento={this.setEvento}
-                        evento={this.state.evento}
-                      />
-                      : <></>
+                  {this.state.evento.ubicacion && this.state.evento.ubicacion !== "" ?
+                    <Fechas
+                      setEvento={this.setEvento}
+                      evento={this.state.evento}
+                    />
                     : <></>
                   }
                 </Row>
                 <Row>
                   {/* Detalles */}
                   {this.state.evento.fecha_hora_inicio ?
-                    this.state.evento.fecha_hora_inicio !== "" ?
+                    this.state.evento.fecha_hora_inicio !== null ?
                       <Detalles
                         setEvento={this.setEvento}
                         evento={this.state.evento}
@@ -107,8 +110,8 @@ class Crear extends Component {
                     : <></>}
                 </Row>
                 <Row>
-                  {this.state.evento.boletos ?
-                    this.state.evento.boletos.length > 0 ?
+                  {this.state.evento.boletos && this.state.evento.boletos !== "" ?
+                    JSON.parse(this.state.evento.boletos).data.length > 0 ?
                       <Col md="5" xs="12" className="mx-auto mt-3 p-0">
                         <Button block color="success"
                           type="button"

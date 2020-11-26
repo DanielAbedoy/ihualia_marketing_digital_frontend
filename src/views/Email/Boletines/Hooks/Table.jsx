@@ -31,7 +31,7 @@ const Table = ({ boletines, event_gestionarBoletin,history }) => {
             <th scope="col">Asunto</th>
             <th scope="col">Estatus</th>
             <th scope="col">Fecha</th>
-            <th scope="col">Envios</th>
+            <th scope="col">Enviados</th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -43,7 +43,8 @@ const Table = ({ boletines, event_gestionarBoletin,history }) => {
                 <td>{boletin.asunto}</td>
                 <td className={boletin.estatus.toLowerCase() === "enviado" ? "bg-success" : boletin.estatus.toLowerCase() === "borrador" ? "bg-warning" : "bg-danger"} >{boletin.estatus.toUpperCase()}</td>
                 <td>{boletin.fecha_creado}</td>
-                <td>{getNEnvios(boletin.envios)}</td>
+                {/* <td>{getNEnvios(boletin.envios)}</td> */}
+                <td>0</td>
                 <td>
                   <Drop
                     boletin={boletin}
@@ -56,7 +57,7 @@ const Table = ({ boletines, event_gestionarBoletin,history }) => {
 
           })}
 
-          {boletines.length > 0 ?
+          {/* {boletines.length > 0 ?
             <tr >
               <th scope="row"></th>
               <td ><b>Total Boletines:</b></td>
@@ -66,7 +67,7 @@ const Table = ({ boletines, event_gestionarBoletin,history }) => {
             </tr>
             :
             <></>
-          }
+          } */}
 
         </tbody>
       </table>

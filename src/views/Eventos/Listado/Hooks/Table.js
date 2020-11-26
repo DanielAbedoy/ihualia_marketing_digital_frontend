@@ -54,7 +54,7 @@ function Row_Table(props) {
         <TableCell>
           <Drop 
             gestionar={props.gestionar}
-            eliminar={props.eliminar}
+            reload={props.reload}
             ir={props.ir}
             continuar={props.continuar}
             evento ={props.evento}
@@ -72,13 +72,13 @@ export default function CollapsibleTable(props) {
       {props.eventos.length > 0 ?
         <TableContainer >
           <Table stickyHeader aria-label="collapsible table">
-            <TableHead className="bg-primary">
+            <TableHead >
               <TableRow>
-                <TableCell align="center" className="text-white h6 bg-primary"><b>Nombre</b></TableCell>
-                <TableCell align="center" className="text-white h6 bg-primary"><b>Tipo</b></TableCell>
-                <TableCell align="center" className="text-white h6 bg-primary"><b>Categoria</b></TableCell>
-                <TableCell align="center" className="text-white h6 bg-primary"><b>Estatus</b></TableCell>
-                <TableCell  className="bg-primary"/>
+                <TableCell style={{backgroundColor:"#21f0779c"}} align="center" className="text-white h6 "><b>Nombre</b></TableCell>
+                <TableCell style={{backgroundColor:"#21f0779c"}} align="center" className="text-white h6 "><b>Tipo</b></TableCell>
+                <TableCell style={{backgroundColor:"#21f0779c"}}align="center" className="text-white h6 "><b>Categoria</b></TableCell>
+                <TableCell style={{backgroundColor:"#21f0779c"}}align="center" className="text-white h6 "><b>Estatus</b></TableCell>
+                <TableCell style={{backgroundColor:"#21f0779c"}} />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -88,7 +88,7 @@ export default function CollapsibleTable(props) {
                   <Row_Table key={i} indx={i} evento={evento}
                     gestionar={props.gestionar}
                     ir={props.ir}
-                    eliminar={props.eliminar}
+                    reload={props.reload}
                     continuar={props.continuar}
                   />
                 );

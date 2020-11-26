@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col, Input, Collapse, Button } from 'reactstrap';
 import { useToasts } from 'react-toast-notifications';
 import { confirmAlert } from 'react-confirm-alert';
@@ -19,26 +19,56 @@ const Detalles = props => {
   const [creado, setCreado] = useState();
   const [datos, setDatos] = useState({ imagen: '', resumen: "" });
 
+  useEffect(() => {
+    
+    if (props.evento.resumen === undefined || props.evento.resumen === "") return;
+    const e = props.evento;
+    setDatos({ ...datos, imagen: e.imagen, resumen: e.resumen });
+    addComponetesBorrador(JSON.parse(e.componentes).data);
+    setCreado(true);
+  },[props.evento])
 
   const addComponente = (tipo) => {
     switch (tipo) {
       case "imagen":
-
-        setComponentes([...componentes, { posicion: n, hook: <ImageUploader evento={props.evento.id} posicion={n} />, contenido: "", tipo: "imagen" }]);
+        setComponentes([...componentes.slice(), { posicion: n, hook: <ImageUploader evento={props.evento.id} posicion={n}  />, contenido: "", tipo: "imagen" }]);
         setN(n + 1);
 
         break;
       case "video":
 
-        setComponentes([...componentes, { posicion: n, hook: <VideoThumbnail posicion={n} />, contenido: "", tipo: "video" }]);
+        setComponentes([...componentes.slice(), { posicion: n, hook: <VideoThumbnail posicion={n} />, contenido: "", tipo: "video" }]);
         setN(n + 1);
         break;
       case "parrafo":
 
-        setComponentes([...componentes, { posicion: n, hook: <RTE posicion={n} />, contenido: "", tipo: "parrafo" }]);
+        setComponentes([...componentes.slice(), { posicion: n, hook: <RTE posicion={n}  />, contenido: "", tipo: "parrafo" }]);
         setN(n + 1);
         break;
     }
+  }
+
+  const addComponetesBorrador = (comps) => {
+    
+    let cmps = [];
+    let nH = 1;
+
+    comps.forEach((c, k) => {
+      switch (c.tipo) {
+        case "imagen":
+          cmps.push({ posicion: c.posicion, hook: <ImageUploader evento={props.evento.id} posicion={c.posicion} contenido={c.contenido} />, contenido: c.contenido, tipo: "imagen" });
+          break;
+        case "video":
+          cmps.push({ posicion: c.posicion, hook: <VideoThumbnail posicion={c.posicion} contenido={c.contenido} />, contenido: c.contenido, tipo: "video" })
+          break;
+        case "parrafo":
+          cmps.push({ posicion: c.posicion, hook: <RTE posicion={c.posicion} contenido={c.contenido} />, contenido: c.contenido , tipo: "parrafo" })
+          break;
+      }
+      if (k + 1 === cmps.length) nH = c.posicion+1;
+    })
+    setN(nH);
+    setComponentes([...cmps]);
   }
 
   const setValues = (pos, contenido) => componentes.forEach(c => { if (c.posicion === pos) c.contenido = contenido });
@@ -52,53 +82,39 @@ const Detalles = props => {
   const validar = () => {
     if (datos.imagen === '' || datos.resumen === '') {
       addToast("Debes agregar los datos principales", { appearance: "info", autoDismiss: true });
-      return false;
+      return crear(false);
     }
 
     if (componentes.length === 0) {
       confirmAlert({
         message: "¿ Seguro que no incluiras componentes extras ?", buttons: [
-          { label: "Si", onClick: () => true },
-          { label: "No", onClick: () => false },
+          { label: "Si", onClick: () => crear(true)},
+          { label: "No", onClick: () => {} },
         ]
       })
+    } else {
+      return crear(true);  
     }
-    return true;
+    
 
   }
 
-  const crear = async () => {
+  const crear = async (flag) => {
 
-    if (!validar()) return;
-
-    const saveInfo = async() => {
-      const resp = await new ModeloEvento().modificar_evento(props.evento.id, datos);
-      if (resp.statusText === "OK") {
-        //Agregar los valores de componentes
-        setCreado(true);
-        setOpen(false);
-        props.setEvento(resp.data);
-        addToast("Guardado correctamente", { appearance: "success", autoDismiss: true });
-
-      } else addToast("Algo salio mal", { appearance: "error", autoDismiss: true });
-    }
-
+    if (!flag) return;
 
     let componentToSend = acomodarComponentes();
-    if (componentToSend.length > 0) {
-      const r = await new ModeloEvento().add_componentes(props.evento.id, componentToSend);
-      if (r.statusText === "OK") saveInfo();
-      else addToast("Algo salio mal", { appearance: "error", autoDismiss: true });
-    } else saveInfo();
 
+    const resp = await new ModeloEvento().modificar_evento(props.evento.id, { ...datos, componentes: JSON.stringify({ data: componentToSend }) });
+    if (resp.statusText === "OK") {
+      //Agregar los valores de componentes
+      setCreado(true);
+      setOpen(false);
+      props.setEvento(resp.data);
+      addToast("Guardado correctamente", { appearance: "success", autoDismiss: true });
 
-
-
-
-
-    //Cambiar los datos del evento
-
-
+    } else addToast("Algo salio mal", { appearance: "error", autoDismiss: true });
+        //Cambiar los datos del evento
 
   }
 
@@ -130,12 +146,13 @@ const Detalles = props => {
             <br />
             <ImageUploader
               evento={props.evento.id}
+              value={datos.imagen}
               setDato={(dato) => setDatos({ ...datos, imagen: dato })}
             />
             <br />
             <span className="h5">Resumen del evento*</span>
             <Input
-              id="resumen"
+              id="resumen" value={datos.resumen}
               onChange={e => setDatos({ ...datos, resumen: e.target.value })}
               className="mt-2" style={{ height: "80px" }} type="textarea" placeholder="describe de que tratara el evento" /><br />
 
@@ -176,7 +193,7 @@ const Detalles = props => {
           <Col md="12">
             <Row>
               <Col md="4" xs="7">
-                <Button onClick={crear} color={creado ? "info" : "success"} block >{creado ? "Modificar" : "Continuar"}</Button>
+                <Button onClick={validar} color={creado ? "info" : "success"} block >{creado ? "Modificar" : "Continuar"}</Button>
               </Col>
             </Row>
           </Col>

@@ -8,7 +8,7 @@ import TableRow from '@material-ui/core/TableRow';
 import TableContainer from '@material-ui/core/TableContainer';
 import { makeStyles } from '@material-ui/core/styles';
 
-const Tabla = ({ open, setOpen, arrAsistentes, asistentes, precio }) => {
+const Tabla = ({ open, setOpen, arrAsistentes, precio }) => {
 
   const useStyles = makeStyles({
     container: {
@@ -30,8 +30,11 @@ const Tabla = ({ open, setOpen, arrAsistentes, asistentes, precio }) => {
   const acomodarInfo = () => {
     let i = [];
     arrAsistentes.forEach(a => {
-      let asis = asistentes.find(as => as.id == a.asistencia);
-      i.push({ asistente: <p className="m-0" >{asis.nombre}<br />{asis.correo}</p>, cantidad: a.cantidad, ganancia: ((a.cantidad * 1) * precio) })
+      i.push({
+        asistente: <p className="m-0" >{a.nombre}<br />{a.correo}</p>,
+        cantidad: a.boletos_cantidad,
+        ganancia: ((a.boletos_cantidad * 1) * precio)
+      })
     })
     setInfo(i);
   }
@@ -39,33 +42,45 @@ const Tabla = ({ open, setOpen, arrAsistentes, asistentes, precio }) => {
   return (
     <Row>
       <Col md="12">
+        {arrAsistentes.length !== 0 ?
         <TableContainer className={classes.container} >
-          <Table stickyHeader>
-            <TableHead >
-              <TableRow>
-                <TableCell className="text-white" style={{ backgroundColor: "#08F7FE" }}><b>Asistente</b></TableCell>
-                <TableCell className="text-white" style={{ backgroundColor: "#08F7FE" }} align="right"><b>Boletos Adquiridos</b> </TableCell>
-                <TableCell className="text-white" style={{ backgroundColor: "#08F7FE" }} align="right"><b>Ganancia</b></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {info.map((i, k) => {
-                return (
-                  <TableRow key={k}>
-                    <TableCell component="th" scope="row" >
-                      {i.asistente}
-                    </TableCell>
-                    <TableCell align="right">{i.cantidad} boletos</TableCell>
+        <Table stickyHeader>
+          <TableHead >
+            <TableRow>
+              <TableCell className="text-white" style={{ backgroundColor: "#21f0779c" }}><b>Asistente</b></TableCell>
+              <TableCell className="text-white" style={{ backgroundColor: "#21f0779c" }} align="right"><b>Boletos Adquiridos</b> </TableCell>
+              {precio !== 0 ?
+                <TableCell className="text-white" style={{ backgroundColor: "#21f0779c" }} align="right"><b>Ganancia</b></TableCell>
+                : <></>
+              }
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {info.map((i, k) => {
+              return (
+                <TableRow key={k}>
+                  <TableCell component="th" scope="row" >
+                    {i.asistente}
+                  </TableCell>
+                  <TableCell align="right">{i.cantidad} boletos</TableCell>
+                  {precio !== 0 ?
                     <TableCell align="right">${i.ganancia}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                    : <></>
+                  }
+
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+          </TableContainer>
+          : <>
+            <p className="text-center h4"><b>No hay datos para mostrar</b></p>
+          </>    
+      }
       </Col>
 
-      <Col md="12" className="border border-dark my-4"></Col>
+      <Col md="12" className="border my-4"></Col>
 
     </Row>
   );

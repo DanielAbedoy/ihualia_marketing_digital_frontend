@@ -2,11 +2,15 @@ import React, { Component, PropTypes } from 'react';
 import RichTextEditor from 'react-rte';
 
 
-
 class MyStatefulEditor extends Component {
 
   state = {
     value: RichTextEditor.createEmptyValue()
+  }
+
+  componentDidMount = () => {
+    if (this.props.contenido === undefined) return;
+    this.setState({ value:  RichTextEditor.createValueFromString(this.props.contenido,'html')});
   }
 
   toolbarConfig = {
@@ -29,9 +33,9 @@ class MyStatefulEditor extends Component {
     ]
   };
 
-  onChange = (value) => {
-    this.setState({ value });
+  onChange = (value) => {    
     if (this.props.posicion) {
+      this.setState({ value: value});
       this.props.setValues(this.props.posicion, value.toString('html'));
     }
   };

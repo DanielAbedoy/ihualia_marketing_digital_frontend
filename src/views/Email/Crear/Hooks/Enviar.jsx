@@ -5,36 +5,16 @@ import Variables from '../../../../variables/global';
 import Model_Email from '../../../../models/EmailMarketing';
 import URLs from '../../../../models/urls';
 
-const Enviar = ({ datosBoletin, grupos, _fecha }) => {
+import { confirmAlert } from 'react-confirm-alert';
+import '../../../../assets/css/alert-confirm.css';
+
+const Enviar = ({ boletin, grupos, history }) => {
+
+  
 
   const { addToast } = useToasts();
-
-  const validar = () => {
-    if (grupos === '') return false
-    if (datosBoletin.tipo_publicacion ==="programado" && !_fecha.date) {
-      addToast("Debes agregar la fecha de nuevo", { appearance: "info", autoDismiss: true })
-      return false; 
-    }
-    return true;
-  }
-
-  const programar = async() => {
-    let grupos_id = "";
-    grupos.forEach(grupo => grupos_id += `${grupo.id},`);
-
-    await new Model_Email().update_boletin(datosBoletin.id, { asunto: datosBoletin.asunto, tipo_publicacion: datosBoletin.tipo_publicacion, contenido: datosBoletin.contenido, estatus: "por enviar", id_cuenta: datosBoletin.id_cuenta })
-    const links = getLinks(datosBoletin.contenido);
-    await Promise.all(await new Model_Email().add_links(links, datosBoletin.id)); //Agregar Links)
-    new Model_Email().add_programacion_boletin(_fecha.date, _fecha.hour, datosBoletin.id, grupos_id)
-      .then((resp) => {
-        if (resp !== "error") {
-          console.log(resp)
-          alert("Programado con exito");
-          //this.props.history.push('/emailmarketing')
-        }
-      })
-  }
-
+  let keys = new Variables().key_words_boletin();
+/* 
   const sendEmails = async (e) => {
     e.preventDefault();
     if (!validar()) return;
@@ -88,20 +68,48 @@ const Enviar = ({ datosBoletin, grupos, _fecha }) => {
           }
         })
     }
+  } */
+
+  const enviar = () => {
+    let contactos_html = [];
+    grupos.forEach(grupo => {
+      grupo.contactos.forEach(c => contactos_html.push({ contacto: c.id, html: generarHTML(c, grupo.campos_extra), correo: c.correo }));
+    })
+
+    console.log(contactos_html);
   }
 
-  const getLinks = (contenido) => {
-    let refs = contenido.split('href="');
-    let links = [];
-    //Recorrer los links y subir el link
-    refs.forEach((ref, indx) => { if (indx !== 0) links.push(ref.split('"')[0]) })
-    return links;
+  const generarHTML = (contacto,campos) => {
+    let html_main = boletin.contenido;
+    let links = JSON.parse(boletin.links).data;
+
+    keys.forEach(key => {
+      if (key.key === '{{{remitente}}}') html_main = html_main.replace("{{{remitente}}}", contacto.nombre, "gi");
+      else html_main = html_main.replace(("{{{" + key.key + "}}}"), `${key.valor}`, "gi");
+    });
+
+    campos.forEach(c => html_main = html_main.replace(("{{{" + c + "}}}"), `${contacto[c]}`, "gi"));
+
+    links.forEach(link => { html_main = html_main.replace(`${link.str}`, `${new URLs().supporserver()}/email/seen-link-by/?contacto=${contacto.id}&link=${link.id}&boletin=${boletin.id}`) })
+    html_main = `${html_main} <img src="${new URLs().supporserver()}/email/seen-boletin-by/?contacto=${contacto.id}&boletin=${boletin.id}" width="1" height="1" />`;
+
+    return html_main;
+  }
+
+  const programar = async() => {
+    let gIds = [];
+    grupos.forEach(g => gIds.push(g.id));
+
+    const resp = await new Model_Email().modificar_boletin(boletin.id, { grupos: gIds, estatus: "programado" });
+    if (resp.statusText === "OK") confirmAlert({ title: "Exito", message: "Se a programado de manera correcta", buttons: [{ label: "Continuar", onClick: () => history.push("emailmarketing/crear") }] })
+    else addToast("Algo salio mal", { appearance: "error", autoDismiss: true });
   }
 
   return (
     <Row className="mt-4">
       <Col md="5" xs="9" className="mx-auto p-0">
-        <Button block color="success" onClick={sendEmails} > {datosBoletin.tipo_publicacion === "enviado" ? "Enviar" : "Programar"} </Button>
+        <Button block color="success" onClick={JSON.parse(boletin.publicacion).tipo === "ahora" ? enviar : programar} >
+          {JSON.parse(boletin.publicacion).tipo === "ahora" ? "Enviar" : "Programar"} </Button>
       </Col>
     </Row>
 

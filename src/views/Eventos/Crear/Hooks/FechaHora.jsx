@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Row, Col, Input, Collapse, Button } from 'reactstrap';
 import { useToasts } from 'react-toast-notifications';
 
@@ -15,6 +15,19 @@ const FechaHora = props => {
     { fecha_hora_inicio: "", fecha_hora_fin: "", zona_horaria: "" }
   );
 
+  useEffect(() => {
+    
+    if (props.evento.fecha_hora_fin === undefined || props.evento.fecha_hora_fin === null) return;
+
+    const d = props.evento;
+    let fI = d.fecha_hora_inicio.split("T");
+    let fF = d.fecha_hora_fin.split("T");
+
+    setDatos({ ...datos, fecha_hora_inicio: `${fI[0]}T${fI[1].split("-")[0]}`, fecha_hora_fin: `${fF[0]}T${fF[1].split("-")[0]}`, zona_horaria: d.zona_horaria });
+    setCreado(true);
+
+  }, [props.evento])
+  
   const crear = async () => {
     if (!validar()) return;
 
@@ -70,19 +83,20 @@ const FechaHora = props => {
           <Col md="9" xs="12" className="mx-auto">
             <span className="h5">Fecha y Hora de Inicio</span><br />
             <Input
-              id="fecha_ini"
+              id="fecha_ini" value={datos.fecha_hora_inicio} value={datos.fecha_hora_inicio}
               onChange={e => setDatos({ ...datos, fecha_hora_inicio: e.target.value })}
               className="mt-2" type="datetime-local" /><br />
 
 
             <span className="h5">Fecha y Hora de Finalización</span><br />
             <Input
-              id="fecha_fin"
+              id="fecha_fin" value={datos.fecha_hora_fin}
               onChange={e => setDatos({ ...datos, fecha_hora_fin: e.target.value })}
               className="mt-2" type="datetime-local" /><br />
 
             <Input
               id="cbox_zona"
+              value={datos.zona_horaria}
               onChange={e => setDatos({ ...datos, zona_horaria: e.target.value })}
               className="mt-2" type="select" >
               <option  >Busca la zona horaria de la ubicacacion del evento</option>

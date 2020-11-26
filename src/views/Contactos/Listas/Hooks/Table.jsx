@@ -90,11 +90,6 @@ function Row_Table(props) {
                     if (j > 0) {
                       return (
                         <Col key={j} md="6" className="mb-2 ">
-                          {/* <span className="h6">{campo.toUpperCase()}</span>
-                          <Input
-                            onChange={e => setDataNew({...newContacto, [campo.toLowerCase()]: e.target.value })}
-                            type="text" placeholder={contacto[`${campo.toLowerCase()}`]}
-                          /> */}
                           <TextField
                             placeholder={contacto[`${campo.toLowerCase()}`]}
                             onChange={e => setDataNew({ ...newContacto, [campo.toLowerCase()]: e.target.value })}
@@ -142,10 +137,10 @@ export default function CollapsibleTable(props) {
               <TableRow className="bg-primary">
                 {props.campos.map((campo, indx) => {
                   return (
-                    <TableCell align="center" key={indx} className="text-white h6 bg-primary"><b>{campo.toUpperCase()}</b></TableCell>
+                    <TableCell style={{backgroundColor:"rgba(44,96,186,0.75)"}} align="center" key={indx} className="text-white h6 "><b>{campo.toUpperCase()}</b></TableCell>
                   );
                 })}
-                <TableCell className="bg-primary" />
+                <TableCell style={{backgroundColor:"rgba(44,96,186,0.75)"}} />
               </TableRow>
             </TableHead>
             <TableBody>

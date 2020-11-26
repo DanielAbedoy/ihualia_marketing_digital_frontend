@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, ModalHeader, ModalBody, Row, Col, Input } from 'reactstrap';
 import ModelEmail from '../../../../models/EmailMarketing';
 
 const ModalEnvios = props => {
 
   const toggle = () => props.event_toggle(!props.open);
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    if (props.contactos.length === 0) return;
+    let c = [];
+    props.enviados.forEach(e => c.push(props.contactos.find(c => c.id == e)));
+    setData([...c]);
+  }, [props.contactos, props.enviados])
+
 
   return (
     <Modal size="lg" isOpen={props.open} toggle={toggle} >
@@ -32,16 +41,22 @@ const ModalEnvios = props => {
                     </tr>
                   </thead>
                   <tbody>
-                    {props.enviados.map((contacto, indx) => {
+                    {data.map((contacto, indx) => {
                       return (
                         <tr key={indx}>
                           <th scope="row">{(indx + 1)}</th>
-                          <td >{contacto.contacto.nombre}</td>
-                          <td>{contacto.contacto.correo}</td>
-                          <td>{contacto.grupo.nombre}</td>
+                          <td >{contacto.nombre}</td>
+                          <td>{contacto.correo}</td>
+                          <td>{contacto.grupo}</td>
                         </tr>
                       );
                     })}
+                    <tr>
+                      <td></td>
+                      <td ><b>Total:</b></td>
+                      <td><b>{data.length}</b></td>
+                      <td></td>
+                    </tr>
                   </tbody>
                 </table>
               </div>

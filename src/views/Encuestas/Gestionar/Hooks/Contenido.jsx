@@ -51,13 +51,13 @@ const Contenido = ({ open, setOpen, preguntas, datos }) => {
                           return (
                             <React.Fragment key={j}>
                               <img width="40%" src={`${new urls().supporserver()}/encuestas/getimg/?encuesta=${datos.id}&imagen=${o.opcion}`} alt="" />
-                              <p className="m-0 text-muted">{o.check ? "CORRECTA" : ""}</p>
+                              <p className="m-0 text-muted">{datos.ponderacion === true ? (o.check ? "CORRECTA" : "") : ""}</p>
                             </React.Fragment>
                           )
                         }
                         return (
                           <React.Fragment key={j}>
-                            <p className="m-0 text-muted">- {o.opcion} - {o.check ? "CORRECTA" : "INCORRECTA"}</p>
+                            <p className="m-0 text-muted">- {o.opcion} {datos.ponderacion === true ? (o.check ? " - CORRECTA" : ""):""}</p>
                           </React.Fragment>
                         )
                       })}

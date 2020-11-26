@@ -4,7 +4,6 @@ import { Button, Row, Col, Card, CardBody, CardHeader, Input } from 'reactstrap'
 import ModeloContactos from '../../../models/Contactos.js';
 import Variables from '../../../variables/models.js';
 
-import NavBar from '../NavBar.js';
 import GrupoComponent from './Hooks/CardGrupo';
 
 
@@ -85,10 +84,8 @@ class Crear extends Component {
                 <Row>
                     <Col xs="12">
                         <Card>
-                            <CardHeader>
-                                <NavBar
-                                    title="Grupos - Contactos"
-                                />
+                            <CardHeader className="text-white p-4" style={{backgroundColor:"rgb(44,96,186)"}}>
+                                <p className="h3"><i className="fa fa-users"></i> Contactos |</p>
                             </CardHeader>
                             <CardBody>
                                 <Row>

@@ -63,19 +63,19 @@ const Crear = props => {
             <Row>
               <Col md="4" xs="12" className="mx-auto mt-2">
                 
-                <CustomInput
-                  onClick={() => setTipoBoleto("gratis")}
-                  id="exampleCustomSwitch" type="radio" name="rb_accion" label="Gratis" />
+                <CustomInput checked={datos.tipo=== "gratis" ?true:false}
+                  onChange={() => setTipoBoleto("gratis")}
+                  id="exampleCustomSwitch" type="radio" label="Gratis" />
               </Col>
               <Col md="4" xs="12" className="mx-auto">
-                <CustomInput
-                  onClick={() => setTipoBoleto("pago")}
-                  id="exampleCustomSwitch1" type="radio" name="rb_accion" label="Pago" />
+                <CustomInput checked={datos.tipo=== "pago" ?true:false}
+                  onChange={() => setTipoBoleto("pago")}
+                  id="exampleCustomSwitch1" type="radio" label="Pago" />
               </Col>
               <Col md="4" xs="12" className="mx-auto">
-                <CustomInput
-                  onClick={() => setTipoBoleto("donacion")}
-                  id="exampleCustomSwitch2" type="radio" name="rb_accion" label="Donación" />
+                <CustomInput checked={datos.tipo=== "donacion" ?true:false}
+                  onChange={() => setTipoBoleto("donacion")}
+                  id="exampleCustomSwitch2" type="radio"  label="Donación" />
               </Col>
             </Row>
 

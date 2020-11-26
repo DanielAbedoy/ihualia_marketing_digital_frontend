@@ -1,12 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, ModalHeader, ModalBody, Row, Col, Input } from 'reactstrap';
 
 const ModalRecividos = props => {
 
   const toggle = () => props.event_toggle(!props.open);
 
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    if (props.contactos.length === 0) return;
+    let c = [];
+    props.vistos.forEach(e => c.push({ ...props.contactos.find(c => c.id == e.id_contacto), fecha_visto: e.fecha_visto }));
+    setData([...c]);
+  }, [props.contactos, props.vistos])
+
   const acomodarFecha = (fecha_lg) => {
-    const date = fecha_lg.split(" ");
+    const date = fecha_lg.split("T");
     const time = date[1].split(".");
     return `${date[0]} ${time[0]}`;
   }
@@ -38,17 +47,22 @@ const ModalRecividos = props => {
                   </thead>
                   <tbody>
 
-                    {props.vistos.map((contacto, indx) => {
-                      const datosC = JSON.parse(contacto.contacto);
+                    {data.map((contacto, indx) => {
                       return (
                         <tr key={indx} >
                           <th scope="row">{(indx + 1)}</th>
-                          <td >{datosC.nombre}</td>
-                          <td>{datosC.correo}</td>
-                          <td>{acomodarFecha(contacto.fecha)}</td>
+                          <td >{contacto.nombre}</td>
+                          <td>{contacto.correo}</td>
+                          <td>{acomodarFecha(contacto.fecha_visto)}</td>
                         </tr>
                       );
                     })}
+                    <tr>
+                      <td></td>
+                      <td ><b>Total:</b></td>
+                      <td><b>{data.length}</b></td>
+                      <td></td>
+                    </tr>
                   </tbody>
                 </table>
               </div>

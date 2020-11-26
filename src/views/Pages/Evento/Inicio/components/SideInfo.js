@@ -8,17 +8,19 @@ class SideInfo extends Component {
   state = {
     tipo:"",
     lugar: {},
-    sitio: {},
+    sitio: '',
     
   }
 
   componentDidMount = () => {
     
-    if (this.props.evento.tipo_ubicacion === "lugar") {
-      this.setState({ tipo: "lugar", lugar: this.props.evento.lugar[0] })
+    const u = JSON.parse(this.props.evento.ubicacion);
+
+    if (u.tipo === "lugar") {
+      this.setState({ tipo: "lugar", lugar: u.data })
       
-    } else if (this.props.evento.tipo_ubicacion === "online") { 
-      this.setState({tipo:"sitio", lugar:this.props.evento.sitio[0]})
+    } else if (u.tipo === "online") { 
+      this.setState({tipo:"sitio", sitio: u.data})
     }
   }
 
@@ -75,7 +77,7 @@ class SideInfo extends Component {
             :
             <>
               <p className="h6"><b>Lugar:</b> Evento Online</p><br />
-              <p className="h6"><b>Enlace:</b>  <a href={this.state.sitio.link}>{this.state.sitio.link}</a></p>
+              <p className="h6"><b>Enlace:</b>  <a href={this.state.sitio}>{this.state.sitio}</a></p>
             </>
           }
           <br/>

@@ -2,30 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardBody, Row, Col, CardFooter, Input } from 'reactstrap';
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
-
 import EventoModel from '../../../../../models/Eventos';
 
-const Boleto = ({ boletos, carrito, total, setCarrito }) => {
+import ItemsCarousel from 'react-items-carousel';
+
+const Boleto = ({ boletos, carrito, total, setCarrito, asistentes }) => {
 
   const [bolets, setBolets] = useState([])
+  const [activeItemIndex, setActiveItemIndex] = useState(0);
 
-  const responsive = {
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 3,
-      slidesToSlide: 3 // optional, default to 1.
-    },
-    tablet: {
-      breakpoint: { max: 1024, min: 464 },
-      items: 2,
-      slidesToSlide: 2 // optional, default to 1.
-    },
-    mobile: {
-      breakpoint: { max: 464, min: 0 },
-      items: 1,
-      slidesToSlide: 1 // optional, default to 1.
-    }
-  };
+  const nunCards = window.screen.width > 540 ? window.screen.width > 1024 ? 3 : 2 : 1;
+
 
   const format_corrency = new Intl.NumberFormat('es-MX', {
     style: 'currency',
@@ -41,10 +28,10 @@ const Boleto = ({ boletos, carrito, total, setCarrito }) => {
     } else {
       for (let i = min; i <= max; i++) {
         nums.push(<option key={i}>{i}</option>);
-      }  
+      }
     }
 
-    
+
     return nums;
   }
 
@@ -70,85 +57,81 @@ const Boleto = ({ boletos, carrito, total, setCarrito }) => {
     setCarrito(car, total)
   }
 
-
   useEffect(() => {
-    getCantidadesBoletos()
+    getCantidadesBoletos(boletos)
+
   }, [boletos])
 
-  const getCantidadesBoletos = async () => {
 
-    let arr_bolets = [];
-    boletos.forEach(b => arr_bolets.push(`${b.id}`));
+  const getCantidadesBoletos = async (boletos) => {
 
-    const vendidos = await new EventoModel().get_cantidad_boletos_vendidos(arr_bolets);
-    if (vendidos.statusText !== "OK") return;
+    let bC = {};
+    boletos.forEach(b => bC = { ...bC, [b.id]: 0 });
+    asistentes.forEach(a => {
+      const bols = JSON.parse(a.boletos).data;
+      bols.forEach(bls => bC = { ...bC, [`${bls.id}`]: bC[`${bls.id}`] + (bls.cantidad * 1) });
+    })
 
     boletos.forEach(boleto => {
       let cantidad_total = parseInt(boleto.cantida_total);
       let cantidad_maxima = parseInt(boleto.cantidad_maxima);
-      let cantidad = vendidos.data.find(v => v.boleto == boleto.id).vendidos;
+      //let cantidad = vendidos.data.find(v => v.boleto == boleto.id).vendidos;
+      let cantidad = bC[`${boleto.id}`];
 
       const cantidad_gnrl = cantidad_total - cantidad;
       let cantidad_a_mostrar = 0;
       if (cantidad_gnrl < cantidad_maxima) cantidad_a_mostrar = cantidad_gnrl;
       else cantidad_a_mostrar = cantidad_maxima;
       boleto.cantidad_a_mostrar = cantidad_a_mostrar;
-
     });
     setBolets(boletos);
   }
 
   return (
-    <Carousel
-      swipeable={false}
-      draggable={false}
-      showDots={false}
-      responsive={responsive}
-      ssr={true} // means to render carousel on server-side.
-      infinite={false}
-      autoPlay={false}
-      containerClass="carousel-container zIndxHigh"
-      dotListClass="custom-dot-list-style"
-      itemClass="carousel-item-padding-40-px"
-      slidesToSlide={1}
-    >
-      {bolets.map((boleto, i) => {
-        return (
-          <div key={i} className="px-4" style={{ height: "64vh" }}>
-            <Card className="card-boleto-h" style={{ height: "100%" }}>
-              <CardHeader className="bg-info p-1">
-                <p className="text-center m-0 text-white">{boleto.nombre}</p>
-              </CardHeader>
-              <CardHeader className="bg-primary">
-                <p className="text-center h3 text-white">{format_corrency.format(boleto.precio)}</p>
-                <p className="text-center text-white mt-2 mb-0" ><b>Aquierelo: {boleto.canal_ventas}</b></p>
-              </CardHeader>
-              <CardBody className="px-3 d-flex align-items-center flex-column">
-                <p className="text-center" ><b>{boleto.descripcion}</b></p>
-                <hr />
+    <div style={{ padding: `0 ${40}px` }}>
+      <ItemsCarousel
+        requestToChangeActive={setActiveItemIndex}
+        activeItemIndex={activeItemIndex}
+        numberOfCards={nunCards}
+        gutter={22}
+        leftChevron={<i className="fa fa-chevron-left"></i>}
+        rightChevron={<i className="fa fa-chevron-right"></i>}
+        outsideChevron
+        chevronWidth={40}
 
+      >
+        {bolets.map((boleto, i) => {
+          return (
+            <div key={i} style={{ height: "70vh" }}>
+              <Row className="m-0 p-0 bg-white rounded flex-column" style={{ height: "100%" }}>
+
+                <p className={`text-center py-2 rounded-top m-0 text-white bg-h-${boleto.tipo === "gratis" ? "success" : boleto.tipo === "pago" ? "primary" : "warning"}`}
+                ><b>{boleto.nombre}</b></p>
+
+                <p className="text-center mt-3 h1"><b>{format_corrency.format(boleto.precio)}</b></p>
+                <p className="text-center mt-2 mb-0" ><b>Aquierelo: {boleto.canal_ventas}</b></p>
+
+                <p className="text-center px-2 my-auto text-muted" ><b>{boleto.descripcion} </b></p>
+              
                 {boleto.cantidad_a_mostrar === 0 ?
                   <p className="text-center h4 m-0"><b>AGOTADO</b></p>
-                  :<>
-                  <p className="text-center text-muted m-0">Agrega tus Boletos</p>
-                  <Input type="select" className="mt-1 mx-auto" style={{ width: "50%" }}
-                    onChange={(e) => changeCarrito(e.target.value, boleto)}
-                  >
-                    <option>0</option>
-                    {optionsValues(boleto.cantidad_minima, boleto.cantidad_a_mostrar)}
-                  </Input></>
+                  : <>
+                    <p className="text-center text-muted m-0">Agrega tus Boletos</p>
+                    <Input type="select" className="mt-1 mx-auto" style={{ width: "50%" }}
+                      onChange={(e) => changeCarrito(e.target.value, boleto)}
+                    >
+                      <option>0</option>
+                      {optionsValues(boleto.cantidad_minima, boleto.cantidad_a_mostrar)}
+                    </Input></>
                 }
+                <p className={`text-center text-white mt-auto mb-0 py-2 bg-h-${boleto.tipo === "gratis" ? "success" : boleto.tipo === "pago" ? "primary" : "warning"}`} ><b>Boleto de tipo: {boleto.tipo.toUpperCase()}</b></p>
+              </Row>
+            </div>
+          );
+        })}
 
-              </CardBody>
-              <CardFooter className="bg-primary p-0 m-0">
-                <p className="text-center m-0 p-0" ><b>Boleto de tipo: {boleto.tipo.toUpperCase()}</b></p>
-              </CardFooter>
-            </Card>
-          </div>
-        );
-      })}
-
-    </Carousel>
+      </ItemsCarousel>
+    </div>
   );
 
 }

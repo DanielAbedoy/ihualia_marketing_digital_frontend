@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Card, CardBody, CardHeader, Col, Row, Badge, Input } from 'reactstrap';
+import { confirmAlert } from 'react-confirm-alert';
+import '../../../assets/css/alert-confirm.css';
 
 import ChartComponent from '../../../components/ChartComp';
 import Contenido from './Hooks/Contenido';
@@ -24,9 +26,30 @@ class Gestionar extends Component {
   }
 
   componentDidMount = () => {
-    new ModelEncuesta().get_encuesta("25")
-      .then(e => this.setState({ encuesta: e }, () => this.sortEncuestasRealizadas()));
+    if (!this.props.location.state) {
+      this.props.history.push('/encuestas/listado');
+      return;
+    } 
+
+    new ModelEncuesta().get_encuesta(this.props.location.state.encuesta)
+      .then(e => this.setState({ encuesta: e }, () => this.sortEncuestasRealizadas()))
+      .catch (err => this.props.history.push('/encuestas/listado'))
   }
+  
+  activar_desactivar = tipo => {
+    
+    confirmAlert({
+      message:`Seguro que deseas ${tipo === 'a' ? "activar" : "desactivar"} la encuesta ?`,
+      buttons:[
+        {label:"Si",onClick:()=>{
+          new ModelEncuesta().modificar_encuesta(this.state.encuesta.id, { estatus: tipo === "a" ? "publicado" : "inactiva" })
+            .then(r => { if (r.statusText === "OK") this.props.history.push("/encuestas/listado") });
+        }},
+        {label:"Cancelar",onClick:()=>{}}
+      ]
+    })
+
+  } 
 
   sortEncuestasRealizadas = () => {
 
@@ -81,7 +104,16 @@ class Gestionar extends Component {
                   <>
                     <Row>
                       <Col xs="12" md="7" className="mx-auto">
-                        <p className="text-center"> <b>Encuesta:</b> <Badge color="success" >ACTIVA</Badge></p>
+                        
+                        {this.state.encuesta.estatus === "publicado"?
+                          <>
+                            <p className="text-center"> <b>Encuesta:</b> <Badge color="success" >ACTIVA</Badge>  <Badge onClick={()=>this.activar_desactivar("d")} className="ml-2 cursor-p" color="danger" >DESACTIVAR</Badge>  </p>
+                          </>
+                          :
+                          <>
+                            <p className="text-center"> <b>Encuesta:</b> <Badge color="danger" >DESACTIVADA</Badge>  <Badge onClick={()=>this.activar_desactivar("a")} className="ml-2 cursor-p" color="success" >Activar</Badge>  </p>
+                          </>
+                        }
 
                         <p className=" m-0"><b> Nombre: </b> {this.state.encuesta.nombre} </p>
                         <p className=" m-0"><b> Presentacion: </b> {this.state.encuesta.presentacion} </p>
@@ -158,7 +190,7 @@ class Gestionar extends Component {
                                 <p className="h5 text-center">Contenido</p>
                               </Col>
                               <Contenido
-                                datos={{ nombre: this.state.encuesta.nombre, presentacion: this.state.encuesta.presentacion, instrucciones: this.state.encuesta.instrucciones, despedida: this.state.encuesta.despedida, imagen: this.state.encuesta.imagen, id: this.state.encuesta.id }}
+                                datos={{ nombre: this.state.encuesta.nombre, presentacion: this.state.encuesta.presentacion, instrucciones: this.state.encuesta.instrucciones, despedida: this.state.encuesta.despedida, imagen: this.state.encuesta.imagen, id: this.state.encuesta.id, ponderacion:this.state.encuesta.ponderacion }}
                                 preguntas={JSON.parse(this.state.encuesta.preguntas_json)} open={this.state.openContenido} setOpen={(o) => this.setState({ openContenido: o })}
                               />
                               <Col onClick={() => this.setState({ openRespuestas: !this.state.openRespuestas })} md="12" className="px-4 my-2 py-4 rounded shadow-lg d-flex flex-column text-white align-items-center justify-content-center" style={{ cursor: "pointer", backgroundColor: "rgb(255,170,51)" }}>
@@ -166,7 +198,7 @@ class Gestionar extends Component {
                                 <p className="h5 text-center">Respuestas</p>
                               </Col>
                               <Respuestas
-                                datos={{ id: this.state.encuesta.id }}
+                                datos={{ id: this.state.encuesta.id, ponderacion: this.state.encuesta.ponderacion, anonima: this.state.encuesta.anonima }}
                                 preguntas={JSON.parse(this.state.encuesta.preguntas_json)} encuestados={this.state.encuesta.encuestados} open={this.state.openRespuestas} setOpen={(o) => this.setState({ openRespuestas: o })}
                               />
                             </Row>

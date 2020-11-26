@@ -66,7 +66,6 @@ const Drop = ({ encuesta, history, reload }) => {
             </>
             :
             <>
-              <DropdownItem onClick={() => { eliminar(encuesta.id) }} >Eliminar</DropdownItem>
               <DropdownItem onClick={() => { gestionar(encuesta.id) }} >Gestionar</DropdownItem>
             </>
         }

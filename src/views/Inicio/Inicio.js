@@ -14,27 +14,9 @@ class Inicio extends Component {
 
 
   prueba = () => {
-   /*  axios.post("http://localhost:8000/api/campo-extra/addcampo/",
-      {
-        campo: "joyas",
-        grupo:"2"
-        
-      })
-      .then(console.log)
-      .catch(console.log) */
-
-      axios.post("http://localhost:8000/api/asistente-evento/add/",
-        {
-          infoPrincipal: { evento:"24",correo: "josedaniel@lide.com", nombre: "Mi nombre", telefono: "555555", metodo_pago: "no", monto_total: "no", estatus_pago: "pagado" },
-          boletos: [{ cantidad: "2", id:"4" },{ cantidad: "4", id:"5" },],
-          donacion: { are: true, monto: "100" },
-          //detalles:{are:true, data:{tipo:"oxxo", referencia:"sdadasdasdsd"}}
-          detalles:{are:true, data:{tipo:"card", id_pago:"sdadasdasdsd", id_orden:"dsfsdfsdfsdf"}}
-          
-      })
+   axios.get("http://loacalhost:8000/api/grupo/contactos/?grupo=2&grupo=3")
       .then(console.log)
       .catch(console.log)
-    
   }
 
   render() {

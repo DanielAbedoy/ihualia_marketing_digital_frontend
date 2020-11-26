@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Col, Input, Row, FormGroup, CustomInput, Button } from 'reactstrap';
 import { Editor } from '@tinymce/tinymce-react';
 import ModelEmail from '../../../../models/EmailMarketing';
@@ -12,6 +12,14 @@ const Boletin = props => {
   const { addToast} = useToasts();
   const [contenido, setContenido] = useState("");
   const [openKeys, setOpenKeys] = useState(false);
+
+
+  useEffect(() => {
+    if (props.plantilla === "") return;
+    if(props.plantilla.contenido)setContenido(props.plantilla.contenido)
+    else setContenido(props.plantilla)
+  },[props.plantilla])
+
   const onChargeImgage = (blobInfo, success, failure, progress) => {
 
     //Crear una ruta en express para subir la imagen
@@ -27,21 +35,24 @@ const Boletin = props => {
     //ya esta
   }
 
-  const onCambiarPlantilla = e => {
-    e.preventDefault();
-    props.event_setPlantilla('');
+  const generarLinks = () => {
+    let refs = contenido.split('href="');
+    let links = [];
+    //Recorrer los links y subir el link
+    refs.forEach((ref, indx) => { if (indx !== 0) links.push({ str: ref.split('"')[0], id: indx }) });
+    return links;
   }
 
   const guardar = async(e) => {
     e.preventDefault()
     if (!validar()) return;
 
-    const i = props.getInfo;
-    const d = { asunto: i.asunto, tipo_publicacion: i.tipo_publicacion, contenido: contenido, estatus: i.estatus, id_cuenta: i.id_cuenta };
-    const response = await new ModelEmail().update_boletin(i.id, d);
-    if (response !== "Error") {
-      props.event_setDatos(response);
+    const d = { contenido: contenido, links: JSON.stringify({ data: generarLinks() }) };
+    const response = await new ModelEmail().modificar_boletin(props.boletin.id, d);
+    if (response.statusText === "OK") {
+      props.setBoletin(response.data);
       addToast("Todo salio correcatamente", { appearance: "success", autoDismiss: true });
+      props.close();
     }else addToast("Algo salio mal", { appearance: "error", autoDismiss: true });
 
   }
@@ -55,25 +66,27 @@ const Boletin = props => {
   }
 
   return (
+
     <>
       {props.plantilla !== '' ?
         <Col md="12">
           <Row>
             <Col md="3" xs="8">
-                <p onClick={onCambiarPlantilla} className="h6" style={{cursor:"pointer"}}><i className="fa fa-undo"></i> Cambiar Plantilla</p>
+                <p onClick={props.changePlantilla} className="h6" style={{cursor:"pointer"}}><i className="fa fa-undo"></i> Cambiar Plantilla</p>
             </Col>
             <Col md="3" xs="8">
-                <p onClick={ ()=> setOpenKeys(!props.open)} className="h6" style={{cursor:"pointer"}}><i className="fa fa-key"></i> Ver KeyWords</p>
+                <p onClick={ ()=> setOpenKeys(!openKeys)} className="h6" style={{cursor:"pointer"}}><i className="fa fa-key"></i> Ver KeyWords</p>
             </Col>
             <KeyWords
               open={openKeys}
               setOpen={setOpenKeys}
             />
             <Col md="12" xs="12" className="mx-auto">
+              
               <Editor
                 apiKey='bwkr8o4fc9bqg9np21jcbkikmrzb0oq45sqq0wyiu03gwnzf'
                 //initialValue={plantilla}
-                value={props.plantilla.contenido}
+                value={contenido}
                 //onEditorChange={(content, editor) => props.event_setBoletin(content)}
                 onEditorChange={(content, editor) => setContenido(content)}
                 init={{
@@ -89,12 +102,12 @@ const Boletin = props => {
                   file_picker_types: 'image',
                   default_link_target: "_blank"
                 }}
-              />
+                />
             </Col>
             <Col md="12">
               <Row>
                 <Col md="3" xs="12" className="ml-auto mt-3">
-                  <Button color={props.getInfo.contenido === "null" ? "success" : "info"} block onClick={guardar} >{props.getInfo.contenido === "null" ? "Continuar" : "Cambiar"}</Button>
+                  <Button color={props.boletin.contenido === "" ? "success" : "info"} block onClick={guardar} >{props.boletin.contenido === "" ? "Continuar" : "Cambiar"}</Button>
                 </Col>
               </Row>
             </Col>

@@ -1,12 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Col, Row, Button } from 'reactstrap';
 
 import ModeloEvento from '../../../../../models/Eventos';
 import URLs from '../../../../../models/urls';
 
-const ImageUpload = ({ evento, posicion, setDato, setValues }) => {
+const ImageUpload = ({ evento, posicion, setDato, setValues, value, contenido }) => {
 
   const [url, setUrl] = useState('');
+
+  useEffect(() => {
+    if (value === "" || value === undefined) return;
+    setUrl(`${new URLs().supporserver()}/ev/getimg/?imagen=${value}&evento=${evento}`)
+    setDato(value);
+  },[value])
+
+  useEffect(() => {
+    if (!contenido) return;
+    setUrl(`${new URLs().supporserver()}/ev/getimg/?imagen=${contenido}&evento=${evento}`)
+  },[])
 
   const cambiarImg = () => {
     setUrl('');
@@ -25,7 +36,6 @@ const ImageUpload = ({ evento, posicion, setDato, setValues }) => {
       setValues(posicion, data.ref);
     } else {
       setDato(data.ref)  
-
     }
   }
 

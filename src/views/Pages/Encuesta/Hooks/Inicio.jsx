@@ -20,12 +20,12 @@ const Inicio = ({id ,nombre, presentacion, instrucciones, imagen, anonima, conti
       <Col md="10" xs="12" style={{height:"100%"}} className="mx-auto">
         <Row style={{ height: "100%" }}>
           <Col className="d-flex align-items-center justify-content-center">
-            <div style={{width:"100%", backgroundColor:"white", boxShadow:"0px 5px 10px -1px rgba(0,0,0,0.75)" }} className="p-0 my-3" >
+            <div style={{width:"100%", backgroundColor:"white", boxShadow:"0px 5px 10px -1px rgba(0,0,0,0.75)" }} className="p-0 my-3 rounded" >
               <Row className="m-0 p-0" style={{height:"100%"}}>
                 <Col md="5" xs="12" className="m-0 p-0">
                   <img width="100%" height="100%" src={`${new urls().supporserver()}/encuestas/getimg/?encuesta=${id}&imagen=${imagen}`} alt="imagen-principal"/>
                 </Col>
-                <Col md="7" xs="12" style={{ height: "100%" }} className="p-3 d-flex flex-column">
+                <Col md="7" xs="12" className="p-3 d-flex flex-column justify-content-center">
                   <p className="h1"><b>{nombre}</b></p>
                   <p className="h5">{presentacion}</p>
                   <p className="text-muted"><b>{instrucciones}</b></p>

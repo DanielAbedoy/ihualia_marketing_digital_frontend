@@ -84,8 +84,8 @@ class Inicio extends Component {
                 <Col md="8" xs="12">
                   <InfoContent
                     evento={this.state.evento.id}
-                    etiquetas={this.state.evento.etiquetas}
-                    componentes={this.state.evento.componentes}
+                    etiquetas={JSON.parse(this.state.evento.etiquetas).data}
+                    componentes={JSON.parse(this.state.evento.componentes).data}
                     id_cuenta={this.state.evento.id_cuenta}
                   />
                 </Col>

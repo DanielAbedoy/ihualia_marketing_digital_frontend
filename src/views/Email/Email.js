@@ -47,26 +47,22 @@ class Email extends Component {
     const fecha_end = this.getFecha("end");
 
     const boletines = await new EmailMarketing().get_boletines_fecha_cuenta(fecha_start, fecha_end, id_cuenta);
-    console.log(boletines)
     this.setState({ boletines: boletines }, () => { this.filerBoletienesEnviados(); this.filterBorradores(); this.filterProgramados() })
   }
 
   filerBoletienesEnviados = () => {
     let f = new Date();
-    const sends = this.state.boletines.filter(b => b.estatus == "enviado" && b.tipo_publicacion == "enviado");
-    console.log(sends);
+    const sends = this.state.boletines.filter(b => b.estatus == "enviado");
     this.setState({ enviados: sends }, () => { this.sortDataChart() });
   }
 
   filterBorradores = () => {
     const borradores = this.state.boletines.filter(b => b.estatus === "borrador");
-    console.log(borradores);
     this.setState({ borradores: borradores });
   }
 
   filterProgramados = () => {
-    const progs = this.state.boletines.filter(b => b.estatus === "por enviar" && b.tipo_publicacion == "programado");
-    console.log(progs);
+    const progs = this.state.boletines.filter(b => b.estatus === "programado" );
     this.setState({ pendientes: progs });
   }
 

@@ -16,7 +16,7 @@ class InfoContent extends Component {
 
   acodar_componentes = () => {
     let componentes = this.props.componentes;
-    let arr = [];
+/*     let arr = [];
     const len = componentes.length;
     for (let i = 0; i < len; i++) {
       for (let j = 0; j < len; j++) {
@@ -26,8 +26,8 @@ class InfoContent extends Component {
         }
       }
     }
-
-    this.setState({ componentes: arr });
+ */
+    this.setState({ componentes: componentes });
   }
 
   _onReady(event) {
@@ -58,7 +58,7 @@ class InfoContent extends Component {
                   <Col md="8" sm="9" xs="12" className="mx-auto">
                     <img
                       style={{ width: "100%" }}
-                      src={`${new urls().supporserver()}/ev/getimg/?imagen=${componente.contenido}&evento=${componente.id_evento}`}
+                      src={`${new urls().supporserver()}/ev/getimg/?imagen=${componente.contenido}&evento=${this.props.evento}`}
                     />
                   </Col>
                 </Row>
@@ -104,7 +104,7 @@ class InfoContent extends Component {
                 {this.props.etiquetas.map((e, i) => {
                   return (
                     <Col key={i} className=" m-2 mx-auto">
-                      <Badge style={{ fontSize: "12px" }} color="white" className=" border border-primary p-2">#{e.palabra} </Badge>
+                      <Badge style={{ fontSize: "12px" }} color="white" className=" border border-primary p-2">#{e} </Badge>
                     </Col>
                   );
                 })}

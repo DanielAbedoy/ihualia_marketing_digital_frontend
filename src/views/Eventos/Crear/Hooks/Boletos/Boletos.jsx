@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Row, Col, Input, Collapse, Button, Card, CardHeader, CardFooter, CardBody } from 'reactstrap';
 import { useToasts } from 'react-toast-notifications';
 
@@ -9,19 +9,51 @@ import Crear from './Crear';
 const Boletos = props => {
 
   const { addToast } = useToasts();
-  const [accion, setAccion] = useState('crear');
+  const [accion, setAccion] = useState('listado');
   const [boletos, setBoletos] = useState([]);
   const [open, setOpen] = useState(true);
   const [creado, setCreado] = useState(false)
 
-  const generarBoleto = (boleto) => {
-    setBoletos([...boletos.slice(), boleto]);
+  const [id, setId] = useState(1);
+
+
+  useEffect(() => {
+    if (props.evento.boletos === undefined || props.evento.boletos === "") return;
+    const d = props.evento;
+    if (JSON.parse(d.boletos).data.length === 0) return;
+    const b = JSON.parse(d.boletos);
+    setBoletos([...b.data]);
+    setId((b.data[b.data.length - 1].id) + 1);
+    setCreado(true);
+  },[props.evento])
+
+  const generarBoleto = async (boleto) => {
+    const new_arr = [...boletos.slice(), {...boleto, id:id}];
+    const resp = await new ModeloEventos().modificar_evento(props.evento.id, { boletos: JSON.stringify({ data: new_arr }) });
+    if (resp.statusText === "OK") {
+      props.setEvento(resp.data)
+      addToast("Guardado correctamente", { appearance: "success", autoDismiss: true })
+      setCreado(true);
+      setId(id + 1);
+    } else addToast("Algo salio mal", { appearance: "error", autoDismiss: true })
+    setBoletos([...new_arr]);
     setAccion("listado")
   }
 
-  const quitarBoleto = (boleto) => {
+  const quitarBoleto = async (boleto) => {
     const new_arr = boletos.filter(b => b.descripcion != boleto.descripcion)
-    setBoletos(new_arr)
+
+    const resp = await new ModeloEventos().modificar_evento(props.evento.id, { boletos: JSON.stringify({ data: new_arr }) });
+    if (resp.statusText === "OK") {
+      props.setEvento(resp.data)
+      addToast("Eliminado correctamente", { appearance: "success", autoDismiss: true })
+
+      if (new_arr.length === 0) setCreado(false);
+
+      setBoletos([...new_arr])
+    } else addToast("Algo salio mal", { appearance: "error", autoDismiss: true })
+
+    
   }
 
   const format_corrency = new Intl.NumberFormat('es-MX', {
@@ -31,18 +63,6 @@ const Boletos = props => {
     minimumFractionDigits: 2
   });
 
-
-  const crear = async () => {
-    const resp = await new ModeloEventos().add_boletos(props.evento.id, boletos);
-    if (resp.statusText === "OK") {
-      const r = await new ModeloEventos().modificar_evento(props.evento.id, { id_cuenta: props.evento.id_cuenta });
-      props.setEvento(r.data)
-      addToast("Guardado correctamente y listo para publicar", { appearance: "success", autoDismiss: true })
-      setCreado(true);
-      setOpen(false);
-    } else addToast("Algo salio mal", { appearance: "error", autoDismiss: true })
-
-  }
 
   return (
     <Col md="9" xs="12" className="mx-auto">
@@ -104,9 +124,6 @@ const Boletos = props => {
                               );
                             })}
                           </Row>
-                        </Col>
-                        <Col md="4" className="my-4">
-                          <Button color={creado ? "info" : "success"} block onClick={crear} >{creado ? "Cambiar Boletos" : "Agregar Boletos"}</Button>
                         </Col>
                       </Row>
                     </>}

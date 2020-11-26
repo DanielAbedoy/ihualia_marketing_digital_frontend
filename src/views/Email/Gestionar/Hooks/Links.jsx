@@ -12,12 +12,15 @@ const ModalLinks = props => {
   const getVistos = e => {
     e.preventDefault();
     if (e.target.value === "none") { setContactos([]); return; }
-    let link = props.links.find(l => l.id == e.target.value);
-    setContactos(link.vistos)
+
+    let c = [];
+    const vFilter = props.vistos.filter(v => v.id_link == e.target.value);
+    vFilter.forEach(f => c.push({ ...props.contactos.find(c => c.id == f.id_contacto), fecha_visto: f.fecha_visto }));
+    setContactos([...c]);
   }
 
   const acomodarFecha = (fecha_lg) => {
-    const date = fecha_lg.split(" ");
+    const date = fecha_lg.split("T");
     const time = date[1].split(".");
     return `${date[0]} ${time[0]}`;
   }
@@ -44,7 +47,7 @@ const ModalLinks = props => {
                   <option value="none" >Selecciona el link...</option>
                   {props.links.map((link, indx) => {
                     return (
-                      <option value={link.id} key={indx}>{link.link}</option>
+                      <option value={link.id} key={indx}>{link.str}</option>
                     );
                   })}
                 </Input>
@@ -72,17 +75,21 @@ const ModalLinks = props => {
                       <tbody>
 
                         {contactos.map((c, indx) => {
-                          let datos = JSON.parse(c);
-                          let datosC = JSON.parse(datos.contacto);
                           return (
                             <tr key={indx} >
                               <th scope="row">{(indx + 1)}</th>
-                              <td >{datosC.nombre}</td>
-                              <td>{datosC.correo}</td>
-                              <td>{acomodarFecha(datos.fecha)}</td>
+                              <td >{c.nombre}</td>
+                              <td>{c.correo}</td>
+                              <td>{acomodarFecha(c.fecha_visto)}</td>
                             </tr>
                           );
                         })}
+                        <tr>
+                          <td></td>
+                          <td ><b>Total:</b></td>
+                          <td><b>{contactos.length}</b></td>
+                          <td></td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
