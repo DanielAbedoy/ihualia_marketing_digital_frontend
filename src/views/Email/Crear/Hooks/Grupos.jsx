@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Col, Row, CustomInput, Button } from 'reactstrap';
 import { useToasts } from 'react-toast-notifications';
 import ModeloContactos from '../../../../models/Contactos';
 
 import Enviar from './Enviar';
+import { SessionContext } from '../../../../sessionContext';
 
 const Grupos = ({ boletin, setBoletin, plantilla, history }) => {
 
+  const context = useContext(SessionContext);
   const [grupos, setGrupos] = useState([]);
   const { addToast } = useToasts();
   const [gruposSelec, setGruposSelec] = useState([]);
@@ -18,7 +20,7 @@ const Grupos = ({ boletin, setBoletin, plantilla, history }) => {
 
 
   const get_grupos = async () => {
-    const grupos_ = await new ModeloContactos().getContactosGruposCuenta(require('store').get('cuenta_en_uso').id);
+    const grupos_ = await new ModeloContactos().getContactosGruposCuenta(context.cuenta.id);
     setGrupos(grupos_)
   }
 

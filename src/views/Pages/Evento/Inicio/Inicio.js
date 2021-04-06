@@ -31,8 +31,9 @@ class Inicio extends Component {
       .then(evento => {
         if (evento === "error" || evento === undefined) { this.props.history.push('/404'); return; }
         if (evento.estatus === "borrador" || evento.estatus === "pasado") { this.props.history.push('/404'); return; }
-        this.setState({ evento: evento});
-      })
+        new EventoModel().get_organizador(evento.id_cuenta)
+          .then(o => this.setState({ evento: { ...evento, id_cuenta: o.nombre } }));
+        })
   }
 
   render() {

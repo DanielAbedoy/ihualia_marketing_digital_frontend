@@ -1,129 +1,118 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import { Card, CardBody, CardHeader, Col, Row, Badge } from 'reactstrap';
 
-import ImagenUser from '../../components/UserImages.js';
-import Modal_Imagen from './components/Modal_Imagen.js';
-import Modal_Nombre from './components/Modal_Nombre.js';
-import Modal_Usuario from './components/Modal_Usuario.js';
-import Modal_Correo from './components/Modal_Correo.js';
-import Modal_Password from './components/Modal_Password.js';
-import Modelo from '../../models/Marketing.js';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 
-class Perfil extends Component{
+import ImagenUser from '../../components/UserImages.js';
+import Load from '../../components/Load';
+import { SessionContext } from '../../sessionContext.js';
+
+const Show = React.lazy(() => import('./Hooks/Mis Datos/Show'));
+const Cuentas = React.lazy(() => import('./Hooks/Cuentas'));
+const Companieros = React.lazy(() => import('./Hooks/Companieros/Companieros'));
+const Empresa = React.lazy(() => import('./Hooks/Empresa'));
+
+
+class Perfil extends Component {
+
+  static contextType = SessionContext;
 
   state = {
-    usuario: {
-      correo: '',
-      usuario: '',
-      password: '',
-      nombre: '',
-      tipo: '',
-      imagen: '',
-      id_cliente:''
-    },
-
-    nombre_imagen: ''
+    ventana: "",
+    info: { nombre: "", imagen: "", cargo: "", id: "", cuentas: [] }
   }
 
   componentDidMount = () => {
-    let user = require('store').get('usuario_guardado');
-    const nom_img = user.imagen;
-    const img = ImagenUser.filter(w => w.nombre === user.imagen)
-    user.imagen = img[0].direccion;
-    this.setState({ usuario: user, nombre_imagen:nom_img })
+    const getInfo = async () => {
+      const i = await this.context.user();
+      let info = { nombre: i.nombre, imagen: i.imagen, cargo: i.tipo, id: i.id, cuentas: i.cuentas }
+      this.setState({ info }, () => {
+        if (this.props.location.state) this.setState({ ventana: this.props.location.state.ventana });
+        else this.setState({ventana:0})
+      });
+    }
+    getInfo();
   }
 
-  abrir_modal_imagen = e => this.modal_imagen.toggle();
-  abrir_modal_nombre = e => this.modal_nombre.toggle();
-  abrir_modal_usuario = e => this.modal_usuario.toggle();
-  abrir_modal_correo = e => this.modal_correo.toggle();
-  abrir_modal_password = e => this.modal_password.toggle();
+  cambiarVentana = (e, v) => this.setState({ ventana: v });
 
-  actualizar_datos = (usuario_actualizado) => {
-    new Modelo().actualizar_usuario(this.state.usuario.correo, usuario_actualizado)
-      .then(r => {
-        if (r.statusText === "OK") {
-          alert("Actualizado con éxito")
-          require('store').set('usuario_guardado',r.data);
-        };        
-        window.location.reload(true);
-      })
-  }
-  
+  render() {
 
-  render(){
-    return(
+    const TabCmp = ({ }) => {
+
+      const useStyles = makeStyles(() => ({
+        root: { color: "#000000" },
+        select: { backgroundColor: "#333333" }
+      }));
+
+      const classes = useStyles();
+
+      return (
+        <Tabs
+          value={this.state.ventana}
+          onChange={this.cambiarVentana}
+          classes={{ root: classes.root, indicator: classes.select }}
+          variant="scrollable"
+          style={{ width: "100%" }}
+        >
+          <Tab label="Mis datos" icon={<i className="fa fa-user"></i>} />
+          <Tab label="Mis cuentas" icon={<i className="fa fa-briefcase"></i>} />
+          <Tab label="Mis compañeros " icon={<i className="fa fa-users"></i>} />
+          <Tab label="Mi empresa" icon={<i className="fa fa-building"></i>} />
+        </Tabs>
+      );
+    }
+
+    return (
       <div className="animated fadeIn">
         <Row>
           <Col xs="12">
             <Card>
-              <CardHeader>
-                
-                <p className="h3 p-2"><i className="fa fa-user-o"></i> Mi Perfil</p>
-                
+              <CardHeader style={{ backgroundColor: "#333333" }} >
+                <p className="h3 p-2 text-white"><i className="fa fa-user-o"></i> Mi Perfil</p>
               </CardHeader>
               <CardBody>
 
-                <Row>
-                  <Col md="12" className="text-center mx-auto" >
-                    <hr />
-            
-                    <span className="h4"><b>{this.state.usuario.tipo}</b></span><br/><br/>
-
-                    <img alt={this.state.usuario.nombre +"-imagen"} src={this.state.usuario.imagen} /><br/>
-                    <Badge onClick={this.abrir_modal_imagen} style={{ cursor: "pointer" }} className="mb-4"  color="info">Cambiar </Badge><br/>
-                    <Modal_Imagen
-                      ref={element => { this.modal_imagen = element }}
-                      imagen_actual={this.state.nombre_imagen}
-                      usuario={this.state.usuario}
-                      event={this.actualizar_datos}
-                    />
-                    
-                    
-                    <span className="h4"><b>Nombre: </b> {this.state.usuario.nombre} </span>
-                    <Badge onClick={this.abrir_modal_nombre} style={{ cursor: "pointer" }} color="info"> <i className="fa fa-pencil"></i></Badge><br /><br />
-                    <Modal_Nombre
-                      ref={element => { this.modal_nombre = element }}
-                      usuario={this.state.usuario}
-                      imagen={this.state.nombre_imagen}
-                      event={this.actualizar_datos}
-                    />
-
-                    <span className="h4"><b>Usuario: </b> {this.state.usuario.usuario} </span>
-                    <Badge onClick={this.abrir_modal_usuario} style={{ cursor: "pointer" }} color="info"> <i className="fa fa-pencil"></i></Badge><br/><br/>
-                    <Modal_Usuario
-                      ref={element => { this.modal_usuario = element }}
-                      usuario={this.state.usuario}
-                      imagen={this.state.nombre_imagen}
-                      event={this.actualizar_datos}
-                    />
-
-                    
-                    <span className="h4"><b>Correo: </b> {this.state.usuario.correo} </span>
-                    <Badge onClick={this.abrir_modal_correo} style={{ cursor: "pointer" }} color="info"> <i className="fa fa-pencil"></i></Badge><br/><br/>
-                    <Modal_Correo
-                      ref={element => { this.modal_correo = element }}
-                      usuario={this.state.usuario}
-                      imagen={this.state.nombre_imagen}
-                    />
-                    
-
-                    <span className="h4"><b>Contraseña: </b> ******** </span>
-                    <Badge onClick={this.abrir_modal_password} style={{ cursor: "pointer" }} color="info"> <i className="fa fa-pencil"></i></Badge><br/><br/>
-                    <Modal_Password
-                      ref={element => { this.modal_password = element }}
-                      usuario={this.state.usuario}
-                      imagen={this.state.nombre_imagen}
-                      event={this.actualizar_datos}
-                    />
-
-                  
-
-                    
+                <Row className="my-3">
+                  <Col md="11" xs="12" className="mx-auto px-3 py-5 text-white" style={{ backgroundImage: `url(${require('../../assets/img/users/portada.jpg')})`, backgroundSize: "100% auto", backgroundPosition: "center center" }}>
+                    <Row>
+                      <div className="mx-3">
+                        <img width="100%" src={this.state.info.imagen} alt="user photo" className="rounded shadow-lg" ></img>
+                      </div>
+                      <div className="d-flex flex-column">
+                        <p className="h4 mb-1 mt-auto"><b>{this.state.info.nombre}</b></p>
+                        <p className="h6 m-0"><b>{this.state.info.cargo}</b></p>
+                      </div>
+                      <div className="d-flex flex-column ml-auto mr-2" style={{ width: "20%" }}>
+                        <div className="btn-h bg-h-danger mt-auto">SALIR</div>
+                      </div>
+                    </Row>
                   </Col>
                 </Row>
 
-                
+                <Row>
+                  <Col md="11" xs="12" className="mx-auto shadow-sm">
+                    {this.state.ventana !== "" &&
+                      <TabCmp />
+                    }
+                  </Col>
+                </Row>
+
+                <Row className="mt-2 mb-4">
+                    <Col md="11" xs="12" className="mx-auto">
+                      {this.state.ventana === 0 && <React.Suspense fallback={<Load />}><Show history={this.props.history} setContext={this.props.setContext} /></React.Suspense>}
+                      {this.state.ventana === 1 && <React.Suspense fallback={<Load />}><Cuentas history={this.props.history} setContext={this.props.setContext} cuentas={this.state.info.cuentas} /></React.Suspense>}
+                      {this.state.ventana === 2 && <React.Suspense fallback={<Load />}><Companieros cliente={this.context.cliente} myselfID={this.state.info.id} /></React.Suspense>}
+                      {this.state.ventana === 3 && <React.Suspense fallback={<Load />}><Empresa /></React.Suspense>}
+
+                    </Col>
+                  
+                </Row>
+
+
+
               </CardBody>
             </Card>
           </Col>

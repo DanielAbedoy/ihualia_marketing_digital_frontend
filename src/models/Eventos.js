@@ -242,6 +242,11 @@ class Eventos {
     return await peticion();
   }
 
+  get_organizador = (cuenta) => {
+    return axios.get(`${new URLs().getUrlPrincipal()}/api/cuenta/${cuenta}/organzador/`)
+      .then(r =>   r.data )
+      .catch(e => e.response.request)
+  }
 }
 
 export default Eventos;

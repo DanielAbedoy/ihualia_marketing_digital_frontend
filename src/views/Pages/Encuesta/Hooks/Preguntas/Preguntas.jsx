@@ -146,12 +146,17 @@ const Preguntas = ({ nombre, instrucciones, preguntas, paginacion, anonima, punt
                   );
                 })}
                 <Row className="mt-3" >
-                  <Col md="2" xs="6" >
-                    <p className="text-center h2 m-0"><b onClick={menusPagina} style={{ cursor: "pointer" }} ><i className="fa fa-arrow-left"></i></b></p>
-                  </Col>
-                  <Col md="2" xs="6" className="ml-auto">
-                    <p className="text-center h2 m-0"><b onClick={plusPagina} style={{ cursor: "pointer" }} ><i className="fa fa-arrow-right"></i></b></p>
-                  </Col>
+                  {cmpPreguntas[pagina - 1] && 
+                    <Col md="2" xs="6" >
+                      <p className="text-center h2 m-0"><b onClick={menusPagina} style={{ cursor: "pointer" }} ><i className="fa fa-arrow-left"></i></b></p>
+                    </Col>
+                  }
+                  {cmpPreguntas[pagina + 1] && 
+                    <Col md="2" xs="6" className="ml-auto">
+                      <p className="text-center h2 m-0"><b onClick={plusPagina} style={{ cursor: "pointer" }} ><i className="fa fa-arrow-right"></i></b></p>
+                    </Col>
+                  }
+                  
                 </Row>
 
                 {sendResponses()}

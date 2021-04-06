@@ -23,11 +23,9 @@ const EncuestaPublic = React.lazy(() => import('./views/Pages/Encuesta/Encuesta'
 
 class App extends Component {
 
-
   authFunction = (component, option, location) => {
-    if (new Auth().isAuthLogin() === option) {
-      return (<Redirect to={`/${location}`}/>)
-    }
+    const auth = new Auth().isAuthLogin();
+    if (auth === option) return (<Redirect to={`/${location}`} />)
     return (component);
   }
 
@@ -36,7 +34,7 @@ class App extends Component {
       <HashRouter>
         <React.Suspense fallback={loading()}>
           <Switch>
-            <Route path="/login" name="Login Page" render={props => this.authFunction(<Login {...props} />, true, "inicio") } />
+            <Route path="/login" name="Login Page" render={props => this.authFunction(<Login {...props} />, true, "inicio")} />
             <Route path="/register" name="Register Page" render={props => this.authFunction(<Register {...props} />, true, "inicio")} />
             <Route path="/evento" name="Evento" render={props => <EventoPublic {...props} />} />
             <Route path="/encuesta/:id" name="Encuesta" render={props => <EncuestaPublic {...props} />} />

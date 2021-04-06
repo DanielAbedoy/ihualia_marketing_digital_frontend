@@ -1,216 +1,102 @@
 import axios from 'axios';
 import URLs from './urls';
+import Settings from '../settings';
 
 class Marketing {
 
 
-    constructor() {
-        this.urls = new URLs();
-    }
+  constructor() {
+    this.urls = new URLs();
+  }
 
-    //BIEN
-    //Almacenar el Cliente(Empresa) | nombre(persona), razon_socila, direccion, telefono, dominio, giro
-    nuevo_cliente = async (datos_cliente, datos_usuario) => {
-        const peticion = () => {
-            return axios.post(`${this.urls.getUrlPrincipal()}/api/cliente/`, datos_cliente)
-                .then((r) => {
-                    datos_usuario.id_cliente = r.data.id_cliente;
-                    //Almacenar el Usuario como administrador|  correo, usuario, password, nombre, tipo=Administrador, estatus=Activo, imagen, id_cliente
-                    return this.nuevo_usuario(datos_usuario);
-                })
-                .catch(console.log)
-        }
+  //NUEVOS QQUE SIEMPRE SI SE OCUAPN
 
-        return await peticion();
-    }
+  get_cuentas_cliente = (id_cliente) => {
+    return axios.get(`${Settings.BACKENDURL}/api/cuenta/?id_cliente=${id_cliente}`)
+      .then((r) => r.data.results)
+      .catch(err => err.response.request)
 
-    //BIEN
-    nuevo_usuario = async (datos_usuario) => {
-        const peticion = () => {
-            return axios.post(`${this.urls.getUrlPrincipal()}/api/usuario/`, datos_usuario)
-                .then((r) => { return r })
-                .catch(console.log)
-        }
+  }
 
-        return await peticion();
-    }
+  get_usuarios_cliente = (id_cliente) => {
 
+    return axios.get(`${Settings.BACKENDURL}/api/usuario/bycliente/?cliente=${id_cliente}`)
+      .then(r => r.data)
+      .catch(console.log)
+  }
 
-    //BIEN
-    //Retorna la promesa del usuario
-    getUsuario = async (user) => {
-        const peticionGetUsuario = () => {
-            //return axios.get(`http://localhost:8000/api/usuario/?correo=${user}`)
-            return axios.get(`${this.urls.getUrlPrincipal()}/api/usuario/?correo=${user}`)
-                .then(data => {
-                    return data.data[0];
-                })
-                .catch((error) => {
-                    if (error.request) {
-                        return error.request.statusText;
-                    } else {
-                        return "otro"
-                    }
-                })
-        }
+  add_new_cliente = (datos_cli, datos_user) => {
+    return axios.post(`${Settings.BACKENDURL}/create-cliente`, { ...datos_cli, ...datos_user })
+      .then(r => ({ statusText: r.statusText, data: r.data }))
+      .catch(err => err.response.request)
+  }
 
-        return await peticionGetUsuario();
-    }
+  actualizar_user = (user, datos) => {
+    return axios.patch(`${Settings.BACKENDURL}/api/usuario/${user}/actualizar/`, datos)
+      .then(r => ({ estatusText: r.statusText, data: r.data }))
+      .catch(err => err.response)
+  }
 
+  get_empresa = (cliente) => {
+    return axios.get(`${Settings.BACKENDURL}/api/cliente/${cliente}/info/`)
+      .then(r => r.data )
+      .catch(err => err.response)
+  }
 
-    
+  actualizar_empresa = (cliente, datos) => {
+    return axios.patch(`${Settings.BACKENDURL}/api/cliente/${cliente}/`, datos)
+      .then(r => ({ statusText: r.statusText, data: r.data }))
+      .catch(err => err.response)
+  }
 
+  add_new_user = (info, cuentas=[]) => {    
+    return axios.post(`${Settings.BACKENDURL}/api/usuario/createnew/`, {...info, cuentas:cuentas})
+      .then(r => ({ statusText: r.statusText, data: r.data }))
+      .catch(err => err.response)
 
-    get_cuenta = async (id_cuenta) => {
-        const peticion = () => {
-            return axios.get(`${this.urls.getUrlPrincipal()}/api/cuenta/${id_cuenta}/`)
-                .then((r) => {
-                    return r;
-                })
-                .catch(console.log)
-        }
+  }
 
-        return await peticion();
-    }
+  add_new_cuenta = (info, usuarios) => {
+    return axios.post(`${Settings.BACKENDURL}/api/cuenta/createnew/`, {...info, usuarios:usuarios})
+      .then(r => ({ statusText: r.statusText, data: r.data }))
+      .catch(err => err.response)
+  }
 
-    get_usuarios_cliente = async (id_cliente) => {
-        const peticion = () => {
-            return axios.get(`${this.urls.getUrlPrincipal()}/api/usuario/?id_cliente=${id_cliente}`)
-                .then(r => r.data)
-                .catch(console.log)
-        }
+  add_users_a_cuenta = (usuarios,cuenta) => {
+    return axios.post(`${Settings.BACKENDURL}/api/cuentausuario/addusers/`, {cuenta:cuenta, usuarios:usuarios})
+      .then(r => ({ statusText: r.statusText, data: r.data }))
+      .catch(err => err.response)
+  }
 
-        return await peticion();
-    }
+  delete_vinculacion = (cuenta, usuario) => {
+    return axios.post(`${Settings.BACKENDURL}/api/cuentausuario/desvincular/`, {cuenta:cuenta, usuario:usuario})
+    .then(r => ({ statusText: r.statusText}))
+    .catch(err => err.response)
+  }
 
-    nuevo_usuario_cuenta = async (datos) => {
-        const peticion = () => {
-            return axios.post(`${this.urls.getUrlPrincipal()}/api/usuario-cuenta/`, datos)
-                .then(r => r)
-                .catch(console.log)
-        }
-        return await peticion();
-    }
+  add_cuentas_a_user = (usuario,cuentas) => {
+    return axios.post(`${Settings.BACKENDURL}/api/cuentausuario/addcuentas/`, {cuentas:cuentas, usuario:usuario})
+      .then(r => ({ statusText: r.statusText, data: r.data }))
+      .catch(err => err.response)
+  }
 
-    actualizar_usuario = async (correo_usuario, datos) => {
-        const peticion = () => {
-            return axios.put(`${this.urls.getUrlPrincipal()}/api/usuario/${correo_usuario}/`, datos)
-                .then(r => r)
-                .catch(e => e)
-        }
-        return await peticion();
-    }
+  actualizar_cuenta = (cuenta,datos) => {
+    return axios.patch(`${Settings.BACKENDURL}/api/cuenta/${cuenta}/`,datos)
+      .then(r => ({ statusText: r.statusText, data: r.data }))
+      .catch(err => err.response)
+  }
 
-    eliminar_usuario = async (correo_usuario) => {
-        const peticion = () => {
-            return axios.delete(`${this.urls.getUrlPrincipal()}/api/usuario/${correo_usuario}/`)
-                .then(r => r)
-                .catch()
-        }
-        return await peticion();
-    }
+  get_cuenta = (cuenta) => {
+    return axios.get(`${Settings.BACKENDURL}/api/cuenta/${cuenta}/`)
+      .then(r => r.data)
+      .catch(err => err.response)
+  }
 
-
-
-    nueva_cuenta = async (datos) => {
-        const peticion = () => {
-            return axios.post(`${this.urls.getUrlPrincipal()}/api/cuenta/`, datos)
-                .then(r => r)
-                .catch(console.log)
-        }
-        return await peticion();
-    }
-
-    actualizar_cuenta = async (id_cuenta, datos) => {
-        const peticion = () => {
-            return axios.put(`${this.urls.getUrlPrincipal()}/api/cuenta/${id_cuenta}/`, datos)
-                .then(r => r)
-                .catch(e => e)
-        }
-        return await peticion();
-    }
-
-    eliminar_cuenta = async (id_cuenta) => {
-        const peticion = () => {
-            return axios.delete(`${this.urls.getUrlPrincipal()}/api/cuenta/${id_cuenta}/`)
-                .then(r => r)
-                .catch(e => e)
-        }
-        return await peticion();
-    }
-
-    desvincular_usuario_cuenta = async (id_cuenta, correo_usuario) => {
-        const peticion = () => {
-            return axios.get(`${this.urls.getUrlPrincipal()}/api/usuario-cuenta/?id_usuario=${correo_usuario}&id_cuenta=${id_cuenta}`)
-                .then(r => r.data[0].id)
-                .then(id => axios.delete(`${this.urls.getUrlPrincipal()}/api/usuario-cuenta/${id}/`))
-                .then(r => r)
-                .catch(e => e)
-        }
-
-        return await peticion();
-    }
-
-    get_cliente = async (id_cliente) => {
-        const peticion = () => {
-            return axios.get(`${this.urls.getUrlPrincipal()}/api/cliente/${id_cliente}/`)
-                .then(r => r.data)
-                .catch(e => e)
-        }
-        return await peticion();
-    }
-
-
-    //NUEVOS
-    add_cuenta = (nombre, estatus, cliente, usuarios) => {
-
-        let data = { nombre, estatus, id_cliente: cliente };
-        if (usuarios) data = { ...data, usuarios };
-        return axios.post(`${this.urls.getUrlPrincipal()}/api/cuenta/`, data)
-            .then(r => r)
-            .catch(e => e.response.request)
-    }
-
-    get_cuentas_usuario = async (correo_usuario) => {
-        return axios.get(`${this.urls.getUrlPrincipal()}/api/cuentausuario/cuentas/?usuario=${correo_usuario}`)
-            .then((r) => r.data)
-            .catch(err => err.response.request)
-    }
-    get_cuentas_cliente = (id_cliente) => {
-        return axios.get(`${this.urls.getUrlPrincipal()}/api/cuenta/?id_cliente=${id_cliente}`)
-            .then((r) => r.data.results)
-            .catch(err => err.response.request)
-
-    }
-
-    add_users_cuenta = (cuenta, usuarios) => {
-        return axios.post(`${this.urls.getUrlPrincipal()}/api/cuentausuario/addusers/`, { cuenta: cuenta, allnew: usuarios })
-            .then((r) => r.data)
-            .catch(err => err.response.request)
-    }
-    get_usuarios_cuenta = (id_cuenta) => {
-        return axios.get(`${this.urls.getUrlPrincipal()}/api/cuentausuario/usuarios/?cuenta=${id_cuenta}`)
-            .then(r => r.data)
-            .catch(err => err.response.request)
-
-    }
-
-    get_cuentas_usuario = async (correo_usuario) => {
-        
-            return axios.get(`${this.urls.getUrlPrincipal()}/api/cuentausuario/cuentas/?usuario=${correo_usuario}`)
-                .then((r) => r.data)
-                .catch(console.log)
-
-    }
-
-    add_cuentas_user = (usuario, cuentas) => {
-        return axios.post(`${this.urls.getUrlPrincipal()}/api/cuentausuario/addcuentas/`, { usuario: usuario, cuentas: cuentas })
-            .then((r) => r.data)
-            .catch(err => err.response.request)
-    }
-
-
-
+  get_user = (usuario) => {
+    return axios.get(`${Settings.BACKENDURL}/api/usuario/${usuario}/info/`)
+      .then(r => r.data)
+      .catch(err => err.response)
+  }
 }
 
 export default Marketing;

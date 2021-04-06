@@ -36,9 +36,18 @@ const useStyles = makeStyles({
 
 
 function Row_Table(props) {
-  const { respuestas, id, nombre, correo, creado, anonima, preguntas, encuesta } = props;
+  const { respuestas, id, nombre, correo, creado, anonima, preguntas, encuesta, ponderacion } = props;
   const [open, setOpen] = React.useState(false);
   const classes = useRowStyles();
+
+  const getCalificacion = () => {
+    console.log(respuestas)
+    let calificacion = 0;
+    for (let r in respuestas){
+      if (respuestas[r].estatus === "correcta") calificacion += ((preguntas.data.find(p => p.n == (r+"")).puntuacion)*1);
+    }
+    return (<span>{calificacion}</span>)
+  }
 
   return (
     <React.Fragment >
@@ -51,7 +60,10 @@ function Row_Table(props) {
             <TableCell>{correo}</TableCell>
           </>
         }
-        <TableCell align="" >{creado}</TableCell>
+        <TableCell >{creado}</TableCell>
+        {ponderacion &&
+          <TableCell >{getCalificacion()}</TableCell>
+        }
         <TableCell>
           <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -66,7 +78,6 @@ function Row_Table(props) {
               <Col md="9" xs="12" className="mx-auto">
 
                 {preguntas.data.map((pregunta, i) => {
-
                   const arrValues = [];
                   if (typeof respuestas[pregunta.n].respuesta === "object") {
                     for (const res in respuestas[pregunta.n].respuesta) {
@@ -127,7 +138,7 @@ function Row_Table(props) {
 }
 
 
-const Encuestados = ({ open, setOpen, encuestados, anonima, preguntas, encuesta }) => {
+const Encuestados = ({ open, setOpen, encuestados, anonima, preguntas, encuesta, ponderacion }) => {
 
   
   const classes = useStyles();
@@ -157,14 +168,17 @@ const Encuestados = ({ open, setOpen, encuestados, anonima, preguntas, encuesta 
                         <TableCell className="text-white" style={{backgroundColor:"orange"}}>Correo</TableCell>
                       </>
                     }
-                    <TableCell className="text-white" style={{backgroundColor:"orange"}}>Fecha</TableCell>
+                    <TableCell className="text-white" style={{ backgroundColor: "orange" }}>Fecha</TableCell>
+                    {ponderacion &&
+                      <TableCell className="text-white" style={{ backgroundColor: "orange" }}>Calificacion</TableCell>
+                    }
                     <TableCell className="text-white" style={{backgroundColor:"orange"}}></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {encuestados.map((e, i) => {
                     return (
-                      <Row_Table key={i} encuesta={encuesta} preguntas={preguntas} respuestas={JSON.parse(e.respuestas_json)} id={e.id} nombre={e.nombre} correo={e.correo} creado={e.creado} anonima={anonima} />
+                      <Row_Table key={i} encuesta={encuesta} preguntas={preguntas} respuestas={JSON.parse(e.respuestas_json)} id={e.id} nombre={e.nombre} correo={e.correo} creado={e.creado} anonima={anonima} ponderacion={ponderacion} />
                     );
                   })}
                 </TableBody>

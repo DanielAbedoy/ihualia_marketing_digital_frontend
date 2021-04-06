@@ -6,9 +6,11 @@ import ComboBox from '../componets/ComboBox.js';
 
 import Table from './Hooks/Table';
 import ModelContactos from '../../../models/Contactos';
+import { SessionContext } from '../../../sessionContext.js';
 
 class ListaContactos extends Component {
 
+    static contextType = SessionContext;
 
     grupoId = 0;
 
@@ -25,8 +27,7 @@ class ListaContactos extends Component {
     }
 
     componentDidMount = () => {
-        this.setState({ cuenta: require('store').get('cuenta_en_uso').id })
-
+        this.setState({ cuenta:this.context.cuenta.id })
     }
 
     //Funcion para saber el grupo que esta seleccionado

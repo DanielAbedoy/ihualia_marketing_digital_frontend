@@ -5,8 +5,11 @@ import ModelEvento from '../../../models/Eventos';
 
 import NavBar from '../components/NavBar.js';
 import Tabla from './Hooks/Table';
+import { SessionContext } from '../../../sessionContext';
 
 class Listado extends Component {
+
+  static contextType = SessionContext;
 
   state = {
     option: <span className="text-center"><i className="fa fa-circle-o-notch fa-spin fa-1x fa-fw"></i></span>,
@@ -24,7 +27,7 @@ class Listado extends Component {
   toggle = e => this.setState({ open_share: !this.state.open_share });
 
   get_eventos = () => {
-    const id_cuenta = require('store').get('cuenta_en_uso').id;
+    const id_cuenta = this.context.cuenta.id;
     new ModelEvento().get_info_eventos_cuenta(id_cuenta)
       .then(eventos => {
         if (eventos === "error") return;

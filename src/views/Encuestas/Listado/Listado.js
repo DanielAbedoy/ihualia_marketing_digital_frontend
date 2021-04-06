@@ -4,8 +4,11 @@ import { Card, CardBody, CardHeader, Col, Row } from 'reactstrap';
 import ModelEncuesta from '../../../models/Encuestas';
 
 import Tabla from './Hooks/Tabla';
+import { SessionContext } from '../../../sessionContext';
 
 class Listado extends Component{
+
+  static contextType = SessionContext;
 
   state = {
     encuestas: []
@@ -16,7 +19,7 @@ class Listado extends Component{
   }
 
   findEncuestas = () => {
-    const c = require('store').get("cuenta_en_uso").id;
+    const c = this.context.cuenta.id;
     new ModelEncuesta().get_encuestas_info(c)
       .then(encuestas => {
         this.setState({ encuestas: encuestas });

@@ -5,8 +5,11 @@ import NavBar from '../components/NavBar';
 import ModelEmail from '../../../models/EmailMarketing';
 
 import Table from './Hooks/Table';
+import { SessionContext } from '../../../sessionContext';
 
 class Boletines extends Component {
+
+  static contextType = SessionContext;
 
   state = {
     boletines: [],
@@ -22,7 +25,7 @@ class Boletines extends Component {
 
   getDatosBoletines = () => {
 
-    const id_cuenta = require('store').get("cuenta_en_uso").id;
+    const id_cuenta = this.context.cuenta.id;
     new ModelEmail().get_boletines_fecha_cuenta(this.state.fecha_start, this.state.fecha_end, id_cuenta)
       .then(boletines => {
         if (boletines !== "error") this.setState({ boletines: boletines });

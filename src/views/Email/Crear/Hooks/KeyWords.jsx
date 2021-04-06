@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Row, Col, Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
 import ModelContactos from '../../../../models/Contactos';
 
 import globals from '../../../../variables/global';
+import { SessionContext } from '../../../../sessionContext';
 
 const KeyWords = (props) => {
 
-  
+  const context = useContext(SessionContext);
   const [words, setWords] = useState([]);
   const toggle = () => props.setOpen(!props.open);
 
   useEffect(() => {
-    
-    new ModelContactos().getGrupos(require('store').get('cuenta_en_uso').id)
+    new ModelContactos().getGrupos(context.cuenta.id)
       .then(grupos => {
         let aux = [];
         grupos.forEach(g => {

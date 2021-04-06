@@ -15,7 +15,7 @@ const AddContacto = props => {
 
   useEffect(() => {
     getCampos();
-  }, [])
+  }, [props.campos_extra])
 
 
 

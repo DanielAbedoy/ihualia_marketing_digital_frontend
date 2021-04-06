@@ -69,7 +69,9 @@ const Comentario = ({ caliification, content, setValueContent, encuesta }) => {
       }
 
       <br />
-      <Input type="textarea" height="200px" style={{ backgroundColor: "white" }} disabled className="mt-3 mb-2" />
+      <Input type="textarea" height="200px" style={{ backgroundColor: "white" }} readOnly className="mt-3 mb-2"
+        value={content.respuesta}
+      />
       {caliification ?
         <TextField fullWidth multiline
           value={content.respuesta}

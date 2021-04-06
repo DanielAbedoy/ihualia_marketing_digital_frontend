@@ -70,7 +70,7 @@ const SingleText = ({ caliification, content, setValueContent, encuesta }) => {
       }
 
       <br />
-      <Input style={{ backgroundColor: "white" }} disabled className="mt-3 mb-2" />
+      <Input style={{ backgroundColor: "white" }} readOnly value={content.respuesta} className="mt-3 mb-2" />
       {caliification ?
         <TextField fullWidth
           value={content.respuesta}

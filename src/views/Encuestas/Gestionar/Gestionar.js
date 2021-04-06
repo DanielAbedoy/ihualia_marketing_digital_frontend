@@ -175,6 +175,7 @@ class Gestionar extends Component {
                             <p className="text-center m-0">Ver completo</p>
                           </Col>
                           <Encuestados
+                            ponderacion={this.state.encuesta.ponderacion}
                             preguntas={JSON.parse(this.state.encuesta.preguntas_json)} encuesta={this.state.encuesta.id}
                             encuestados={this.state.encuesta.encuestados} anonima={this.state.encuesta.anonima} ponderacion={this.state.encuesta.ponderacion}
                             open={this.state.openEncuestados} setOpen={(p) => this.setState({ openEncuestados: p })}

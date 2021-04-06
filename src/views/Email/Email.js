@@ -10,6 +10,8 @@ import CardMini from '../../components/CardMini';
 import ChartComponent from '../../components/ChartComp';
 import EmailMarketing from '../../models/EmailMarketing';
 
+import { SessionContext } from '../../sessionContext.js';
+
 
 class Email extends Component {
 
@@ -25,11 +27,11 @@ class Email extends Component {
     labelsChat: [],
     dataSetChart: [],
   }
+  static contextType = SessionContext;
+
+
   componentWillMount = () => {
-    if (require("store").get("cuenta_en_uso")) {
-      this.setState({ cuenta: true });
-      this.getBoletines(); 
-    }
+    if (this.context.cuenta !== undefined && this.context.cuenta !== false) this.setState({ cuenta: true });
   }
   /* Obtener los boletintes el mes [X]
     Boletienes enviados [x]
@@ -42,7 +44,7 @@ class Email extends Component {
 
   getBoletines = async () => {
 
-    const id_cuenta = require("store").get("cuenta_en_uso").id;
+    const id_cuenta = this.context.cuenta.id;
     const fecha_start = this.getFecha("start");
     const fecha_end = this.getFecha("end");
 

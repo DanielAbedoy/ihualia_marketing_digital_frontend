@@ -6,14 +6,18 @@ import CardStandar from '../../components/CardStandar';
 import NavBar from './components/NavBar.js';
 import items from './items';
 
+import { SessionContext } from '../../sessionContext.js';
+
 class Eventos extends Component{
+
+  static contextType = SessionContext;
 
   state = {
     cuenta: false
   }
 
   componentWillMount = () => {
-    if (require('store').get("cuenta_en_uso")) this.setState({ cuenta: true });
+    if (this.context.cuenta !== undefined && this.context.cuenta !== false) this.setState({ cuenta: true });
   }
 
   render() {

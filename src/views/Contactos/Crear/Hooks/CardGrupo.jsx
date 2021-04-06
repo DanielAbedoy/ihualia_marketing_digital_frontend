@@ -77,6 +77,7 @@ const GrupoComponent = (props) => {
           <Collapse isOpen={openUpdate}>
             <UpdateGrupo
               id_grupo={grupo.id}
+              reload={()=>props.reload()}
             />
           </Collapse>
         </CardBody>

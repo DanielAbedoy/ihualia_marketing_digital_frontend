@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { render } from 'react-dom';
 import { Row, Col, Card, CardHeader, CardBody, Input, Button } from 'reactstrap';
 import TextField from '@material-ui/core/TextField';
-import alerts  from '../../../../components/Alerts';
+import { useToasts } from 'react-toast-notifications';
 
 import ModelContactos from '../../../../models/Contactos';
 
@@ -10,22 +10,23 @@ const UpdateGrupo = props => {
 
   const [nombreGrupo, setNombreGrupo] = useState('');
   const [nuevoCampo, setNuevoCampo] = useState('');
-
+  const { addToast } = useToasts();
 
   const  actualizarNombreGrupo = async (e) => {
     e.preventDefault();
     if (nombreGrupo === '') {
-      ///new alerts().error("Debe agregar un nombre", 2000)
-      alert("Debej agregar el nuevo nombre")
+      addToast("Debes agregar el nombre", { appearance: "info", autoDismiss: true });
       return;
     }
 
     const resp = await new ModelContactos().cambiar_nombre_grupo(props.id_grupo, nombreGrupo);
       
     if (resp !== "error") {
-      alert("Actualizado");
+      addToast("Actualizado correctamente", { appearance: "success", autoDismiss: true });
+      setNombreGrupo("");
+      props.reload();
     } else {
-      alert("Error al cambiar nombre")
+      addToast("Algo ocurrio mal", { appearance: "error", autoDismiss: true });
     }
 
   }
@@ -33,14 +34,16 @@ const UpdateGrupo = props => {
   const agregarNuevoCampo = async e => {
     e.preventDefault();
     if (nuevoCampo === '') {
-      ///new alerts().error("Debe agregar un nombre", 2000)
-      alert("Debej agregar el nombre del campo")
+      addToast("Debes agregar el nombre", { appearance: "info", autoDismiss: true });
       return;
     }
     //Agregar el campo a "campo-extra" si existe el campo saltar
     const resp = await new ModelContactos().add_campo_extra(nuevoCampo.toLocaleLowerCase(), props.id_grupo);
-    console.log(resp)
-    if(resp === "OK")alert("Creado")
+    if (resp === "OK") {
+      addToast("Agregado correctamente", { appearance: "success", autoDismiss: true });
+      setNuevoCampo("");
+      props.reload();
+    }
   }
 
 

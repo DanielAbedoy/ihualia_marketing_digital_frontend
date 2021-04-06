@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Col, Input, Row, FormGroup, CustomInput, Button } from 'reactstrap';
 import { useToasts } from 'react-toast-notifications';
 import store from 'store';
 
 import ModelEmail from '../../../../models/EmailMarketing';
+import { SessionContext } from '../../../../sessionContext';
 
 const DatosIniciales = ({boletin, setBoletin,close}) => {
 
+  const context = useContext(SessionContext);
   const [datos, setDatos] = useState({asunto:"", tipo:"", fecha:"", hora:""});
   const { addToast } = useToasts();
   const [creado, setCreado] = useState(false);
@@ -48,7 +50,7 @@ const DatosIniciales = ({boletin, setBoletin,close}) => {
     //Validar que todo este completo
     if (!validar()) return;
     //Crear el boletincomo borrador mandar datos al padre
-    const id_cuenta = require('store').get("cuenta_en_uso").id;
+    const id_cuenta = context.cuenta.id;
 
     const response = await new ModelEmail().add_boletin({
       asunto: datos.asunto, estatus: "borrador", publicacion: datos.tipo === "ahora" ? JSON.stringify({ tipo: "ahora" }) : JSON.stringify({ tipo: "programado", fecha: datos.fecha, hora: datos.hora }),

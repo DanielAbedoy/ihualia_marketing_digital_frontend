@@ -3,6 +3,8 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 import * as router from 'react-router-dom';
 import { Container } from 'reactstrap';
 
+import { valueContext, SessionContext } from '../../sessionContext';
+
 import {
   AppAside,
   AppFooter,
@@ -31,7 +33,11 @@ const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 class DefaultLayout extends Component {
 
+  state = { valConxt: valueContext(), user:'' }
+
   loading = () => <Load />
+
+  componentDidMount = () => this.setValueContext();
 
   signOut(e) {
     e.preventDefault()
@@ -44,63 +50,72 @@ class DefaultLayout extends Component {
     if (!new Auth().isAuthUseCuenta()) {
       alert("Debes tener una cuenta en uso")
       const location = props.location.pathname.split("/");
-      return (<Redirect to={`/${location[1]}`}/>);
+      return (<Redirect to={`/${location[1]}`} />);
     }
     return (component);
   }
 
+  setValueContext = async() => {
+    let info = await valueContext().user();
+    this.setState({ valConxt: valueContext(), user: info });
+  }
+  
   render() {
     return (
       <div className="app">
-        <AppHeader fixed>
-          <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} />
-          </Suspense>
-        </AppHeader>
-        <div className="app-body">
-          <AppSidebar fixed display="lg">
-            <AppSidebarHeader />
-            <AppSidebarForm />
-            <Suspense>
-              <AppSidebarNav navConfig={navigation} {...this.props} router={router} />
-            </Suspense>
-            <AppSidebarFooter />
-            <AppSidebarMinimizer />
-          </AppSidebar>
-          <main className="main">
-            <AppBreadcrumb appRoutes={routes} router={router} />
-            <Container fluid>
-              <Suspense fallback={this.loading()}>
-                <Switch>
-                  {routes.map((route, idx) => {
-                    return route.component ? (
-                      <Route
-                        key={idx}
-                        path={route.path}
-                        exact={route.exact}
-                        name={route.name}
-                        render={props => {
-                          if (route.authCount) return this.authCountFunction(<route.component {...props} />, props);
-                          else return (<route.component {...props} />);
-                        }} />
-                    ) : (null);
-                  })}
-                  <Redirect from="/" to="/login" />
-                </Switch>
-              </Suspense>
-            </Container>
-          </main>
-          <AppAside fixed>
+
+        <SessionContext.Provider value={this.state.valConxt} >
+
+          <AppHeader fixed>
             <Suspense fallback={this.loading()}>
-              <DefaultAside />
+              <DefaultHeader history={this.props.history} cuenta={this.state.valConxt.cuenta} user={this.state.user} onLogout={e => this.signOut(e)} />
             </Suspense>
-          </AppAside>
-        </div>
-        <AppFooter>
-          <Suspense fallback={this.loading()}>
-            <DefaultFooter />
-          </Suspense>
-        </AppFooter>
+          </AppHeader>
+          <div className="app-body">
+            <AppSidebar fixed display="lg">
+              <AppSidebarHeader />
+              <AppSidebarForm />
+              <Suspense>
+                <AppSidebarNav navConfig={navigation} {...this.props} router={router} />
+              </Suspense>
+              <AppSidebarFooter />
+              <AppSidebarMinimizer />
+            </AppSidebar>
+            <main className="main">
+              <AppBreadcrumb appRoutes={routes} router={router} />
+              <Container fluid>
+                <Suspense fallback={this.loading()}>
+                  <Switch>
+                    {routes.map((route, idx) => {
+                      return route.component ? (
+                        <Route
+                          key={idx}
+                          path={route.path}
+                          exact={route.exact}
+                          name={route.name}
+                          render={props => {
+                            if (route.authCount) return this.authCountFunction(<route.component {...props} setContext={this.setValueContext} />, props);
+                            else return (<route.component {...props} setContext={this.setValueContext} />);
+                          }} />
+                      ) : (null);
+                    })}
+                    <Redirect from="/" to="/login" />
+                  </Switch>
+                </Suspense>
+              </Container>
+            </main>
+            <AppAside fixed>
+              <Suspense fallback={this.loading()}>
+                <DefaultAside />
+              </Suspense>
+            </AppAside>
+          </div>
+          <AppFooter>
+            <Suspense fallback={this.loading()}>
+              <DefaultFooter />
+            </Suspense>
+          </AppFooter>
+        </SessionContext.Provider  >
       </div>
     );
   }

@@ -2,8 +2,8 @@ import React from 'react';
 
 //Contactos
 import routes_contactos from './views/Contactos/items';
-import routes_cuentas from './views/Cuentas/Administrador/items';
-import routes_usuarios_admin from './views/Usuarios/Administrador/items';
+import routes_cuentas from './views/Cuentas/items';
+import routes_usuarios_admin from './views/Usuarios/items';
 import routes_eventos from './views/Eventos/items';
 import routes_email from './views/Email/items';
 import routes_encuentas from './views/Encuestas/items';

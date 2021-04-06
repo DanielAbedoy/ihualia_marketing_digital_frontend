@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import { Form, FormGroup, Label, Input } from 'reactstrap';
 
 import Modelo from '../../../models/Contactos.js';
+import { SessionContext } from '../../../sessionContext.js';
 
 class Example extends Component {
+
+  static contextType = SessionContext;
 
   //Contructor de la clas
   constructor(props) {
@@ -22,8 +25,8 @@ class Example extends Component {
   }
 
   componentDidMount() {
-    if ((require('store').get('cuenta_en_uso') !== undefined)) {
-      this.cuenta = require('store').get('cuenta_en_uso').id;
+    if (this.context.cuenta !== false) {
+      this.cuenta = this.context.cuenta.id;
     }
     
     this.getGrupos();
@@ -34,7 +37,9 @@ class Example extends Component {
     e.preventDefault();
     //this.props.action(e.target.value);
     const grupo = this.state.grupos.find(g => g.id == e.target.value);
-    this.props.action(grupo);
+    if (!grupo) this.props.action({ id: 0 });
+    else this.props.action(grupo);
+    
   }
 
   //Funcion que obtendra los grupos existentes en la DB

@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Col, Row, Input, Button } from 'reactstrap';
 import { useToasts } from 'react-toast-notifications';
 
 import ModelEncuestas from '../../../../models/Encuestas'
 import { useEffect } from 'react';
+import { SessionContext } from '../../../../sessionContext';
 
 
 const DatosIniciales = ({setEncuesta, close, encuesta, datosBorrador}) => {
 
+  const context = useContext(SessionContext);
   const [datos, setDatos] = useState({ nombre: "", presentacion: "", instrucciones: "", estatus: "borrador" });
   const [creado, setCreado] = useState(false);
   const { addToast } = useToasts();
@@ -29,7 +31,7 @@ const DatosIniciales = ({setEncuesta, close, encuesta, datosBorrador}) => {
   
   const crear = async () => {
     if (!validar()) return;
-    const cuenta = require('store').get("cuenta_en_uso").id;
+    const cuenta = context.cuenta.id;
     const resp = await new ModelEncuestas().add_encuesta({ ...datos, cuenta: cuenta });
     if (resp.statusText === "Created") {
       addToast("Creado correctamente", { appearance: "success", autoDismiss: true });

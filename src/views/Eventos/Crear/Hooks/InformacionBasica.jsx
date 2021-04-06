@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Row, Col, Input, Collapse, Badge, Button } from 'reactstrap';
 import { useToasts } from 'react-toast-notifications';
 
 import ModelEventos from '../../../../models/Eventos';
 import Variables from '../../../../variables/global';
+import { SessionContext } from '../../../../sessionContext';
 
 const InformacionBasica = props => {
 
+  const context = useContext(SessionContext);
   const [evento, setEvento] = useState('');
   const { addToast } = useToasts();
   const [open, setOpen] = useState(true);
@@ -60,7 +62,7 @@ const InformacionBasica = props => {
 
     if (!validar()) return addToast("Debes agregar toda la informacion", { appearance: 'info', autoDismiss: true })
 
-    const cuenta = require('store').get("cuenta_en_uso").id;
+    const cuenta = context.cuenta.id;
     const resp = await new ModelEventos().crear_evento(datos.nombre, datos.tipo, datos.categoria, datos.subcategoria, "borrador", JSON.stringify({data:etiquetas}), cuenta)
 
     if (resp.statusText === "Created") {
@@ -183,7 +185,7 @@ const InformacionBasica = props => {
             </Row>
             <br />
             <span className="h5">Nombre del Organizador</span><br />
-            <Input className="mt-2" type="text" placeholder={require('store').get('cuenta_en_uso') ? require('store').get('cuenta_en_uso').nombre : ""} disabled={true}
+            <Input className="mt-2" type="text" placeholder={context.cuenta.nombre} disabled={true}
             /><br />
 
           </Col>

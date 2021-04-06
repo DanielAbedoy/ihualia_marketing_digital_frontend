@@ -9,9 +9,11 @@ import ModalLinks from './Hooks/Links';
 
 import ModelContactos from '../../../models/Contactos';
 import ModelEmail from '../../../models/EmailMarketing';
+import { SessionContext } from '../../../sessionContext';
 
 class Gestionar extends Component {
 
+  static contextType = SessionContext;
   state = {
 
     boletin: '',
@@ -38,7 +40,7 @@ class Gestionar extends Component {
 
 
   getContactos = async() => {
-    const gps = await new ModelContactos().getGrupos(require("store").get("cuenta_en_uso").id);
+    const gps = await new ModelContactos().getGrupos(this.context.cuenta.id);
     if (typeof gps !== "object") return;
     let c = [];
     this.state.boletin.grupos.forEach(g => {

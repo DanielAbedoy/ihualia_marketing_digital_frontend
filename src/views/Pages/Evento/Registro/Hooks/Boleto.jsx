@@ -88,7 +88,7 @@ const Boleto = ({ boletos, carrito, total, setCarrito, asistentes }) => {
   }
 
   return (
-    <div style={{ padding: `0 ${40}px` }}>
+    <div style={{ padding: `40px ${30}px 0px 30px` }}>
       <ItemsCarousel
         requestToChangeActive={setActiveItemIndex}
         activeItemIndex={activeItemIndex}
@@ -98,9 +98,9 @@ const Boleto = ({ boletos, carrito, total, setCarrito, asistentes }) => {
         rightChevron={<i className="fa fa-chevron-right"></i>}
         outsideChevron
         chevronWidth={40}
-
       >
         {bolets.map((boleto, i) => {
+          console.log(boleto)
           return (
             <div key={i} style={{ height: "70vh" }}>
               <Row className="m-0 p-0 bg-white rounded flex-column" style={{ height: "100%" }}>
@@ -112,18 +112,29 @@ const Boleto = ({ boletos, carrito, total, setCarrito, asistentes }) => {
                 <p className="text-center mt-2 mb-0" ><b>Aquierelo: {boleto.canal_ventas}</b></p>
 
                 <p className="text-center px-2 my-auto text-muted" ><b>{boleto.descripcion} </b></p>
-              
-                {boleto.cantidad_a_mostrar === 0 ?
-                  <p className="text-center h4 m-0"><b>AGOTADO</b></p>
-                  : <>
-                    <p className="text-center text-muted m-0">Agrega tus Boletos</p>
-                    <Input type="select" className="mt-1 mx-auto" style={{ width: "50%" }}
-                      onChange={(e) => changeCarrito(e.target.value, boleto)}
-                    >
-                      <option>0</option>
-                      {optionsValues(boleto.cantidad_minima, boleto.cantidad_a_mostrar)}
-                    </Input></>
+
+                {boleto.canal_ventas === "Solo en la puerta" ?
+                  <>
+                    <p className="text-center mt-2 mb-0" ><b>Boletos que estaran dispobibles:
+                       {"  " + boleto.cantidad_total}</b></p>
+                  </>
+                  :
+                  <>
+                    {boleto.cantidad_a_mostrar === 0 ?
+                      <p className="text-center h4 m-0"><b>AGOTADO</b></p>
+                      : <>
+                        <p className="text-center text-muted m-0">Agrega tus Boletos</p>
+                        <Input type="select" className="mt-1 mx-auto" style={{ width: "50%" }}
+                          onChange={(e) => changeCarrito(e.target.value, boleto)}
+                        >
+                          <option>0</option>
+                          {optionsValues(boleto.cantidad_minima, boleto.cantidad_a_mostrar)}
+                        </Input></>
+                    }
+                  </>
                 }
+
+
                 <p className={`text-center text-white mt-auto mb-0 py-2 bg-h-${boleto.tipo === "gratis" ? "success" : boleto.tipo === "pago" ? "primary" : "warning"}`} ><b>Boleto de tipo: {boleto.tipo.toUpperCase()}</b></p>
               </Row>
             </div>
